@@ -1,0 +1,5 @@
+{
+  "threshold": 0.8,
+  "n_held_items": 400,
+  "n_removed": 243
+}

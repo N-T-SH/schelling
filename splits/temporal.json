@@ -1,0 +1,16 @@
+{
+  "assignment_hash": "7a0c00a6d277bbc864de2d1deb0819912161463b6f9636bee9a4487f9958e8d0",
+  "counts": {
+    "excluded": 1325229,
+    "test": 4292,
+    "train": 34336,
+    "val": 4290
+  },
+  "fractions": {
+    "test": 0.1,
+    "val": 0.1
+  },
+  "manifest_hash": "6d8f95adbc831dbc5b36040f80d52ab5a5badced3c3bc53dec82f229530b2dc9",
+  "name": "temporal",
+  "seed": 0
+}

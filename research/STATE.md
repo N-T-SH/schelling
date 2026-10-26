@@ -6,10 +6,10 @@ checkpoint. A fresh agent should be able to resume from it alone.
 ## Now
 
 - **Mode:** BUILD
-- **Milestone:** M0 Scaffold (complete, awaiting sign-off)
+- **Milestone:** M1 Data (complete, awaiting sign-off)
 - **Campaign:** none
-- **Next step:** wait for human sign-off on `research/reports/M0.md`; then plan M1.
-- **Done so far:** A12 verified (M4, 10 cores, 16 GiB, no CUDA GPU).
+- **Next step:** wait for human sign-off on `research/reports/M1.md` and decisions on its three findings; then plan M2.
+- **Done so far:** M0 signed off 2026-10-26. M1 built; real data built (Psych-101 1% sample).
 
 ## Plan for the current milestone or phase
 
@@ -27,9 +27,10 @@ Done when: adapter, split, contamination, guard and leakage tests pass; `schelli
 
 ## Blocked: needs the human
 
-M0 checkpoint: sign-off needed (see `research/reports/M0.md`).
+M1 checkpoint: sign-off and three decisions needed (see `research/reports/M1.md`, section Findings).
 
 ## Done
 
 | Date | Milestone / phase | Report | Signed off |
 | --- | --- | --- | --- |
+| 2026-10-26 | M0 Scaffold | research/reports/M0.md | yes |

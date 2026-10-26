@@ -1,0 +1,16 @@
+{
+  "assignment_hash": "ff3c2ccc33a4c7568566e8ffaf186bace7701e420c257ae72a3193fe5ed16dd6",
+  "counts": {
+    "excluded": 0,
+    "test": 662635,
+    "train": 42918,
+    "val": 662594
+  },
+  "fractions": {
+    "test": 0.1,
+    "val": 0.1
+  },
+  "manifest_hash": "2c574d863c4fc4b0b605289a17eaa47c21974f43148cdf3c5d578652f4433409",
+  "name": "heldout_domain",
+  "seed": 0
+}

@@ -1,0 +1,16 @@
+{
+  "assignment_hash": "ea02bc6dec31ea6eafc57e30e8176dc6f60d845eaf2c71b271422fb842fea4da",
+  "counts": {
+    "excluded": 1199379,
+    "test": 84416,
+    "train": 0,
+    "val": 84352
+  },
+  "fractions": {
+    "test": 0.1,
+    "val": 0.1
+  },
+  "manifest_hash": "b8efb618c860d72bf8db097ad27022ba664b1b31bdfb28754ac3e15b37a1512b",
+  "name": "retest",
+  "seed": 0
+}

@@ -103,8 +103,16 @@ def data_splits(
         path = splits.write_split(splits.split_manifest(frame, name, seed), out)
         typer.echo(f"wrote {path}")
     part = splits.assign_partitions(frame, "heldout_item", seed)
+    # Compare question plus answer options: Likert rows share a long instruction, so question
+    # text alone would flag every row as a near duplicate of its siblings.
+    keyed = frame.assign(
+        question=frame["question"]
+        + " | "
+        + frame["options"].map(lambda o: " ".join(o) if o is not None else "")
+        + frame["levels"].map(lambda o: " ".join(o) if o is not None else "")
+    )
     rep = contamination.contamination_report(
-        frame[part == "train"], frame[part.isin(["val", "test"])]
+        keyed[part == "train"], keyed[part.isin(["val", "test"])]
     )
     rep.pop("exact"), rep.pop("near")  # ids only; counts are the reviewable summary
     rep["n_removed"] = len(rep.pop("remove_item_ids"))

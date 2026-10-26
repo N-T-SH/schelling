@@ -1,0 +1,16 @@
+{
+  "assignment_hash": "d3b741dfe7be590a01c641e8764792bbbbd7caf769d7dac393292b3294f98caa",
+  "counts": {
+    "excluded": 0,
+    "test": 11730,
+    "train": 1106315,
+    "val": 250102
+  },
+  "fractions": {
+    "test": 0.1,
+    "val": 0.1
+  },
+  "manifest_hash": "db18b41b6cfbcf6859f84ca6f60139e29dd3237ba19bc4904f9a329169dc9be7",
+  "name": "heldout_study",
+  "seed": 0
+}
