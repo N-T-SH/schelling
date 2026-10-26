@@ -49,15 +49,21 @@ class SchellingModel(PreTrainedModel):
     def _encode_texts(
         self, ids: torch.Tensor, mask: torch.Tensor, valid: torch.Tensor
     ) -> torch.Tensor:
-        """(B, K, T) option texts -> (B, K, H); padded options are not run through the encoder."""
+        """(B, K, T) option texts -> (B, K, H); padded options are not run through the encoder.
+
+        Identical texts (the same Likert levels recur across hundreds of questions) are encoded
+        once per call and the result is gathered back, which changes nothing numerically.
+        """
         b, k, t = ids.shape
-        out = torch.zeros(b, k, self.config.backbone_hidden_size, device=ids.device)
         flat_valid = valid.reshape(-1)
+        out = torch.zeros(b * k, self.config.backbone_hidden_size, device=ids.device)
         if flat_valid.any():
-            enc = self.encode(ids.reshape(-1, t)[flat_valid], mask.reshape(-1, t)[flat_valid])
-            out = out.reshape(-1, out.shape[-1]).index_put((flat_valid.nonzero().squeeze(-1),), enc)
-            out = out.reshape(b, k, -1)
-        return out
+            rows = torch.cat([ids.reshape(-1, t), mask.reshape(-1, t)], dim=1)[flat_valid]
+            uniq, inverse = torch.unique(rows.cpu(), dim=0, return_inverse=True)
+            uniq = uniq.to(ids.device)
+            enc = self.encode(uniq[:, :t], uniq[:, t:])
+            out[flat_valid] = enc[inverse.to(ids.device)].to(out.dtype)
+        return out.reshape(b, k, -1)
 
     def score_survival(
         self,

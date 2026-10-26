@@ -14,31 +14,19 @@ checkpoint. A fresh agent should be able to resume from it alone.
 
 ## Plan for the current milestone or phase
 
-M3 Model v0 (SPEC milestone 4). Evaluator sealed since M2 sign-off; nothing below touches `eval/`, `splits/`, `data/manifests/`.
+M4 Real training (SPEC milestone 5). Standing instruction: continue past M3 when it leaves no decision points (it did). M4 ends at a human checkpoint regardless.
 
-Scope: `SchellingConfig`, `SchellingModel` with Noul, Choice and Score heads on a shared encoder, v0 serialised person context, per-head temperature fields, save/load, Auto-class registration, `Predictor` API, `simulate.sample_population`, `schelling simulate`. Untrained (random head init); training is M4.
+Done when (SPEC, read with decision 0001): trained ModernBERT-base beats B1 on NLL on `heldout_person` val for Twin-2K-500 (Psych-101 excluded from the bar); goldens frozen. If it does not, that is the result: report it plainly.
 
-Assumptions to check first: A06 (ModernBERT-base and -large load and run one CPU forward pass with the pinned transformers; public download of about 600 MB and 1.6 GB), A07 (`register_for_auto_class` copies the custom files and `AutoModel.from_pretrained(..., trust_remote_code=True)` works in a fresh process). A13 (bitwise determinism) needs the trainer, so I propose moving it to M4 and checking only forward-pass determinism in M3.
+Hardware reality (A12 + benchmark 2026-10-26, Apple M4, MPS): ModernBERT-base full fine-tune runs at about 2,200 tokens/s (about 16 examples/s at 128 context tokens); freezing the embeddings and lowest 14 of 22 layers doubles that. So the budget is on the order of 100,000 to 150,000 example presentations (about a tenth of one epoch of the Twin train partition) in 1 to 1.5 hours, and the full validation evaluation of about 136,000 rows will take tens of minutes. This is a smoke-scale run of the idea, not a tuned one. Decision for the report: single seed, one config, no tuning on val beyond early stopping.
 
-Design (decisions flagged in the report if they bind later work):
-- Backbone loaded through `AutoModel`; tests use a tiny random BERT built from a committed tiny WordPiece vocab (`scripts/make_fixtures.py` extended), no network.
-- Context text = `[PERSON] attributes + last k history items [STATE] ... [QUESTION] ...`; h = pooled (mean over attention mask) representation. Options and levels are encoded separately by the same backbone (mean pooled) so padded options can be masked.
-- Noul: MLP(h) to logit, sigmoid, probs = [1 - p, p].
-- Choice: logit_i = <W h, e_i> / tau, padded options masked to minus infinity; permutation equivariant by construction.
-- Score: CORN-style conditional thresholds. t_k = MLP([h; (e_k + e_{k+1}) / 2]) for k in 0..L-2, P(y > k | y > k-1) = sigmoid(t_k), so P(y > k) is a product of probabilities and is monotone decreasing by construction; P(y = k) from successive differences; expected_level from the distribution.
-- Temperatures: three scalar fields in the config (default 1.0), applied to logits; fitting is M4.
-- Each question is a separate forward pass, so answers are independent of other questions in the request by construction.
-- `Predictor.decide`, `decide_batch` (padding-invariant), `encode_person` returns the serialised person text in v0 (embedding caching arrives with person encoder v1 in M5; stated in the docstring).
-
-Tests first: `tests/unit/test_heads.py` (sums to 1 atol 1e-5, padded options zero, Noul p_yes in (0,1) and probs consistent, Score sums to 1 / expected level in range / monotone cumulative, no NaN or Inf for empty history, empty attributes and maximum-length input), `tests/property/` with Hypothesis (option permutation permutes probabilities, adding question B leaves answer A unchanged, batch equals single, all atol 1e-5), `tests/integration/` (save_pretrained then from_pretrained identical outputs atol 1e-6, safetensors only, fresh-process AutoModel with trust_remote_code, `schelling simulate` smoke test on fixtures, sampler determinism).
-
-Risks and open points:
-- CI cost: `uv sync --extra train` pulls CUDA PyTorch wheels on Linux (about 2 GB). Plan: pin the CPU PyTorch index for Linux in `pyproject.toml` (`tool.uv.sources`), and verify CI time; if CI becomes too slow, run torch tests in a separate job.
-- Dependency pins: torch, transformers and safetensors are declared with lower bounds only; M3 locks versions in `uv.lock` and records them in A06.
-- `PersonContext.history` is serialised as text in v0; long histories are truncated to k (default 20) by recency. Tokeniser max length 512 for the tiny model, 1024 for ModernBERT (to confirm in A06).
-- The untrained model is not evaluated with `schelling eval` in M3 (no trained weights; it would only measure random initialisation). Wiring `eval --model <path>` to a `SchellingModel` arrives with M4, and the evaluator needs no change for it because it only needs a `predict_proba` on the shared protocol.
-
-Done when: head, property and round-trip tests pass with the tiny backbone; ruff, mypy --strict and the fast suite are green; CI passes; `research/reports/M3.md` written.
+Design:
+- `train/config.py` (pydantic, YAML, `--set key=value`), `train/losses.py` (hard and soft CE, Noul BCE, Choice CE with masks, Score CORN loss which equals the NLL of the distribution; tested), `train/sampler.py` (study temperature sampling, p proportional to n^0.5), `train/trainer.py` (AdamW with separate head and backbone learning rates, cosine schedule with warmup, early stopping on val NLL of `heldout_person`, best and last checkpoints, TensorBoard, `run.json` with config, git sha, dirty flag, split manifest hash, package versions, seeds), `model/calibration.py` (per-head temperature fitted on val logits, stored in the config), `infer/batching.py` (shared tensorisation so training and inference cannot differ), `infer/baseline_adapter.py` (a saved model as a `predict_proba` baseline so `schelling eval --model <dir>` works unchanged).
+- Heads expose raw logits so calibration can refit temperatures without re-running the encoder; behaviour unchanged (existing tests guard it).
+- Training input: person attributes only (`history_items` 0): conditioning on a person's other answers is campaign C01, not M4. Random option permutation augmentation for Choice. Psych-101 included in training through the sampler; its results stay labelled uninformative.
+- Option texts are deduplicated per batch in the model (done, numerically identical).
+- Tests first: `test_losses`, `test_calibration`, `test_sampler`, `test_train_config`, integration (50-step fixture run: loss decreases, `run.json` complete, safetensors, two runs bitwise identical = A13, CLI smoke, `eval --model <dir>` works), regression golden (slow).
+- Goldens: `tests/golden/metrics.json` created once from the fixture run by `scripts/make_golden.py`; updating needs `[golden-update]` in the commit message.
 
 ## Blocked: needs the human
 
