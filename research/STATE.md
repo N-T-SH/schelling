@@ -6,7 +6,7 @@ checkpoint. A fresh agent should be able to resume from it alone.
 ## Now
 
 - **Mode:** BUILD
-- **Milestone:** M3 Model v0 (planned, not started)
+- **Milestone:** M4 Real training (planning)
 - **Campaign:** none
 - **Next step:** M3 (check A06/A07, tests first). Standing instruction (2026-10-26): continue to M4 after M3 only if M3 leaves no open decision points or failures.
 - **Eval change:** treatment-effect metrics and LOEO folds merged (`research/reports/EC1-treatment-effects.md`, decisions 0002 and 0003).
@@ -51,3 +51,4 @@ _(none)_
 | 2026-10-26 | M0 Scaffold | research/reports/M0.md | yes |
 | 2026-10-26 | M1 Data | research/reports/M1.md | yes (near duplicates removed) |
 | 2026-10-26 | M2 Harness + baselines | research/reports/M2.md | yes; Psych-101 excluded from M4 bar (docs/decisions/0001) |
+| 2026-10-26 | M3 Model v0 | research/reports/M3.md | accepted under standing instruction (no open decision points) |

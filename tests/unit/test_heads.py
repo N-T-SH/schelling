@@ -131,3 +131,9 @@ def test_untrained_model_is_not_degenerate(predictor: Predictor) -> None:
         _req({"c": Choice(prompt="pick", options=["alpha", "beta", "gamma"])}, state="different")
     )
     assert other["c"].probs != out["c"].probs
+
+
+def test_forward_pass_is_deterministic(predictor: Predictor) -> None:
+    req = _req({"c": Choice(prompt="pick", options=["a", "b", "c"]), "n": Noul(proposition="p")})
+    a, b = predictor.decide(req), predictor.decide(req)
+    assert a["c"].probs == b["c"].probs and a["n"].probs == b["n"].probs  # bitwise equal
