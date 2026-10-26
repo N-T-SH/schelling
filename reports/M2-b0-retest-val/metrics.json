@@ -1,0 +1,107 @@
+{
+  "config": {
+    "fit_rows": 578246,
+    "min_persons": 30,
+    "model": "b0",
+    "n_seeds": 20,
+    "partition": "val",
+    "population_excludes": "wave 4",
+    "split": "retest",
+    "subgroup_columns": [
+      "sex",
+      "age_band",
+      "party_id"
+    ]
+  },
+  "config_hash": "8bc8f168f049eb2ecd340912a8ddbe717b609a1b21c9b957a7b25b36b694f1f1",
+  "created_at": "2026-10-26T09:22:49+00:00",
+  "dirty": false,
+  "efficiency": {
+    "batch_decisions_per_s": 694647.0801654308,
+    "decisions_per_s": 8403.052161455722,
+    "device": "cpu",
+    "n_requests": 200.0,
+    "p50_ms": 0.11291648843325675,
+    "p95_ms": 0.13911903079133478
+  },
+  "git_sha": "6ef570f654e9d2ec9b83712c51470796c20c1403",
+  "individual": {
+    "by_source": {
+      "twin2k": {
+        "accuracy": 0.3519181525037936,
+        "brier": 0.6154536940440891,
+        "calibration_intercept": -0.023023264117386023,
+        "calibration_slope": 1.4655309306907112,
+        "ece": 0.03262815345220029,
+        "n": 84352,
+        "nll": 1.073320598372747
+      }
+    },
+    "by_source_qtype": {
+      "twin2k__choice": {
+        "accuracy": 0.3935299394483068,
+        "brier": 0.5501373626373145,
+        "calibration_intercept": -0.21724658529494603,
+        "calibration_slope": 1.2446440687920888,
+        "ece": 0.0563326979143306,
+        "n": 53508,
+        "nll": 0.8601426880838309
+      },
+      "twin2k__noul": {
+        "accuracy": 0.4703595724003887,
+        "brier": 0.5,
+        "calibration_intercept": -0.11870088794661877,
+        "calibration_slope": 1.0,
+        "ece": 0.029640427599611274,
+        "n": 1029,
+        "nll": 0.6931471805599454
+      },
+      "twin2k__score": {
+        "accuracy": 0.2731510984403824,
+        "brier": 0.7366593996310166,
+        "calibration_intercept": 1.159461597562495,
+        "calibration_slope": 2.2717716419200777,
+        "ece": 0.1380345463692772,
+        "n": 29815,
+        "nll": 1.4690248435737765
+      }
+    },
+    "overall": {
+      "accuracy": 0.3519181525037936,
+      "brier": 0.6154536940440891,
+      "calibration_intercept": -0.023023264117386023,
+      "calibration_slope": 1.4655309306907112,
+      "ece": 0.03262815345220029,
+      "n": 84352,
+      "nll": 1.073320598372747
+    }
+  },
+  "model": "b0",
+  "n_rows": 84352,
+  "not_run": [
+    "paraphrase_invariance (needs paraphrased items, M5)",
+    "memorisation_probe (needs paraphrased items, M5)",
+    "treatment_effects (needs a pre-registered pairing table)",
+    "regression_sign_agreement (needs pre-registered models)"
+  ],
+  "partition": "val",
+  "population": {
+    "twin2k": {
+      "n_items": 0,
+      "per_seed": {},
+      "summary": null
+    }
+  },
+  "retest": {
+    "ceiling": 0.7148970978755691,
+    "fraction_of_ceiling": 0.5379044160323698,
+    "model_agreement": 0.38454630595599393,
+    "n": 84352
+  },
+  "robustness": {
+    "permutation_max_abs_dp": 0.0
+  },
+  "seed": 0,
+  "split": "retest",
+  "split_manifest_hash": "8188b5cbd2771702f90d94990d1808abd0ab792a06d7dd486e12b53054491bea"
+}

@@ -6,9 +6,9 @@ checkpoint. A fresh agent should be able to resume from it alone.
 ## Now
 
 - **Mode:** BUILD
-- **Milestone:** M2 Harness + baselines (in progress)
+- **Milestone:** M2 Harness + baselines (complete, awaiting sign-off)
 - **Campaign:** none
-- **Next step:** plan M2 (assumptions A08, A09, A14), then implement.
+- **Next step:** wait for human sign-off on `research/reports/M2.md` and decisions on its findings; then plan M3.
 - **Done so far:** M0 signed off 2026-10-26. M1 built; real data built (Psych-101 1% sample).
 
 ## Plan for the current milestone or phase
@@ -26,7 +26,7 @@ Done when: metric tests pass and `schelling eval` produces a full report for B0 
 
 ## Blocked: needs the human
 
-_(none)_
+M2 checkpoint: sign-off plus decisions on Psych-101 baseline bar and pairing table for treatment effects (see `research/reports/M2.md`). Signing off seals the evaluator.
 
 ## Done
 
