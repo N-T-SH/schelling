@@ -20,7 +20,8 @@ def git_sha() -> str:
 
 
 def git_dirty() -> bool:
-    status = _git("status", "--porcelain")
+    # Run outputs under reports/ are not code; they must not make the next run look dirty.
+    status = _git("status", "--porcelain", "--", ".", ":!reports")
     return bool(status) if status is not None else True
 
 
