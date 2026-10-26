@@ -134,9 +134,31 @@ def train() -> None:
 
 
 @app.command()
-def eval() -> None:
-    """Evaluate a model or baseline on a split."""
-    _not_implemented("eval", "M2")
+def eval(
+    model: Annotated[str, typer.Option(help="baseline: b0, b1, b2 or b3")],
+    split: Annotated[str, typer.Option()] = "heldout_person",
+    partition: Annotated[str, typer.Option(help="train, val or test (test is sealed)")] = "val",
+    processed: Annotated[Path, typer.Option()] = Path("data/processed"),
+    splits_dir: Annotated[Path, typer.Option()] = Path("splits"),
+    out: Annotated[Path, typer.Option(help="run directory for metrics.json and the report")] = Path(
+        "reports/run"
+    ),
+    seed: Annotated[int, typer.Option()] = 0,
+    n_seeds: Annotated[int, typer.Option(help="population sampling seeds")] = 20,
+    min_persons: Annotated[
+        int, typer.Option(help="min persons per item for population metrics")
+    ] = 30,
+) -> None:
+    """Score a baseline on one split partition and write metrics.json plus a Markdown summary."""
+    from schelling.data.loader import SealedPartitionError
+    from schelling.eval.report import run_eval
+
+    try:
+        run_eval(model, processed, splits_dir, split, partition, out, seed, n_seeds, min_persons)
+    except SealedPartitionError as e:
+        typer.echo(str(e), err=True)
+        raise typer.Exit(code=3) from e
+    typer.echo(f"wrote {out / 'metrics.json'}")
 
 
 @app.command()

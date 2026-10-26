@@ -16,3 +16,14 @@ def _sealed_test_partition(monkeypatch: pytest.MonkeyPatch) -> None:
 @pytest.fixture(scope="session")
 def fixtures_dir() -> Path:
     return FIXTURES
+
+
+@pytest.fixture(scope="session")
+def twin_frame(fixtures_dir: Path):  # type: ignore[no-untyped-def]
+    """(records DataFrame, persons DataFrame) built from the Twin fixture."""
+    import pandas as pd
+
+    from schelling.data.adapters import twin2k
+
+    built = twin2k.build(fixtures_dir / "twin2k")
+    return pd.DataFrame([r.model_dump() for r in built.records]), built.persons

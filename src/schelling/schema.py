@@ -96,9 +96,12 @@ class Answer(BaseModel):
 def export_json_schemas(out_dir: Path) -> list[Path]:
     """Write request, response and question schemas; CI compares them to the committed copies."""
     out_dir.mkdir(parents=True, exist_ok=True)
+    from schelling.eval.schema import MetricsFile
+
     models: dict[str, type[BaseModel] | TypeAdapter[object]] = {
         "request": DecisionRequest,
         "response": Answer,
+        "metrics": MetricsFile,
     }
     written = []
     for name, model in models.items():

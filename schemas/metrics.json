@@ -1,0 +1,109 @@
+{
+  "properties": {
+    "config": {
+      "additionalProperties": true,
+      "title": "Config",
+      "type": "object"
+    },
+    "config_hash": {
+      "title": "Config Hash",
+      "type": "string"
+    },
+    "created_at": {
+      "title": "Created At",
+      "type": "string"
+    },
+    "dirty": {
+      "title": "Dirty",
+      "type": "boolean"
+    },
+    "efficiency": {
+      "additionalProperties": true,
+      "title": "Efficiency",
+      "type": "object"
+    },
+    "git_sha": {
+      "title": "Git Sha",
+      "type": "string"
+    },
+    "individual": {
+      "additionalProperties": true,
+      "title": "Individual",
+      "type": "object"
+    },
+    "model": {
+      "title": "Model",
+      "type": "string"
+    },
+    "n_rows": {
+      "title": "N Rows",
+      "type": "integer"
+    },
+    "not_run": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Not Run",
+      "type": "array"
+    },
+    "partition": {
+      "title": "Partition",
+      "type": "string"
+    },
+    "population": {
+      "additionalProperties": true,
+      "title": "Population",
+      "type": "object"
+    },
+    "retest": {
+      "anyOf": [
+        {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Retest"
+    },
+    "robustness": {
+      "additionalProperties": true,
+      "title": "Robustness",
+      "type": "object"
+    },
+    "seed": {
+      "title": "Seed",
+      "type": "integer"
+    },
+    "split": {
+      "title": "Split",
+      "type": "string"
+    },
+    "split_manifest_hash": {
+      "title": "Split Manifest Hash",
+      "type": "string"
+    }
+  },
+  "required": [
+    "git_sha",
+    "dirty",
+    "config_hash",
+    "split_manifest_hash",
+    "seed",
+    "created_at",
+    "model",
+    "split",
+    "partition",
+    "config",
+    "n_rows",
+    "individual",
+    "population",
+    "retest",
+    "robustness",
+    "efficiency",
+    "not_run"
+  ],
+  "title": "MetricsFile",
+  "type": "object"
+}
