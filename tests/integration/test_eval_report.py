@@ -42,7 +42,7 @@ def processed(tmp_path_factory: pytest.TempPathFactory, fixtures_dir: Path) -> t
     return tmp / "proc", tmp / "splits"
 
 
-@pytest.mark.parametrize("model", ["b0", "b1", "b2", "b3"])
+@pytest.mark.parametrize("model", ["b0", "b1", "b2"])  # b3 runs in tests/gbm
 def test_eval_writes_valid_metrics_for_each_baseline(
     processed: tuple[Path, Path], tmp_path: Path, model: str
 ) -> None:

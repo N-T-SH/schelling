@@ -42,7 +42,8 @@ packages = ["src/schelling"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "--strict-markers"
+pythonpath = ["."]
+addopts = "--strict-markers --ignore=tests/gbm"
 markers = [
     "unit: fast isolated tests",
     "property: Hypothesis property tests",
@@ -76,3 +77,19 @@ dev = [
     "scipy-stubs>=1.17.1.5",
     "types-pyyaml>=6.0.12.20260906",
 ]
+
+# transformers ships partial type information; keep strict everywhere else.
+[[tool.mypy.overrides]]
+module = ["schelling.model.*", "schelling.infer.predictor", "schelling.infer.simulate"]
+disallow_untyped_calls = false
+warn_return_any = false
+disallow_subclassing_any = false
+
+# On Linux (CI) take the CPU-only PyTorch wheels: the default ones pull about 2 GB of CUDA libraries.
+[tool.uv.sources]
+torch = [{ index = "pytorch-cpu", marker = "sys_platform == 'linux'" }]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true

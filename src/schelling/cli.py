@@ -201,9 +201,25 @@ def eval(
 
 
 @app.command()
-def simulate() -> None:
-    """Sample a synthetic population."""
-    _not_implemented("simulate", "M3")
+def simulate(
+    model: Annotated[Path, typer.Option(help="saved model directory")],
+    persons: Annotated[Path, typer.Option(help="JSON list of PersonContext")],
+    request: Annotated[Path, typer.Option(help="JSON DecisionRequest used as the template")],
+    out: Annotated[Path, typer.Option(help="parquet file to write")],
+    n_draws: Annotated[int, typer.Option()] = 1,
+    seed: Annotated[int, typer.Option()] = 0,
+) -> None:
+    """Sample a synthetic population: n draws per person and question."""
+    from schelling.infer.predictor import Predictor
+    from schelling.infer.simulate import sample_population
+    from schelling.schema import DecisionRequest, PersonContext
+
+    people = [PersonContext.model_validate(p) for p in json.loads(persons.read_text())]
+    template = DecisionRequest.model_validate_json(request.read_text())
+    frame = sample_population(Predictor.from_pretrained(model), people, template, n_draws, seed)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    frame.to_parquet(out, index=False)
+    typer.echo(f"wrote {len(frame)} draws to {out}")
 
 
 @app.command()

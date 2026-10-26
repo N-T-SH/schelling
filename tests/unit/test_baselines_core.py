@@ -3,7 +3,6 @@ import pandas as pd
 import pytest
 
 from schelling.baselines.demo_cell import DemoCellMean
-from schelling.baselines.gbm import GradientBoosted
 from schelling.baselines.item_mean import ItemMean
 from schelling.baselines.uniform import Uniform
 
@@ -85,12 +84,3 @@ def test_demo_cell_equals_item_mean_when_source_has_no_attributes() -> None:
     a = DemoCellMean().fit(frame, empty).predict_proba(frame)
     b = ItemMean().fit(frame, empty).predict_proba(frame)
     assert all(np.allclose(x, y) for x, y in zip(a, b, strict=True))
-
-
-def test_gbm_outputs_valid_distributions(twin_frame) -> None:  # type: ignore[no-untyped-def]
-    frame, persons = twin_frame
-    model = GradientBoosted(n_rounds=5, seed=0).fit(frame, persons)
-    probs = model.predict_proba(frame.head(50))
-    for p, (_, row) in zip(probs, frame.head(50).iterrows(), strict=True):
-        assert len(p) == _n_options(row)
-        assert p.sum() == pytest.approx(1.0) and (p >= 0).all()

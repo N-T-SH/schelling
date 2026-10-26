@@ -7,7 +7,8 @@ so unlike B1/B2 this baseline is not option-order invariant; the robustness chec
 
 from __future__ import annotations
 
-import lightgbm as lgb
+from typing import Any
+
 import numpy as np
 import pandas as pd
 
@@ -33,7 +34,7 @@ class GradientBoosted:
             "num_threads": 4,
             "cat_smooth": 10,
         }
-        self.models: dict[tuple[str, int], lgb.Booster | np.ndarray] = {}
+        self.models: dict[tuple[str, int], Any] = {}
         self.attr_cols: list[str] = []
         self.attr_codes: dict[str, dict[str, int]] = {}
         self.item_codes: dict[str, int] = {}
@@ -47,6 +48,8 @@ class GradientBoosted:
         return np.column_stack(cols)
 
     def fit(self, train: pd.DataFrame, persons: pd.DataFrame) -> Baseline:
+        import lightgbm as lgb  # lazy: it must never share a process with torch on macOS
+
         self.persons = persons.assign(person_id=persons["person_id"].astype(str)).drop_duplicates(
             "person_id"
         )

@@ -184,8 +184,18 @@ def twin2k(rng: random.Random) -> None:
     pd.DataFrame(rows4).to_csv(d / "wave4_response.csv", index=False)
 
 
+def tiny_vocab() -> None:
+    """Character-level WordPiece vocab: every printable ASCII char, plain and as a ## suffix."""
+    import string
+
+    chars = [c for c in string.ascii_lowercase + string.digits + string.punctuation]
+    tokens = ["[PAD]", "[UNK]", "[CLS]", "[SEP]", "[MASK]", *chars, *[f"##{c}" for c in chars]]
+    (OUT / "tiny_vocab.txt").write_text("\n".join(tokens) + "\n")
+
+
 if __name__ == "__main__":
     OUT.mkdir(exist_ok=True)
     psych101(random.Random(0))
     twin2k(random.Random(0))
+    tiny_vocab()
     print(f"wrote fixtures to {OUT}")
