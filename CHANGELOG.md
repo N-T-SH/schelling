@@ -16,3 +16,4 @@ All notable changes to this project are documented here. The format follows
 - Decision 0001: Psych-101 excluded from the M4 baseline bar until C04; draft treatment-effects pairing table for review.
 - Eval change EC1: treatment-effect metrics (16 pre-registered contrasts), leave-one-experiment-out split folds, `schelling effects-pool`.
 - M3 model v0: SchellingConfig/SchellingModel with Noul, Choice and Score heads, Predictor API, `schelling simulate`, CPU torch in CI.
+- M4 training: trainer, losses, study sampler, temperature calibration, `schelling train`, model scoring via `schelling eval --model <dir>`, frozen golden metrics. First ModernBERT-base run does not beat the item-mean baseline on Twin-2K-500 (see research/reports/M4.md).

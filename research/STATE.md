@@ -6,9 +6,9 @@ checkpoint. A fresh agent should be able to resume from it alone.
 ## Now
 
 - **Mode:** BUILD
-- **Milestone:** M4 Real training (planning)
+- **Milestone:** M4 Real training (run complete; criterion NOT met; awaiting human decision)
 - **Campaign:** none
-- **Next step:** M3 (check A06/A07, tests first). Standing instruction (2026-10-26): continue to M4 after M3 only if M3 leaves no open decision points or failures.
+- **Next step:** human chooses among the three options in the M4 report. No work is queued.
 - **Eval change:** treatment-effect metrics and LOEO folds merged (`research/reports/EC1-treatment-effects.md`, decisions 0002 and 0003).
 - **Done so far:** M0 signed off 2026-10-26. M1 built; real data built (Psych-101 1% sample).
 
@@ -30,7 +30,7 @@ Design:
 
 ## Blocked: needs the human
 
-_(none)_
+M4 checkpoint (`research/reports/M4.md`): the done-criterion is not met (model worse than B1 on Twin-2K-500 validation NLL). Decide the next step: (1) design record for a two-tower model with an item prior (recommended), (2) approve paid GPU compute for a longer run of the current design, (3) accept and go to C01. M5 is not started.
 
 ## Done
 
@@ -40,3 +40,4 @@ _(none)_
 | 2026-10-26 | M1 Data | research/reports/M1.md | yes (near duplicates removed) |
 | 2026-10-26 | M2 Harness + baselines | research/reports/M2.md | yes; Psych-101 excluded from M4 bar (docs/decisions/0001) |
 | 2026-10-26 | M3 Model v0 | research/reports/M3.md | accepted under standing instruction (no open decision points) |
+| 2026-10-26 | M4 Real training | research/reports/M4.md | no: criterion not met, awaiting decision |

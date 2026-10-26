@@ -1,0 +1,71 @@
+{
+  "command": "/Users/niteshp/Documents/Projects/schelling/.venv/bin/schelling train --config configs/base.yaml --set optim.steps=2400",
+  "config": {
+    "data": {
+      "augment_option_permutation": true,
+      "max_train_rows": null,
+      "sources": [
+        "twin2k",
+        "psych101"
+      ],
+      "study_temperature": 0.5
+    },
+    "deterministic": false,
+    "device": "auto",
+    "eval": {
+      "calibration_rows": 6000,
+      "every": 400,
+      "max_rows": 3000,
+      "patience": 4
+    },
+    "model": {
+      "backbone": "answerdotai/ModernBERT-base",
+      "freeze_layers": 14,
+      "head_hidden": 256,
+      "history_items": 0,
+      "max_context_tokens": 256,
+      "max_option_tokens": 16,
+      "tiny_vocab": null
+    },
+    "name": "base-m4",
+    "optim": {
+      "batch_size": 32,
+      "grad_clip": 1.0,
+      "lr_backbone": 5e-05,
+      "lr_head": 0.001,
+      "micro_batch": 16,
+      "precision": "fp32",
+      "steps": 2400,
+      "warmup_frac": 0.05,
+      "weight_decay": 0.01
+    },
+    "out_dir": "runs/base-m4",
+    "processed_dir": "data/processed",
+    "seed": 0,
+    "split": "heldout_person",
+    "splits_dir": "splits",
+    "tensorboard": false
+  },
+  "config_hash": "0137585790c208aaeca704a3fc3aefb427595a4e0c66713320a5ed528f0349d4",
+  "created_at": "2026-10-26T14:18:57+00:00",
+  "device": "mps",
+  "dirty": false,
+  "git_sha": "c15a9222483e00fcf3ef4d697bd59392bcd3fcc3",
+  "n_train_rows": 1095076,
+  "n_val_rows": 136259,
+  "package_versions": {
+    "numpy": "2.4.6",
+    "pandas": "3.1.0",
+    "python": "3.11.14",
+    "schelling": "0.0.0",
+    "torch": "2.14.1",
+    "transformers": "5.20.2"
+  },
+  "partitions_read": [
+    "train",
+    "val"
+  ],
+  "seed": 0,
+  "split_manifest_hash": "c77fe1b963008c710d8f9740ad977a54cd69b19e01943ec96095e509e2b00297",
+  "trainable_parameters": 41301762
+}
