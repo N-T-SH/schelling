@@ -1,8 +1,24 @@
 """Command-line entry point. Stubs exit with code 2 until their milestone lands."""
 
+import hashlib
+import json
+from pathlib import Path
+from typing import Annotated
+
+import pandas as pd
 import typer
 
+from schelling.data import contamination, manifest, splits
+from schelling.data.adapters import psych101, twin2k
+
 app = typer.Typer(help="Schelling: data | train | eval | simulate | push", no_args_is_help=True)
+data_app = typer.Typer(help="Build datasets, manifests and splits.", no_args_is_help=True)
+app.add_typer(data_app, name="data")
+
+_UPSTREAM = {
+    "psych101": ("https://huggingface.co/datasets/marcelbinz/Psych-101", "apache-2.0"),
+    "twin2k": ("https://huggingface.co/datasets/LLM-Digital-Twin/Twin-2K-500", "cc-by-4.0"),
+}
 
 
 def _not_implemented(name: str, milestone: str) -> None:
@@ -11,10 +27,88 @@ def _not_implemented(name: str, milestone: str) -> None:
     raise typer.Exit(code=2)
 
 
-@app.command()
-def data() -> None:
-    """Build datasets, manifests and splits."""
-    _not_implemented("data", "M1")
+@data_app.command("build")
+def data_build(
+    source: Annotated[str, typer.Option(help="psych101 or twin2k")],
+    raw: Annotated[
+        Path, typer.Option(help="raw dir (twin2k) or prompts_training.jsonl (psych101)")
+    ],
+    out: Annotated[Path, typer.Option(help="processed output dir")] = Path("data/processed"),
+    manifests: Annotated[Path, typer.Option(help="manifest dir")] = Path("data/manifests"),
+    revision: Annotated[
+        str, typer.Option(help="upstream revision, recorded in the manifest")
+    ] = "unknown",
+    max_rows: Annotated[int | None, typer.Option(help="psych101: stop after N rows")] = None,
+    keep_fraction: Annotated[
+        float, typer.Option(help="psych101: keep this share of participants")
+    ] = 1.0,
+) -> None:
+    """Convert one raw source to unified records and write its manifest."""
+    out.mkdir(parents=True, exist_ok=True)
+    manifests.mkdir(parents=True, exist_ok=True)
+    if source == "psych101":
+        rep = psych101.AdapterReport()
+        recs = psych101.records_from_rows(psych101.read_rows(raw, max_rows, keep_fraction), rep)
+        files = [raw]
+        stats = {
+            "rows": rep.n_rows,
+            "records": len(recs),
+            "dropped_experiments": rep.dropped_experiments,
+            "max_rows": max_rows,
+            "keep_fraction": keep_fraction,
+        }
+    elif source == "twin2k":
+        built = twin2k.build(raw)
+        recs = built.records
+        built.persons.to_parquet(out / "persons_twin2k.parquet", index=False)
+        names = [
+            "question_catalog.json",
+            "wave1_3_response.csv",
+            "wave1_3_response_label.csv",
+            "wave4_response.csv",
+        ]
+        files = [raw / n for n in names]
+        stats = {
+            "records": len(recs),
+            "persons": len(built.persons),
+            "unmapped_columns": built.report.unmapped_columns,
+            "dropped_values": built.report.dropped_values,
+        }
+    else:
+        raise typer.BadParameter("source must be psych101 or twin2k")
+    frame = pd.DataFrame([r.model_dump() for r in recs])
+    frame.to_parquet(out / f"records_{source}.parquet", index=False)
+    url, lic = _UPSTREAM[source]
+    stats["record_ids_sha256"] = hashlib.sha256(
+        "\n".join(sorted(frame["record_id"])).encode()
+    ).hexdigest()
+    m = manifest.build_manifest(source, url, revision, lic, files, stats)
+    (manifests / f"{source}.json").write_text(json.dumps(m, indent=2, sort_keys=True) + "\n")
+    typer.echo(f"{source}: {len(recs)} records -> {out}")
+
+
+@data_app.command("splits")
+def data_splits(
+    processed: Annotated[Path, typer.Option(help="dir with records_*.parquet")] = Path(
+        "data/processed"
+    ),
+    out: Annotated[Path, typer.Option(help="where to write splits/*.json")] = Path("splits"),
+    seed: Annotated[int, typer.Option()] = 0,
+) -> None:
+    """Write split manifests for every split and a contamination report for heldout_item."""
+    from schelling.data.loader import load_records
+
+    frame = load_records(processed)
+    for name in splits.SPLIT_NAMES:
+        path = splits.write_split(splits.split_manifest(frame, name, seed), out)
+        typer.echo(f"wrote {path}")
+    part = splits.assign_partitions(frame, "heldout_item", seed)
+    rep = contamination.contamination_report(
+        frame[part == "train"], frame[part.isin(["val", "test"])]
+    )
+    rep.pop("exact"), rep.pop("near")  # ids only; counts are the reviewable summary
+    rep["n_removed"] = len(rep.pop("remove_item_ids"))
+    (out / "contamination_heldout_item.json").write_text(json.dumps(rep, indent=2) + "\n")
 
 
 @app.command()

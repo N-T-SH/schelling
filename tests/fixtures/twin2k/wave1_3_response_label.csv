@@ -1,0 +1,31 @@
+QID11,QID12,QID13,QID14,QID101,QID102,QID25_1,QID25_2,QID25_3,QID25_4,QID25_5,QID25_6,QID84_1,QID84_2,QID84_3,QID156,QID10_1,QID10_2,QID126_1,QID126_2,QID126_3,QID126_4,pid
+West,Female,18-29,College,No,Ask others,3,4,3,5,2,5,1,2,1,96,apple,tree,1.0,,1.0,,1
+West,Male,50-64,College,No,Stop,5,4,4,5,3,1,1,1,2,90,apple,tree,1.0,,,1.0,2
+Midwest,Male,30-49,Grad,No,Keep going,1,3,5,4,1,3,2,1,2,69,apple,tree,1.0,,,1.0,3
+South,Male,30-49,HS,Yes,Unsure,4,1,1,2,2,1,1,2,2,66,apple,tree,1.0,1.0,,,4
+Northeast,Female,18-29,College,No,Stop,2,1,3,1,2,3,1,2,2,7,apple,tree,1.0,1.0,1.0,1.0,5
+Midwest,Male,65+,HS,No,Keep going,1,5,1,2,2,1,2,1,1,86,apple,tree,1.0,,1.0,,6
+South,Female,65+,HS,Yes,Ask others,1,5,1,4,2,3,2,2,1,89,apple,tree,1.0,1.0,1.0,1.0,7
+West,Male,18-29,College,No,Unsure,3,4,3,2,5,1,2,1,2,94,apple,tree,1.0,,1.0,1.0,8
+South,Male,50-64,College,No,Keep going,1,5,2,3,2,2,1,2,2,90,apple,tree,,1.0,,,9
+Northeast,Female,30-49,College,No,Keep going,1,4,3,3,4,1,2,1,1,92,apple,tree,1.0,1.0,,,10
+Northeast,Male,18-29,HS,Yes,Stop,3,3,2,1,4,4,1,1,2,57,apple,tree,1.0,,1.0,,11
+Northeast,Male,18-29,HS,No,Unsure,3,5,1,5,4,4,2,2,1,26,apple,tree,,,1.0,1.0,12
+South,Female,18-29,College,Yes,Keep going,3,2,2,5,3,3,2,1,2,14,apple,tree,,1.0,1.0,,13
+West,Female,50-64,College,Yes,Keep going,5,4,4,3,3,1,2,1,2,54,apple,tree,1.0,,,1.0,14
+Northeast,Male,30-49,Grad,Yes,Keep going,4,1,1,4,5,5,2,2,2,100,apple,tree,1.0,,1.0,,15
+West,Male,50-64,HS,Yes,Keep going,5,4,2,1,4,4,2,1,1,27,apple,tree,1.0,1.0,1.0,,16
+Northeast,Female,30-49,Grad,No,Ask others,5,4,3,4,4,2,1,1,2,90,apple,tree,,,1.0,1.0,17
+South,Female,18-29,HS,Yes,Keep going,2,2,1,3,1,4,2,1,1,83,apple,tree,,,,1.0,18
+Midwest,Female,65+,College,No,Stop,1,1,2,3,5,5,2,2,1,63,apple,tree,,,,,19
+Midwest,Male,50-64,Grad,No,Keep going,1,4,4,2,4,5,1,1,2,52,apple,tree,1.0,,,,20
+Midwest,Male,18-29,Grad,Yes,Unsure,1,5,3,2,4,4,1,1,2,78,apple,tree,,1.0,,1.0,21
+Midwest,Male,65+,College,No,Stop,4,3,1,1,1,4,2,1,1,29,apple,tree,1.0,,,1.0,22
+Northeast,Male,65+,HS,Yes,Ask others,2,1,4,4,4,1,2,2,2,10,apple,tree,,1.0,1.0,,23
+Midwest,Male,30-49,College,Yes,Stop,2,1,2,1,1,3,2,1,1,18,apple,tree,1.0,,1.0,,24
+Northeast,Male,50-64,College,No,Unsure,3,5,3,2,5,1,1,2,1,48,apple,tree,1.0,1.0,1.0,,25
+South,Female,65+,Grad,Yes,Stop,5,1,4,1,1,2,2,2,2,94,apple,tree,1.0,,,,26
+South,Male,65+,College,Yes,Ask others,3,4,2,3,3,4,1,1,1,35,apple,tree,1.0,1.0,,,27
+Midwest,Male,65+,College,Yes,Unsure,4,1,4,2,3,1,2,2,1,27,apple,tree,,1.0,,1.0,28
+West,Male,65+,College,Yes,Keep going,3,1,1,3,4,5,2,2,1,95,apple,tree,,,,1.0,29
+South,Female,50-64,HS,Yes,Stop,1,4,3,3,5,2,1,1,2,81,apple,tree,,,,,30

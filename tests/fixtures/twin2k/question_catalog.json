@@ -1,0 +1,226 @@
+[
+ {
+  "QuestionID": "QID11",
+  "QuestionText": "Which part of the United States do you currently live in?",
+  "QuestionType": "MC",
+  "Options": [
+   "Northeast",
+   "Midwest",
+   "South",
+   "West"
+  ],
+  "Settings": {
+   "Selector": "SAVR",
+   "SubSelector": "TX"
+  },
+  "BlockName": "Demographics",
+  "csv_columns": [
+   "QID11"
+  ]
+ },
+ {
+  "QuestionID": "QID12",
+  "QuestionText": "What is the sex that you were assigned at birth?",
+  "QuestionType": "MC",
+  "Options": [
+   "Male",
+   "Female"
+  ],
+  "Settings": {
+   "Selector": "SAVR",
+   "SubSelector": "TX"
+  },
+  "BlockName": "Demographics",
+  "csv_columns": [
+   "QID12"
+  ]
+ },
+ {
+  "QuestionID": "QID13",
+  "QuestionText": "How old are you?",
+  "QuestionType": "MC",
+  "Options": [
+   "18-29",
+   "30-49",
+   "50-64",
+   "65+"
+  ],
+  "Settings": {
+   "Selector": "SAVR",
+   "SubSelector": "TX"
+  },
+  "BlockName": "Demographics",
+  "csv_columns": [
+   "QID13"
+  ]
+ },
+ {
+  "QuestionID": "QID14",
+  "QuestionText": "Highest schooling?",
+  "QuestionType": "MC",
+  "Options": [
+   "HS",
+   "College",
+   "Grad"
+  ],
+  "Settings": {
+   "Selector": "SAVR",
+   "SubSelector": "TX"
+  },
+  "BlockName": "Demographics",
+  "csv_columns": [
+   "QID14"
+  ]
+ },
+ {
+  "QuestionID": "QID100",
+  "QuestionText": "Intro",
+  "QuestionType": "DB",
+  "is_descriptive": true,
+  "BlockName": "Personality"
+ },
+ {
+  "QuestionID": "QID101",
+  "QuestionText": "Would you buy the product at this price?",
+  "QuestionType": "MC",
+  "Options": [
+   "Yes",
+   "No"
+  ],
+  "Settings": {
+   "Selector": "SAVR",
+   "SubSelector": "TX"
+  },
+  "BlockName": "Product Preferences - Pricing",
+  "csv_columns": [
+   "QID101"
+  ]
+ },
+ {
+  "QuestionID": "QID102",
+  "QuestionText": "Which framing do you prefer for the sunk cost problem?",
+  "QuestionType": "MC",
+  "Options": [
+   "Keep going",
+   "Stop",
+   "Unsure",
+   "Ask others"
+  ],
+  "Settings": {
+   "Selector": "SAVR",
+   "SubSelector": "TX"
+  },
+  "BlockName": "Sunk cost - yes",
+  "csv_columns": [
+   "QID102"
+  ]
+ },
+ {
+  "QuestionID": "QID25",
+  "QuestionText": "I see myself as someone who",
+  "QuestionType": "Matrix",
+  "Rows": [
+   "trait 0",
+   "trait 1",
+   "trait 2",
+   "trait 3",
+   "trait 4",
+   "trait 5"
+  ],
+  "Columns": [
+   "Disagree strongly",
+   "Disagree a little",
+   "Neither",
+   "Agree a little",
+   "Agree strongly"
+  ],
+  "Settings": {
+   "Selector": "Likert",
+   "SubSelector": "SingleAnswer"
+  },
+  "BlockName": "Personality",
+  "csv_columns": [
+   "QID25_1",
+   "QID25_2",
+   "QID25_3",
+   "QID25_4",
+   "QID25_5",
+   "QID25_6"
+  ]
+ },
+ {
+  "QuestionID": "QID84",
+  "QuestionText": "Choose the left or right option on each line.",
+  "QuestionType": "Matrix",
+  "Rows": [
+   "$6 in 6 weeks:$3 in 5 weeks",
+   "$6 in 6 weeks:$4 in 5 weeks",
+   "$6 in 6 weeks:$5 in 5 weeks"
+  ],
+  "Columns": [
+   "1",
+   "2"
+  ],
+  "Settings": {
+   "Selector": "Bipolar",
+   "SubSelector": ""
+  },
+  "BlockName": "Economic preferences",
+  "csv_columns": [
+   "QID84_1",
+   "QID84_2",
+   "QID84_3"
+  ]
+ },
+ {
+  "QuestionID": "QID156",
+  "QuestionText": "Slide",
+  "QuestionType": "Slider",
+  "Range": {
+   "Min": 0,
+   "Max": 100
+  },
+  "Settings": {
+   "Selector": "HSLIDER"
+  },
+  "BlockName": "Cognitive tests ",
+  "csv_columns": [
+   "QID156"
+  ]
+ },
+ {
+  "QuestionID": "QID10",
+  "QuestionText": "Words",
+  "QuestionType": "TE",
+  "Settings": {
+   "Selector": "FORM"
+  },
+  "BlockName": "Forward Flow",
+  "csv_columns": [
+   "QID10_1",
+   "QID10_2"
+  ]
+ },
+ {
+  "QuestionID": "QID126",
+  "QuestionText": "",
+  "QuestionType": "MC",
+  "Options": [
+   "a",
+   "b",
+   "c",
+   "d"
+  ],
+  "Settings": {
+   "Selector": "MAVR",
+   "SubSelector": "TX"
+  },
+  "BlockName": "Cognitive tests ",
+  "csv_columns": [
+   "QID126_1",
+   "QID126_2",
+   "QID126_3",
+   "QID126_4"
+  ]
+ }
+]
