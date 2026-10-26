@@ -52,8 +52,8 @@ def build_context(
 ) -> str:
     """`[PERSON] ... [STATE] ... [QUESTION] ...`, fitted to `max_tokens`.
 
-    When too long, the oldest history items go first, then the tail of the state; the question
-    is never cut.
+    When too long, the oldest history items go first, then the start of the state (the end is the most recent
+    context); the question is never cut.
     """
     q = question_text(question)
     s = state_text(state)
@@ -70,14 +70,13 @@ def build_context(
         if n_tokens(text) <= max_tokens or k == 0:
             break
         k = k // 2 if k > 8 else k - 1
-    if n_tokens(text) > max_tokens:  # attributes alone or the state are too long: cut the state
+    if (
+        n_tokens(text) > max_tokens
+    ):  # attributes alone or the state are too long: keep the state's end
         lo, hi = 0, len(s)
-        while lo < hi:  # longest state prefix that fits
+        while lo < hi:  # longest state suffix that fits
             mid = (lo + hi + 1) // 2
-            lo, hi = (
-                (mid, hi)
-                if n_tokens(render(person_text(person, 0), s[:mid])) <= max_tokens
-                else (lo, mid - 1)
-            )
-        text = render(person_text(person, 0), s[:lo])
+            fits = n_tokens(render(person_text(person, 0), s[len(s) - mid :])) <= max_tokens
+            lo, hi = (mid, hi) if fits else (lo, mid - 1)
+        text = render(person_text(person, 0), s[len(s) - lo :] if lo else "")
     return text

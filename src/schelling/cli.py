@@ -167,9 +167,20 @@ def effects_pool(
 
 
 @app.command()
-def train() -> None:
-    """Train a model from a YAML config."""
-    _not_implemented("train", "M4")
+def train(
+    config: Annotated[Path, typer.Option(help="YAML training config")],
+    set_: Annotated[
+        list[str] | None, typer.Option("--set", help="override, e.g. optim.steps=100")
+    ] = None,
+) -> None:
+    """Train and calibrate a model. Reads the train and val partitions only."""
+    from schelling.train.config import load_config
+    from schelling.train.trainer import train as run_train
+
+    result = run_train(load_config(config, set_ or []))
+    typer.echo(
+        f"best validation NLL {result.best_val_nll:.4f}; model in {result.run_dir / 'final'}"
+    )
 
 
 @app.command()

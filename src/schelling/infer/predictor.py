@@ -10,7 +10,8 @@ from typing import Any
 import torch
 from transformers import AutoTokenizer
 
-from schelling.infer.text import build_context, person_text
+from schelling.infer.batching import build_tensors, options_of
+from schelling.infer.text import person_text
 from schelling.model import SchellingModel
 from schelling.schema import Answer, Choice, DecisionRequest, Noul, PersonContext, Score
 
@@ -36,7 +37,9 @@ class Predictor:
     @classmethod
     def from_pretrained(cls, repo_or_path: str | Path, revision: str | None = None) -> Predictor:
         model = SchellingModel.from_pretrained(str(repo_or_path), revision=revision or "main")
-        tokenizer = AutoTokenizer.from_pretrained(str(repo_or_path), revision=revision or "main")
+        tokenizer = AutoTokenizer.from_pretrained(
+            str(repo_or_path), revision=revision or "main", trust_remote_code=False
+        )
         return cls(model, tokenizer)
 
     def save_pretrained(self, path: str | Path) -> None:
@@ -49,41 +52,12 @@ class Predictor:
     # -- batching ---------------------------------------------------------------------------
 
     def _options_of(self, q: Noul | Choice | Score) -> list[str]:
-        return q.options if isinstance(q, Choice) else q.levels if isinstance(q, Score) else []
+        return options_of(q)
 
     def _tensors(self, task: str, items: list[Item]) -> dict[str, torch.Tensor]:
-        cfg, tok = self.model.config, self.tokenizer
-        contexts = [
-            build_context(req.person, req.state, q, tok, cfg.max_context_tokens, cfg.history_items)
-            for _, _, req, q in items
-        ]
-        enc = tok(
-            contexts,
-            padding=True,
-            truncation=True,
-            max_length=cfg.max_context_tokens,
-            return_tensors="pt",
+        return build_tensors(
+            self.tokenizer, self.model.config, task, [(req, q) for _, _, req, q in items]
         )
-        out: dict[str, torch.Tensor] = {
-            "input_ids": enc["input_ids"],
-            "attention_mask": enc["attention_mask"],
-        }
-        if task == "noul":
-            return out
-        opts = [self._options_of(q) for _, _, _, q in items]
-        k = max(len(o) for o in opts)
-        flat = [o[i] if i < len(o) else "" for o in opts for i in range(k)]
-        oenc = tok(
-            flat,
-            padding="max_length",
-            truncation=True,
-            max_length=cfg.max_option_tokens,
-            return_tensors="pt",
-        )
-        out["option_input_ids"] = oenc["input_ids"].reshape(len(items), k, -1)
-        out["option_attention_mask"] = oenc["attention_mask"].reshape(len(items), k, -1)
-        out["option_mask"] = torch.tensor([[i < len(o) for i in range(k)] for o in opts])
-        return out
 
     @torch.no_grad()
     def decide_batch(

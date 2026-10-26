@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from schelling.baselines.base import Baseline
 from schelling.baselines.demo_cell import DemoCellMean
 from schelling.baselines.gbm import GradientBoosted
@@ -14,6 +16,10 @@ def make_baseline(name: str, seed: int = 0) -> Baseline:
         return DemoCellMean()
     if name == "b3":
         return GradientBoosted(seed=seed)
+    if Path(name).is_dir():  # a saved SchellingModel
+        from schelling.infer.baseline_adapter import ModelBaseline
+
+        return ModelBaseline.from_path(name)
     raise ValueError(f"unknown baseline {name!r}; B4 to B6 arrive in M6")
 
 

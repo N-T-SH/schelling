@@ -80,7 +80,7 @@ dev = [
 
 # transformers ships partial type information; keep strict everywhere else.
 [[tool.mypy.overrides]]
-module = ["schelling.model.*", "schelling.infer.predictor", "schelling.infer.simulate"]
+module = ["schelling.model.*", "schelling.infer.*", "schelling.train.*"]
 disallow_untyped_calls = false
 warn_return_any = false
 disallow_subclassing_any = false

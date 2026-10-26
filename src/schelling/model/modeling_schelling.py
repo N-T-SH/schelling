@@ -12,7 +12,16 @@ import torch
 from transformers import AutoConfig, AutoModel, PreTrainedModel
 
 from .configuration_schelling import SchellingConfig
-from .heads import ChoiceHead, NoulHead, ScoreHead, mean_pool
+from .heads import (
+    ChoiceHead,
+    NoulHead,
+    ScoreHead,
+    choice_probs,
+    mean_pool,
+    noul_probs,
+    score_conditionals,
+    score_probs,
+)
 
 TASKS = ("noul", "choice", "score")
 
@@ -77,6 +86,31 @@ class SchellingModel(PreTrainedModel):
         levels = self._encode_texts(option_input_ids, option_attention_mask, option_mask)
         return self.score_head.survival(h, levels, option_mask, self.config.temperature_score)
 
+    def raw(
+        self,
+        task: str,
+        input_ids: torch.Tensor,
+        attention_mask: torch.Tensor,
+        option_input_ids: torch.Tensor | None = None,
+        option_attention_mask: torch.Tensor | None = None,
+        option_mask: torch.Tensor | None = None,
+    ) -> tuple[torch.Tensor, torch.Tensor | None]:
+        """Pre-temperature logits and the option/level mask: (B,) for Noul, (B, K) for Choice,
+        (B, L-1) threshold logits for Score. Temperature calibration refits on these."""
+        if task not in TASKS:
+            raise ValueError(f"task must be one of {TASKS}, got {task!r}")
+        h = self.encode(input_ids, attention_mask)
+        if task == "noul":
+            return self.noul_head.logit(h), None
+        if option_input_ids is None or option_attention_mask is None or option_mask is None:
+            raise ValueError(
+                f"{task} needs option_input_ids, option_attention_mask and option_mask"
+            )
+        opts = self._encode_texts(option_input_ids, option_attention_mask, option_mask)
+        if task == "choice":
+            return self.choice_head.logits(h, opts), option_mask
+        return self.score_head.threshold_logits(h, opts), option_mask
+
     def forward(
         self,
         task: str,
@@ -90,19 +124,30 @@ class SchellingModel(PreTrainedModel):
 
         Each row is one independent question, so an answer cannot depend on other questions.
         """
-        if task not in TASKS:
-            raise ValueError(f"task must be one of {TASKS}, got {task!r}")
-        h = self.encode(input_ids, attention_mask)
+        logits, mask = self.raw(
+            task, input_ids, attention_mask, option_input_ids, option_attention_mask, option_mask
+        )
         if task == "noul":
-            return self.noul_head(h, self.config.temperature_noul)
-        if option_input_ids is None or option_attention_mask is None or option_mask is None:
-            raise ValueError(
-                f"{task} needs option_input_ids, option_attention_mask and option_mask"
-            )
-        opts = self._encode_texts(option_input_ids, option_attention_mask, option_mask)
+            return noul_probs(logits, self.config.temperature_noul)
+        assert mask is not None
         if task == "choice":
-            return self.choice_head(h, opts, option_mask, self.config.temperature_choice)
-        return self.score_head(h, opts, option_mask, self.config.temperature_score)
+            return choice_probs(logits, mask, self.config.temperature_choice)
+        return score_probs(score_conditionals(logits, mask, self.config.temperature_score))
+
+    def score_conditional_probs(
+        self,
+        input_ids: torch.Tensor,
+        attention_mask: torch.Tensor,
+        option_input_ids: torch.Tensor,
+        option_attention_mask: torch.Tensor,
+        option_mask: torch.Tensor,
+    ) -> torch.Tensor:
+        """P(y > k | y >= k): what the CORN loss is defined on."""
+        t, mask = self.raw(
+            "score", input_ids, attention_mask, option_input_ids, option_attention_mask, option_mask
+        )
+        assert mask is not None
+        return score_conditionals(t, mask, self.config.temperature_score)
 
 
 SchellingConfig.register_for_auto_class("AutoConfig")

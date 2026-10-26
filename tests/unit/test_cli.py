@@ -14,7 +14,7 @@ def test_help_lists_commands() -> None:
         assert cmd in result.output
 
 
-@pytest.mark.parametrize("cmd", ["train", "push"])
+@pytest.mark.parametrize("cmd", ["push"])
 def test_stub_commands_fail_loudly_not_silently(cmd: str) -> None:
     result = runner.invoke(app, [cmd])
     assert result.exit_code == 2  # "not implemented" must never look like success
