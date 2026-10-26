@@ -14,7 +14,7 @@
     ]
   },
   "config_hash": "007bbe8bb7fa90b1304701788350ab1f1009d48bc86687044433b033b1f859ca",
-  "created_at": "2026-10-26T09:47:51+00:00",
+  "created_at": "2026-10-26T09:50:19+00:00",
   "dirty": false,
   "effects": {
     "iteration_metric": "false_positive_rate_pairs",
@@ -684,14 +684,14 @@
     }
   },
   "efficiency": {
-    "batch_decisions_per_s": 293308.8984331671,
-    "decisions_per_s": 8256.232613541675,
+    "batch_decisions_per_s": 299756.57563715987,
+    "decisions_per_s": 8163.752194761658,
     "device": "cpu",
     "n_requests": 200.0,
-    "p50_ms": 0.11768750846385956,
-    "p95_ms": 0.13487710675690323
+    "p50_ms": 0.11825049296021461,
+    "p95_ms": 0.13676489179488266
   },
-  "git_sha": "3adc37f5ab1067096b21ba30ed95095b686ea443",
+  "git_sha": "4c7093f7afe5abacc6adf7fd540943a7c79817b0",
   "individual": {
     "by_source": {
       "psych101": {

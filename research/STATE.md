@@ -8,7 +8,7 @@ checkpoint. A fresh agent should be able to resume from it alone.
 - **Mode:** BUILD
 - **Milestone:** M3 Model v0 (planned, not started)
 - **Campaign:** none
-- **Next step:** human reviews the M3 plan below and the draft treatment-effects table (`research/drafts/effects-pairing-table.md`); then check A06/A07 and write M3 tests first.
+- **Next step:** human decides on merging the eval-change branch and gives the go for M3; then check A06/A07 and write M3 tests first. M3 work happens on `main`.
 - **Done so far:** M0 signed off 2026-10-26. M1 built; real data built (Psych-101 1% sample).
 
 ## Plan for the current milestone or phase
@@ -41,7 +41,7 @@ Done when: head, property and round-trip tests pass with the tiny backbone; ruff
 
 ## Blocked: needs the human
 
-M3 plan and the draft treatment-effects table await your review. The four decisions are at the end of `research/drafts/effects-pairing-table.md`.
+Branch `eval-change/treatment-effects` awaits your merge approval (`research/reports/EC1-treatment-effects.md`). M3 not started; waiting for the go.
 
 ## Done
 

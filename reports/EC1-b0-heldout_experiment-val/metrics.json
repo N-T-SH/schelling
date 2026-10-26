@@ -14,7 +14,7 @@
     ]
   },
   "config_hash": "7d905b96811018dde15421c27b7dd7f647cc95c3b48907ec80008ca8e1b89e65",
-  "created_at": "2026-10-26T09:46:51+00:00",
+  "created_at": "2026-10-26T09:49:20+00:00",
   "dirty": false,
   "effects": {
     "iteration_metric": "false_positive_rate_pairs",
@@ -267,20 +267,7 @@
       0.03,
       0.09
     ],
-    "skipped": {
-      "E01": "fewer than 30 persons in an arm (0, 0)",
-      "E02": "fewer than 30 persons in an arm (0, 0)",
-      "E03": "fewer than 30 persons in an arm (0, 0)",
-      "E08": "fewer than 30 persons in an arm (0, 0)",
-      "E09": "fewer than 30 persons in an arm (0, 0)",
-      "E10": "fewer than 30 persons in an arm (0, 0)",
-      "E11": "fewer than 30 persons in an arm (0, 0)",
-      "E12": "fewer than 30 persons in an arm (0, 0)",
-      "E13": "fewer than 30 persons in an arm (0, 0)",
-      "E14": "fewer than 30 persons in an arm (0, 0)",
-      "E15": "fewer than 30 persons in an arm (0, 0)",
-      "E16": "fewer than 30 persons in an arm (0, 0)"
-    },
+    "skipped": {},
     "summary": {
       "correlation": {
         "mean": -0.20764239547146093,
@@ -301,14 +288,14 @@
     }
   },
   "efficiency": {
-    "batch_decisions_per_s": 713648.5783206201,
-    "decisions_per_s": 8835.843335323993,
+    "batch_decisions_per_s": 777577.7627360445,
+    "decisions_per_s": 8582.480836131033,
     "device": "cpu",
     "n_requests": 200.0,
-    "p50_ms": 0.10933299199678004,
-    "p95_ms": 0.127381258062087
+    "p50_ms": 0.1107709831558168,
+    "p95_ms": 0.13590176822617642
   },
-  "git_sha": "3adc37f5ab1067096b21ba30ed95095b686ea443",
+  "git_sha": "4c7093f7afe5abacc6adf7fd540943a7c79817b0",
   "individual": {
     "by_source": {
       "twin2k": {
