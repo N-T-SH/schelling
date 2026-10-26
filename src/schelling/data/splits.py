@@ -130,7 +130,11 @@ def split_manifest(
     body = {
         "name": name,
         "seed": seed,
-        "fractions": {"val": VAL_FRAC, "test": TEST_FRAC},
+        "fractions": (
+            {"val_experiments": VAL_EXPERIMENTS, "test_experiments": TEST_EXPERIMENTS}
+            if name == "heldout_experiment"
+            else {"val": VAL_FRAC, "test": TEST_FRAC}
+        ),
         "counts": {k: int(counts.get(k, 0)) for k in ("train", "val", "test", "excluded")},
         "removed_item_ids": sorted(exclude_item_ids),
         "assignment_hash": hashlib.sha256(joined.encode()).hexdigest(),
