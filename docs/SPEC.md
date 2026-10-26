@@ -1,14 +1,14 @@
 # Schelling — Build Spec
 
-This file is the source of truth for the build. (It started as the "HS1" spec doc of 24 Oct 2026, renamed on 26 Oct 2026.)
+This file is the source of truth for the build. It mirrors the "Schelling — Build Spec" doc (renamed from HS1 on 26 Oct 2026); if the two disagree, ask the human which is current.
 
 ## Overview
 
-Schelling predicts the **distribution of human responses** to a decision, not the correct answer, so that simulated populations reproduce how real people decide and, through that, realistic sociological outcomes. The name refers to Thomas Schelling's *Micromotives and Macrobehavior*: small individual choices aggregate into collective outcomes, such as segregation or norm formation, that no individual intended.
+Schelling models how individual human decisions add up to **sociological outcomes**. The name refers to Thomas Schelling's *Micromotives and Macrobehavior*: small individual choices aggregate into collective outcomes, such as segregation, cooperation or norm formation, that no individual intended. Getting the full distribution of individual decisions right, not just the most likely choice, is the precondition for trusting any population-level simulation built on them.
 
 **Goal:** given a person context, a situation and a typed question, return calibrated probabilities over the answer options, cheap enough to sample millions of decisions for agent-based social simulation.
 
-**Working design hypothesis (may change):** a small, fast, non-generative model with typed outputs. The interface borrows from TypeSafe AI's Jev (typed Choice, Score and yes/no "Noul" outputs with probabilities), but Schelling is trained and evaluated against what real people chose. Changes to this design go through a decision record (`docs/decisions/`).
+**Working hypothesis at the individual-decision level:** each decision is made by a fast, intuitive "System 1"-style model, a small non-generative predictor with typed outputs. Its interface borrows from TypeSafe AI's Jev (typed Choice, Score and yes/no "Noul" outputs with probabilities), but it is trained and evaluated against what real people chose. This is a design bet about how to model one decision, not the project's goal; it is replaced through a decision record (`docs/decisions/`) if evidence favours another design.
 
 **Non-goals:**
 

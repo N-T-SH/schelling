@@ -7,9 +7,10 @@ realistic social outcomes. It will be published on Hugging Face. The name comes 
 Schelling's *Micromotives and Macrobehavior*: individual choices add up to collective
 outcomes nobody intended.
 
-The current design (a small, fast, non-generative typed predictor) is a working hypothesis,
-not a requirement. If evidence shows another design serves the goal better, propose it
-through a decision record (§1, rule 1); do not switch on your own.
+The goal is societal: realistic population-level outcomes. The individual-decision design
+(a fast, intuitive "System 1"-style typed predictor) is a working hypothesis, not a
+requirement. If evidence shows another design serves the goal better, propose it through a
+decision record (§1, rule 1); do not switch on your own.
 
 Read these files before doing anything, and re-read them whenever your context is reset:
 
