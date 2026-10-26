@@ -1,0 +1,18 @@
+{
+  "assignment_hash": "2ab2899e865795c6140198d3fde9e4c9ae54bb63ab7ba4ee01b43b220c9a8f57",
+  "counts": {
+    "excluded": 275539,
+    "test": 412,
+    "train": 1091784,
+    "val": 412
+  },
+  "fractions": {
+    "test": 0.1,
+    "val": 0.1
+  },
+  "held_out_experiment": "myside",
+  "manifest_hash": "7c4676fc4196493e587d717bf5b31dfbec8facc0d47e51c4ecd58248d0522240",
+  "name": "heldout_experiment_f7",
+  "removed_item_ids": [],
+  "seed": 0
+}

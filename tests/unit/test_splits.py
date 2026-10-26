@@ -41,6 +41,7 @@ def test_all_five_splits_plus_retest_exist() -> None:
         "heldout_domain",
         "temporal",
         "retest",
+        *(f"heldout_experiment_f{k}" for k in range(8)),
     }
 
 
@@ -129,3 +130,68 @@ def test_excluded_items_leave_val_and_test_but_not_train(frame: pd.DataFrame) ->
     assert set(split_manifest(frame, "heldout_item", 0, held_items)["removed_item_ids"]) == set(
         held_items
     )
+
+
+def _experiment_frame() -> pd.DataFrame:
+    from schelling.eval.effects import load_pairs
+
+    items = sorted({a for p in load_pairs() for a in (p["arm_a"], p["arm_b"])})
+    persons = [f"p{k}" for k in range(100)]
+    rows = [
+        {
+            "record_id": f"{i}-{k}",
+            "source": "twin2k",
+            "study_id": "s",
+            "item_id": i,
+            "person_id": k,
+            "trial_idx": None,
+            "wave": 1,
+        }
+        for i in [*items, "QID999"]
+        for k in persons
+    ]
+    return pd.DataFrame(rows)
+
+
+def test_each_experiment_is_held_out_in_exactly_one_fold() -> None:
+    from schelling.data.splits import fold_experiment
+
+    held = [fold_experiment(k, 0) for k in range(8)]
+    assert len(set(held)) == 8
+
+
+def test_fold_keeps_held_out_experiment_out_of_train_and_is_person_disjoint() -> None:
+    from schelling.data.splits import fold_experiment
+    from schelling.eval.effects import experiment_of_item
+
+    f = _experiment_frame()
+    exp = f.item_id.map(experiment_of_item())
+    for k in range(8):
+        held = fold_experiment(k, 0)
+        g = f.assign(partition=assign_partitions(f, f"heldout_experiment_f{k}", seed=0), exp=exp)
+        assert not (g[g.exp == held].partition == "train").any()
+        # val/test hold only the held-out experiment; everything else outside train is excluded
+        assert set(g[g.partition.isin(["val", "test"])].exp) == {held}
+        train_p = set(g[g.partition == "train"].person_id)
+        assert train_p.isdisjoint(set(g[g.partition.isin(["val", "test"])].person_id))
+        assert (
+            g[g.item_id == "QID999"].partition.isin(["train"])
+            | g[g.item_id == "QID999"].partition.isna()
+        ).all()
+
+
+def test_fold_person_assignment_matches_heldout_person() -> None:
+    f = _experiment_frame()
+    base = assign_partitions(f, "heldout_person", seed=0)
+    fold = assign_partitions(f, "heldout_experiment_f3", seed=0)
+    val_persons = set(f[base == "val"].person_id)
+    assert set(f[fold == "val"].person_id) <= val_persons
+
+
+def test_fold_is_deterministic_and_seed_dependent() -> None:
+    from schelling.data.splits import fold_experiment
+
+    f = _experiment_frame()
+    a = assign_partitions(f, "heldout_experiment_f0", seed=0)
+    assert a.equals(assign_partitions(f, "heldout_experiment_f0", seed=0))
+    assert len({fold_experiment(0, s) for s in range(8)}) > 1

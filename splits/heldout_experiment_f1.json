@@ -1,0 +1,18 @@
+{
+  "assignment_hash": "bfb214e8a6ece22957225fe251adfb96a7b3fb8764ac535207caf16962aea153",
+  "counts": {
+    "excluded": 275539,
+    "test": 412,
+    "train": 1091784,
+    "val": 412
+  },
+  "fractions": {
+    "test": 0.1,
+    "val": 0.1
+  },
+  "held_out_experiment": "framing_disease",
+  "manifest_hash": "3216135585cb460768789e6b341e584d33115737024a3748e3ab49caa9bd3f25",
+  "name": "heldout_experiment_f1",
+  "removed_item_ids": [],
+  "seed": 0
+}

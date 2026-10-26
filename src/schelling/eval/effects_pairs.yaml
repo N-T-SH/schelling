@@ -1,0 +1,22 @@
+# Pre-registered between-subject contrasts in Twin-2K-500 (docs/decisions/0002).
+# Every arm pair shares an identical, ordered option list and no person answered both arms
+# (checked against question_catalog.json and wave1_3_response.csv). Effect = arm_b minus arm_a
+# on the 0-based response index, standardised by the human pooled SD.
+# Multi-arm experiments use every pairwise contrast; Holm correction is applied within experiment.
+pairs:
+  - {id: E01, experiment: framing_disease, arm_a: QID157, arm_b: QID158}
+  - {id: E02, experiment: outcome_bias, arm_a: QID161, arm_b: QID162}
+  - {id: E03, experiment: absolute_relative, arm_a: QID183, arm_b: QID184}
+  - {id: E04, experiment: myside, arm_a: QID194, arm_b: QID195}
+  - {id: E05, experiment: less_is_more, arm_a: QID171, arm_b: QID172}
+  - {id: E06, experiment: less_is_more, arm_a: QID172, arm_b: QID173}
+  - {id: E07, experiment: less_is_more, arm_a: QID171, arm_b: QID173}
+  - {id: E08, experiment: proportion_dominance_1, arm_a: QID174, arm_b: QID175}
+  - {id: E09, experiment: proportion_dominance_1, arm_a: QID175, arm_b: QID176}
+  - {id: E10, experiment: proportion_dominance_1, arm_a: QID174, arm_b: QID176}
+  - {id: E11, experiment: proportion_dominance_2, arm_a: QID177, arm_b: QID178}
+  - {id: E12, experiment: proportion_dominance_2, arm_a: QID178, arm_b: QID179}
+  - {id: E13, experiment: proportion_dominance_2, arm_a: QID177, arm_b: QID179}
+  - {id: E14, experiment: wta_wtp, arm_a: QID189, arm_b: QID190}
+  - {id: E15, experiment: wta_wtp, arm_a: QID191, arm_b: QID189}
+  - {id: E16, experiment: wta_wtp, arm_a: QID191, arm_b: QID190}

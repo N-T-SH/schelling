@@ -8,7 +8,8 @@ checkpoint. A fresh agent should be able to resume from it alone.
 - **Mode:** BUILD
 - **Milestone:** M3 Model v0 (planned, not started)
 - **Campaign:** none
-- **Next step:** human reviews the M3 plan below and the draft treatment-effects table (`research/drafts/effects-pairing-table.md`); then check A06/A07 and write M3 tests first.
+- **Next step:** M3 (check A06/A07, tests first). Standing instruction (2026-10-26): continue to M4 after M3 only if M3 leaves no open decision points or failures.
+- **Eval change:** treatment-effect metrics and LOEO folds merged (`research/reports/EC1-treatment-effects.md`, decisions 0002 and 0003).
 - **Done so far:** M0 signed off 2026-10-26. M1 built; real data built (Psych-101 1% sample).
 
 ## Plan for the current milestone or phase
@@ -41,7 +42,7 @@ Done when: head, property and round-trip tests pass with the tiny backbone; ruff
 
 ## Blocked: needs the human
 
-M3 plan and the draft treatment-effects table await your review. The four decisions are at the end of `research/drafts/effects-pairing-table.md`.
+_(none)_
 
 ## Done
 

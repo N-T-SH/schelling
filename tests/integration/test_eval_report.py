@@ -172,3 +172,49 @@ def test_retest_split_reports_fraction_of_ceiling(
     assert res.exit_code == 0, res.output
     data = json.loads((tmp_path / "metrics.json").read_text())
     assert data["retest"]["n"] > 0 and 0 <= data["retest"]["ceiling"] <= 1
+
+
+def test_loeo_fold_effects_section_and_pooling(
+    processed: tuple[Path, Path], tmp_path: Path
+) -> None:
+    from schelling.data.splits import fold_experiment
+
+    proc, splits = processed
+    fold = next(k for k in range(8) if fold_experiment(k, 0) == "framing_disease")
+    name = f"heldout_experiment_f{fold}"
+    manifest = json.loads((splits / f"{name}.json").read_text())
+    assert manifest["held_out_experiment"] == "framing_disease"
+    res = runner.invoke(
+        app,
+        [
+            "eval",
+            "--model",
+            "b1",
+            "--split",
+            name,
+            "--partition",
+            "val",
+            "--processed",
+            str(proc),
+            "--splits-dir",
+            str(splits),
+            "--out",
+            str(tmp_path / "run"),
+            "--min-persons",
+            "1",
+            "--n-seeds",
+            "3",
+        ],
+    )
+    assert res.exit_code == 0, res.output
+    data = json.loads((tmp_path / "run" / "metrics.json").read_text())
+    eff = data["effects"]
+    assert eff["n_pairs"] == 1 and "E01" in eff["pairs"]
+    assert len(eff["pairs"]["E01"]["significant_per_seed"]) == 3
+    # B1 never saw either arm: every scored row is an unseen item (uniform).
+    assert data["individual"]["unseen_item_rows"] == data["n_rows"]
+    out = tmp_path / "pooled" / "effects.json"
+    res = runner.invoke(app, ["effects-pool", "--run", str(tmp_path / "run"), "--out", str(out)])
+    assert res.exit_code == 0, res.output
+    pooled = json.loads(out.read_text())
+    assert pooled["effects"]["n_pairs"] == 1 and pooled["source_runs"][0]["split"] == name

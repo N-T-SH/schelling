@@ -22,6 +22,7 @@ class MetricsFile(BaseModel):
     individual: dict[str, Any]
     population: dict[str, Any]
     retest: dict[str, Any] | None
+    effects: dict[str, Any] | None = None
     robustness: dict[str, Any]
     efficiency: dict[str, Any]
     not_run: list[str]

@@ -43,3 +43,4 @@ wandb/
 .idea/
 .vscode/
 .DS_Store
+!/reports/**/effects.json
