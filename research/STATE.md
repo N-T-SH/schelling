@@ -6,24 +6,23 @@ checkpoint. A fresh agent should be able to resume from it alone.
 ## Now
 
 - **Mode:** BUILD
-- **Milestone:** M2 Harness + baselines (not started)
+- **Milestone:** M2 Harness + baselines (in progress)
 - **Campaign:** none
 - **Next step:** plan M2 (assumptions A08, A09, A14), then implement.
 - **Done so far:** M0 signed off 2026-10-26. M1 built; real data built (Psych-101 1% sample).
 
 ## Plan for the current milestone or phase
 
-M1 Data. Assumptions: A01, A03, A04, A05 checked 2026-10-26 (see ASSUMPTIONS.md); A02 verified without download.
+M2 Harness + simple baselines. Assumptions: A08 (sampling from correct probs gives SD ratio ~1; tested by simulation), A09 (B1 hard to beat; measured on heldout_person val), A14 (retest coverage), A15 new (LightGBM needs libomp on macOS: installed via `brew install libomp`, import verified).
 
-Design choices (from evidence, flag in report):
-- Psych-101: one row = one participant x experiment. Adapter emits one `DecisionRecord` per `<<...>>` span; `state` = transcript text before the span (truncated to the last N chars), `trial_idx` = span order. Options = the closed set of distinct choice strings observed for that experiment (kept if 2..20, else the experiment is dropped and logged). This is a pragmatic reading of "unit of prediction"; campaign C04 tests alternatives.
-- Twin-2K-500: build records from `question_catalog.json` + `wave1_3_response*.csv` / `wave4_response*.csv`. Never use `persona_*` fields. Mapping: Likert rows -> score, Bipolar rows and single-select MC -> choice (yes/no 2-option MC -> noul), unmappable (free text, multi-select, slider) dropped and counted.
-- `persons.parquet` holds attributes (Twin demographics) and no history; context is assembled at use time with the target item masked.
-- Splits: hash-based, deterministic, five splits + retest, train/val/test partitions, manifest hash; test sealed by `SCHELLING_ALLOW_TEST` in the loader.
-- Raw data downloads in `data/raw/` (gitignored); manifests with sha256 in `data/manifests/`.
-
-Files: `src/schelling/data/{schema,registry,splits,contamination,manifest,loader}.py`, `data/adapters/{psych101,twin2k}.py`, `scripts/make_fixtures.py`, `tests/fixtures/`, `tests/unit/{test_adapters,test_splits,test_loader_guard,test_contamination,test_twin_leakage}.py`, CLI `schelling data build`.
-Done when: adapter, split, contamination, guard and leakage tests pass; `schelling data build` reproduces identical manifests twice.
+Design:
+- Baselines share one protocol (`baselines/base.py`): `fit(train, persons)` and `predict_proba(frame) -> list[np.ndarray]`. B0 uniform; B1 item mean with Jeffreys pseudo-count 0.5 per option and uniform fallback for unseen items; B2 cell = sex x age_band x education with backoff to B1 below 20 persons (equals B1 on Psych-101: no attributes); B3 LightGBM multiclass per (qtype, n options) group on attributes + item id (categorical).
+- `eval/`: `metrics.py` (NLL, Brier, accuracy, adaptive ECE, calibration slope/intercept, TVD, W1, SD and entropy ratio), `population.py` (one draw per held-out person per item, 20 seeds, per-seed and per-subgroup, correlation Frobenius), `retest.py` (fraction of test-retest ceiling), `robustness.py` (option permutation), `efficiency.py`, `report.py` + `provenance.py` (metrics.json with git_sha, dirty, config_hash, split_manifest_hash, seed, created_at; pydantic model exported to `schemas/metrics.json`), `effects.py` (generic effect-size agreement; not run on data, needs a pre-registered pairing table).
+- `scripts/audit_report.py` (tag check) with tests.
+- Not in M2: paraphrase invariance and memorisation probe (need paraphrases, M5), treatment effects and regression sign agreement on data (need pairing table; will ask), B4 to B6.
+- Retest: fit on wave-1 records of persons not evaluated, score wave-4 answers; ceiling = P(wave 1 answer = wave 4 answer); model agreement = mean probability on the wave-4 answer.
+- `schelling eval --model b0|b1|b2|b3 --split S --partition val` only; it never sets `SCHELLING_ALLOW_TEST`.
+Done when: metric tests pass and `schelling eval` produces a full report for B0 to B3 on both sources.
 
 ## Blocked: needs the human
 
