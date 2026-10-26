@@ -1,0 +1,45 @@
+# Python and tooling
+__pycache__/
+*.py[cod]
+.venv/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+dist/
+build/
+*.egg-info/
+
+# Secrets
+.env
+.env.*
+
+# Data: raw and derived data are never committed; manifests are
+data/*
+!data/manifests/
+!data/manifests/**
+
+# Experiment outputs and model artifacts
+# Eval outputs: keep metrics.json (reports cite them), ignore the rest
+/reports/**
+!/reports/**/
+!/reports/**/metrics.json
+!/reports/**/run.json
+/runs/
+/checkpoints/
+/cache/
+*.safetensors
+*.bin
+*.pt
+*.ckpt
+wandb/
+
+# Gated evaluation data must never enter the repo
+**/Psych-101-test/**
+
+# Editors and OS
+.idea/
+.vscode/
+.DS_Store

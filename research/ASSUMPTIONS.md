@@ -1,0 +1,23 @@
+# Assumptions register
+
+Everything below is believed but **not yet verified in this repo**. Before building on an
+assumption, run its check, fill in *Evidence* (command, output excerpt or URL, date) and set
+*Status* to `verified`, `false` or `partly true`. If an assumption turns out false, stop and
+report it (see AGENTS.md §5). Add new assumptions as you discover them (A15, A16, …).
+
+| ID | Assumption | Why it matters | How to check | Needed by | Status | Evidence |
+| --- | --- | --- | --- | --- | --- | --- |
+| A01 | `marcelbinz/Psych-101` on Hugging Face is Apache-2.0, ships `prompts_training.jsonl`, and marks human choices with `<<` and `>>`. | Adapter design and weight licence. | Read the dataset card; download; parse 200 rows and count `<<…>>` spans per row. | M1 | unverified | |
+| A02 | `marcelbinz/Psych-101-test` is gated, CC-BY-ND-4.0, evaluation only. | Must never be committed, logged or redistributed. | Read the dataset card; confirm gate. Do not download until the human approves. | M4 | unverified | |
+| A03 | `LLM-Digital-Twin/Twin-2K-500` is CC-BY-4.0, has about 2,058 people and about 500 questions each, and wave 4 repeats the heuristics-and-biases tasks two weeks later. | Splits, test-retest ceiling, attribution. | Read the card; load; count persons, items per person; list which items have a wave-4 repeat. | M1 | unverified | |
+| A04 | Twin-2K-500 persona fields (`persona_text`, `persona_json`) contain the person's own answers, so a naive context leaks the target item's answer. | Target leakage would fake great results. | Pick 5 persons and 5 items; search each person's persona fields for their answer to that item. | M1 | unverified | |
+| A05 | Twin-2K-500 question types map cleanly onto Noul / Choice / Score. | Unified record schema. | Tabulate every question type in the catalog; map each; list unmappable ones (sliders, matrices, free text). | M1 | unverified | |
+| A06 | `answerdotai/ModernBERT-base` and `-large` are available, permissively licensed, and load with the pinned `transformers` version. | Backbone choice. | Read model cards; load both in a script; run one forward pass on CPU. | M3 | unverified | |
+| A07 | `register_for_auto_class` plus `save_pretrained` copies the custom `configuration_schelling.py` and `modeling_schelling.py`, and `AutoModel.from_pretrained(path, trust_remote_code=True)` works in a fresh process. | Hugging Face release path. | Integration test in a clean subprocess with the tiny model. | M3 | unverified | |
+| A08 | Sampling one draw per person from *correct* per-person probabilities gives a population SD ratio ≈ 1 in expectation; variance collapse comes from point predictions or overconfident probabilities. | Decides whether a diversity regulariser is needed (C02). | Simulation test: synthetic ground-truth probabilities → sample → SD ratio; then sharpen probabilities and confirm the ratio falls. | M2 | unverified | |
+| A09 | The item-mean baseline (B1) is hard to beat on unseen people (published LLM-persona work often fails to). | Sets expectations; C01 kill criteria. | Measure B0–B3 on `heldout_person` val in M2. | M2 | unverified | |
+| A10 | TypeSafe Jev's API, request schema and pricing match what is assumed in the spec (Noul/Choice/Score, cost per token). | B4 baseline. | Read TypeSafe's current API docs. Do not implement from memory. Needs a human-provided key. | M6 | unverified | |
+| A11 | humans& Persimmon is a gated research preview; access is by application. | C05 and any Persimmon baseline are blocked without it. | Human confirms access status. | C05 | unverified | |
+| A12 | Hardware available: record cores, RAM, disk, GPU. | Sizes every experiment. | `nproc`, `free -h`, `df -h .`, `nvidia-smi` (or none), `uv --version`, `python --version`. | M0 | unverified | |
+| A13 | Training on CPU with fixed seeds and `torch.use_deterministic_algorithms(True)` gives bitwise-identical metrics across two runs. | Reproducibility test in the spec. | Run the 50-step fixture training twice and diff `metrics.json`. | M3 | unverified | |
+| A14 | Twin-2K-500 wave-4 repeats cover enough items to estimate a per-person test-retest ceiling. | "Fraction of ceiling" metric. | Count repeated items per person; report distribution. | M2 | unverified | |
