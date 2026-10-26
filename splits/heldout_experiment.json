@@ -1,0 +1,17 @@
+{
+  "assignment_hash": "361eaa50d494a60c75eae088fad0e4232d744e4ba55f0ea4a752d5dd889d0063",
+  "counts": {
+    "excluded": 0,
+    "test": 8232,
+    "train": 1351683,
+    "val": 8232
+  },
+  "fractions": {
+    "test": 0.1,
+    "val": 0.1
+  },
+  "manifest_hash": "e49bf341f507fcb301ca4307bed610f1f2fcc23d67ce92f3fc08f056efc732dc",
+  "name": "heldout_experiment",
+  "removed_item_ids": [],
+  "seed": 0
+}
