@@ -335,19 +335,38 @@ def train(cfg: TrainConfig) -> TrainResult:
         for task, (items, ys, poss) in groups.items():
             if not items:
                 continue
-            t = {
-                k: v.to(device)
-                for k, v in build_tensors(tokenizer, model.config, task, items).items()
-            }
-            y = torch.tensor(ys, device=device)
-            with autocast:
-                if task == "score":
-                    cond = model.score_conditional_probs(**t)
-                    loss_vec = losses.corn_loss(cond.float(), y, reduction="none")
-                else:
-                    probs = model(task, **t)
-                    loss_vec = losses.hard_cross_entropy(probs.float(), y, reduction="none")
-            per_example = per_example.index_put((torch.tensor(poss, device=device),), loss_vec)
+            # Micro-batches of similar length: padding a short Twin question to a long Psych-101
+            # transcript wastes most of the compute on this hardware. The maths is unchanged.
+            order = sorted(
+                range(len(items)),
+                key=lambda j: (
+                    len(items[j][0].state)
+                    + len(
+                        items[j][1].prompt
+                        if hasattr(items[j][1], "prompt")
+                        else items[j][1].proposition
+                    )
+                ),
+            )
+            for lo in range(0, len(order), cfg.optim.micro_batch):
+                sel = order[lo : lo + cfg.optim.micro_batch]
+                t = {
+                    k: v.to(device)
+                    for k, v in build_tensors(
+                        tokenizer, model.config, task, [items[j] for j in sel]
+                    ).items()
+                }
+                y = torch.tensor([ys[j] for j in sel], device=device)
+                with autocast:
+                    if task == "score":
+                        cond = model.score_conditional_probs(**t)
+                        loss_vec = losses.corn_loss(cond.float(), y, reduction="none")
+                    else:
+                        probs = model(task, **t)
+                        loss_vec = losses.hard_cross_entropy(probs.float(), y, reduction="none")
+                per_example = per_example.index_put(
+                    (torch.tensor([poss[j] for j in sel], device=device),), loss_vec
+                )
         loss = per_example.mean()
         opt.zero_grad(set_to_none=True)
         loss.backward()

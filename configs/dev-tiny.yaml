@@ -1,0 +1,15 @@
+# Fixture-scale smoke config: tiny random BERT on CPU. Point processed_dir and splits_dir at a build.
+name: dev-tiny
+seed: 0
+split: heldout_person
+processed_dir: data/processed
+splits_dir: splits
+out_dir: runs/dev-tiny
+device: cpu
+deterministic: true
+model:
+  tiny_vocab: tests/fixtures/tiny_vocab.txt
+  max_context_tokens: 96
+  max_option_tokens: 8
+optim: {steps: 50, batch_size: 8, lr_backbone: 0.003, lr_head: 0.003}
+eval: {every: 25, max_rows: 400, patience: 5}

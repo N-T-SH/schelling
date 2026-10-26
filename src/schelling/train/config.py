@@ -33,6 +33,7 @@ class DataCfg(_Strict):
 class OptimCfg(_Strict):
     steps: int = 1000
     batch_size: int = 32
+    micro_batch: int = 16  # examples per forward pass; sorted by length within a task type
     lr_backbone: float = 3e-5
     lr_head: float = 1e-3
     weight_decay: float = 0.01

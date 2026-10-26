@@ -2,26 +2,36 @@
 
 from __future__ import annotations
 
+import re
 from typing import Any
 
 from schelling.schema import Choice, Noul, PersonContext, Score
 
+_PARENS = re.compile(r"\s*\([^)]*\)")
+
+
+def _short(value: Any) -> str:
+    """Drop parenthetical asides ("Midwest (ND, SD, ...)") that cost tokens and add nothing."""
+    return _PARENS.sub("", str(value)).strip()
+
 
 def _attr_text(attrs: dict[str, Any]) -> str:
-    return "; ".join(f"{k}: {v}" for k, v in sorted(attrs.items()))
+    return "; ".join(f"{k}: {_short(v)}" for k, v in sorted(attrs.items()))
 
 
 def _history_line(item: Any) -> str:
     return f"{item.question} [{' | '.join(item.options)}] -> {item.options[item.answer]}"
 
 
-def person_text(person: PersonContext | None, k: int) -> str:
-    """Attributes plus the last `k` history items. The opaque person id is never included."""
+def person_text(person: PersonContext | None, k: int, n_attributes: int | None = None) -> str:
+    """Attributes (the first `n_attributes` alphabetically, default all) plus the last `k`
+    history items. The opaque person id is never included."""
     if person is None:
         return ""
     parts = []
-    if person.attributes:
-        parts.append(_attr_text(person.attributes))
+    attrs = dict(sorted(person.attributes.items())[:n_attributes])
+    if attrs:
+        parts.append(_attr_text(attrs))
     for item in person.history[-k:] if k > 0 else []:
         parts.append(_history_line(item))
     return " ; ".join(parts)
@@ -52,8 +62,8 @@ def build_context(
 ) -> str:
     """`[PERSON] ... [STATE] ... [QUESTION] ...`, fitted to `max_tokens`.
 
-    When too long, the oldest history items go first, then the start of the state (the end is the most recent
-    context); the question is never cut.
+    When too long, the oldest history items go first, then attributes, then the start of the
+    state (its end is the most recent context). The question is never cut.
     """
     q = question_text(question)
     s = state_text(state)
@@ -70,13 +80,15 @@ def build_context(
         if n_tokens(text) <= max_tokens or k == 0:
             break
         k = k // 2 if k > 8 else k - 1
-    if (
-        n_tokens(text) > max_tokens
-    ):  # attributes alone or the state are too long: keep the state's end
+    n_attr = len(person.attributes) if person is not None else 0
+    while n_tokens(text) > max_tokens and n_attr > 0:
+        n_attr = n_attr // 2 if n_attr > 4 else n_attr - 1
+        text = render(person_text(person, 0, n_attr), s)
+    if n_tokens(text) > max_tokens:
         lo, hi = 0, len(s)
         while lo < hi:  # longest state suffix that fits
             mid = (lo + hi + 1) // 2
-            fits = n_tokens(render(person_text(person, 0), s[len(s) - mid :])) <= max_tokens
+            fits = n_tokens(render(person_text(person, 0, n_attr), s[len(s) - mid :])) <= max_tokens
             lo, hi = (mid, hi) if fits else (lo, mid - 1)
-        text = render(person_text(person, 0), s[len(s) - lo :] if lo else "")
+        text = render(person_text(person, 0, n_attr), s[len(s) - lo :] if lo else "")
     return text

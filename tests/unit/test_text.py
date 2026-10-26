@@ -54,3 +54,15 @@ def test_oversized_state_is_truncated_not_the_question() -> None:
     tok = tiny_tokenizer()
     ctx = build_context(None, "word " * 500, Noul(proposition="LASTWORD"), tok, 128, 5)
     assert len(tok(ctx)["input_ids"]) <= 128 and "lastword" in ctx.lower()
+
+
+def test_parenthetical_asides_are_dropped_from_attributes() -> None:
+    text = person_text(PersonContext(attributes={"region": "Midwest (ND, SD, NE)"}), k=0)
+    assert text == "region: Midwest"
+
+
+def test_attributes_are_dropped_before_the_question_is_cut() -> None:
+    tok = tiny_tokenizer()
+    person = PersonContext(attributes={f"attr{i}": "some long value here" for i in range(30)})
+    ctx = build_context(person, "", Noul(proposition="KEEPME"), tok, 64, 0)
+    assert len(tok(ctx)["input_ids"]) <= 64 and "keepme" in ctx.lower()

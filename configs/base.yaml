@@ -1,0 +1,19 @@
+# M4: ModernBERT-base on the Mac's MPS GPU (A12). Lower 14 of 22 layers frozen for speed:
+# the measured full fine-tune rate was about 2,200 tokens/s, the frozen one about 4,000.
+name: base-m4
+seed: 0
+split: heldout_person
+processed_dir: data/processed
+splits_dir: splits
+out_dir: runs/base-m4
+device: auto
+model:
+  backbone: answerdotai/ModernBERT-base
+  history_items: 0          # conditioning on a person's other answers is campaign C01
+  max_context_tokens: 256
+  max_option_tokens: 16
+  head_hidden: 256
+  freeze_layers: 14
+data: {study_temperature: 0.5, augment_option_permutation: true}
+optim: {steps: 2800, batch_size: 32, lr_backbone: 0.00005, lr_head: 0.001, warmup_frac: 0.05, weight_decay: 0.01}
+eval: {every: 400, max_rows: 3000, patience: 4, calibration_rows: 6000}
