@@ -41,6 +41,7 @@ def test_all_five_splits_plus_retest_exist() -> None:
         "heldout_domain",
         "temporal",
         "retest",
+        "heldout_experiment",
     }
 
 
@@ -129,3 +130,63 @@ def test_excluded_items_leave_val_and_test_but_not_train(frame: pd.DataFrame) ->
     assert set(split_manifest(frame, "heldout_item", 0, held_items)["removed_item_ids"]) == set(
         held_items
     )
+
+
+def _experiment_frame() -> pd.DataFrame:
+    from schelling.eval.effects import load_pairs
+
+    items = sorted({a for p in load_pairs() for a in (p["arm_a"], p["arm_b"])})
+    rows = [
+        {
+            "record_id": f"{i}-{k}",
+            "source": "twin2k",
+            "study_id": "s",
+            "item_id": i,
+            "person_id": f"p{k}",
+            "trial_idx": None,
+            "wave": 1,
+        }
+        for i in items
+        for k in range(5)
+    ]
+    rows += [
+        {
+            "record_id": f"o-{k}",
+            "source": "twin2k",
+            "study_id": "s",
+            "item_id": "QID999",
+            "person_id": f"p{k}",
+            "trial_idx": None,
+            "wave": 1,
+        }
+        for k in range(5)
+    ]
+    return pd.DataFrame(rows)
+
+
+def test_heldout_experiment_keeps_both_arms_together_and_other_items_in_train() -> None:
+    from schelling.eval.effects import experiment_of_item, load_pairs
+
+    f = _experiment_frame()
+    f = f.assign(partition=assign_partitions(f, "heldout_experiment", seed=0))
+    for p in load_pairs():
+        a = set(f[f.item_id == p["arm_a"]].partition)
+        b = set(f[f.item_id == p["arm_b"]].partition)
+        assert a == b and len(a) == 1
+    by_exp = f.assign(exp=f.item_id.map(experiment_of_item())).dropna(subset=["exp"])
+    assert by_exp.groupby("exp").partition.nunique().max() == 1
+    counts = by_exp.drop_duplicates("exp").partition.value_counts()
+    assert counts["val"] == 2 and counts["test"] == 2 and counts["train"] == 4
+    assert (f[f.item_id == "QID999"].partition == "train").all()
+
+
+def test_heldout_experiment_depends_on_seed_and_is_deterministic() -> None:
+    f = _experiment_frame()
+    chosen = {
+        s: tuple(sorted(set(f[assign_partitions(f, "heldout_experiment", s) == "val"].item_id)))
+        for s in range(6)
+    }
+    assert chosen[0] == tuple(
+        sorted(set(f[assign_partitions(f, "heldout_experiment", 0) == "val"].item_id))
+    )
+    assert len(set(chosen.values())) > 1

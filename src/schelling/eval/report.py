@@ -22,6 +22,7 @@ from schelling.data.splits import split_manifest
 from schelling.eval import metrics as m
 from schelling.eval import population as pop
 from schelling.eval import provenance
+from schelling.eval.effects import run_effects
 from schelling.eval.efficiency import latency
 from schelling.eval.retest import retest_fraction
 from schelling.eval.robustness import permutation_invariance
@@ -30,7 +31,6 @@ from schelling.eval.schema import MetricsFile
 NOT_RUN = [
     "paraphrase_invariance (needs paraphrased items, M5)",
     "memorisation_probe (needs paraphrased items, M5)",
-    "treatment_effects (needs a pre-registered pairing table)",
     "regression_sign_agreement (needs pre-registered models)",
 ]
 SUBGROUP_COLUMNS = ("sex", "age_band", "party_id")
@@ -147,6 +147,9 @@ def run_eval(
             )
         population[src] = res
 
+    twin = pop_mask & (eval_df["source"] == "twin2k").to_numpy()
+    effects = run_effects(eval_df[twin], draws[twin], min_persons, seed) if twin.any() else None
+
     retest = None
     if split == "retest":
         w4 = (eval_df["wave"] == 4).to_numpy()
@@ -181,11 +184,14 @@ def run_eval(
         "individual": individual,
         "population": population,
         "retest": retest,
+        "effects": effects,
         "robustness": {
             "permutation_max_abs_dp": permutation_invariance(baseline, eval_df, seed=seed)
         },
         "efficiency": latency(baseline, eval_df, seed=seed),
-        "not_run": NOT_RUN,
+        "not_run": NOT_RUN
+        if effects is not None
+        else [*NOT_RUN, "treatment_effects (no estimable contrast in this partition)"],
     }
     MetricsFile.model_validate(metrics)
 
@@ -248,6 +254,25 @@ def _summary(mt: dict[str, Any]) -> str:
             f"Fraction of ceiling: {_tag(r['fraction_of_ceiling'], 'retest.fraction_of_ceiling')} "
             f"(ceiling {_tag(r['ceiling'], 'retest.ceiling')}, model {_tag(r['model_agreement'], 'retest.model_agreement')}).",
         ]
+    if mt.get("effects"):
+        e = mt["effects"]
+        lines += [
+            "",
+            "## Treatment effects (mean over seeds)",
+            "",
+            f"{e['n_pairs']} contrasts, {e['n_human_null']} null in humans, "
+            f"{e['n_placebo_contrasts']} placebo contrasts.",
+            "",
+            "| metric | value |",
+            "| --- | --- |",
+        ]
+        for k in (
+            "correlation",
+            "sign_agreement",
+            "false_positive_rate_pairs",
+            "false_positive_rate_pairs_and_placebo",
+        ):
+            lines.append(f"| {k} | {_tag(e['summary'][k]['mean'], f'effects.summary.{k}.mean')} |")
     lines += [
         "",
         "## Robustness and efficiency",

@@ -80,6 +80,44 @@
   "BlockName": "Personality"
  },
  {
+  "QuestionID": "QID157",
+  "QuestionText": "Disease program preference (gain frame)?",
+  "QuestionType": "MC",
+  "Options": [
+   "fav A",
+   "slight A",
+   "slight B",
+   "fav B"
+  ],
+  "Settings": {
+   "Selector": "SAVR",
+   "SubSelector": "TX"
+  },
+  "BlockName": "Disease - gain",
+  "csv_columns": [
+   "QID157"
+  ]
+ },
+ {
+  "QuestionID": "QID158",
+  "QuestionText": "Disease program preference (loss frame)?",
+  "QuestionType": "MC",
+  "Options": [
+   "fav A",
+   "slight A",
+   "slight B",
+   "fav B"
+  ],
+  "Settings": {
+   "Selector": "SAVR",
+   "SubSelector": "TX"
+  },
+  "BlockName": "Disease-loss",
+  "csv_columns": [
+   "QID158"
+  ]
+ },
+ {
   "QuestionID": "QID101",
   "QuestionText": "Would you buy the product at this price?",
   "QuestionType": "MC",

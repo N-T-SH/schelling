@@ -17,6 +17,7 @@ dependencies = [
     "pyarrow>=15",
     "pyyaml>=6",
     "lightgbm>=4.7.0",
+    "scipy>=1.17.1",
 ]
 
 [project.optional-dependencies]
@@ -69,3 +70,9 @@ files = ["src"]
 [tool.coverage.run]
 source = ["src/schelling"]
 omit = ["src/schelling/baselines/jev_api.py", "src/schelling/baselines/llm_prompt.py"]
+
+[dependency-groups]
+dev = [
+    "scipy-stubs>=1.17.1.5",
+    "types-pyyaml>=6.0.12.20260906",
+]

@@ -60,4 +60,4 @@ def test_build_twice_gives_identical_manifests_and_splits(
         assert res.exit_code == 0, res.output
     for p in sorted((tmp_path / "splits_a").glob("*.json")):
         assert p.read_text() == (tmp_path / "splits_b" / p.name).read_text()
-    assert len(list((tmp_path / "splits_a").glob("*.json"))) == 7  # six splits + contamination
+    assert len(list((tmp_path / "splits_a").glob("*.json"))) == 8  # seven splits + contamination

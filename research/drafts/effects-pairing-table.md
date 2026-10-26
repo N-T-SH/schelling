@@ -1,6 +1,6 @@
 # Draft: pre-registered pairing table for treatment-effect metrics
 
-**Status:** DRAFT for human review. Nothing here is implemented. If approved, it becomes
+**Status:** SUPERSEDED by `docs/decisions/0002-treatment-effects.md` (decisions applied; pairs now in `src/schelling/eval/effects_pairs.yaml`). Kept for the record. Note: the outcome-bias and WTA/WTP option lists have 7 and 10 options, not 6 as written below. If approved, it becomes
 `src/schelling/eval/effects_pairs.yaml` plus a runner, added on an `eval-change/treatment-effects`
 branch (the evaluator is sealed). Contains no result numbers, by design: the table is fixed
 before any model sees it.

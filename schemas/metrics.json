@@ -17,6 +17,19 @@
       "title": "Dirty",
       "type": "boolean"
     },
+    "effects": {
+      "anyOf": [
+        {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Effects"
+    },
     "efficiency": {
       "additionalProperties": true,
       "title": "Efficiency",

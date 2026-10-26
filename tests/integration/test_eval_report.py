@@ -172,3 +172,39 @@ def test_retest_split_reports_fraction_of_ceiling(
     assert res.exit_code == 0, res.output
     data = json.loads((tmp_path / "metrics.json").read_text())
     assert data["retest"]["n"] > 0 and 0 <= data["retest"]["ceiling"] <= 1
+
+
+def test_heldout_experiment_split_and_effects_section(
+    processed: tuple[Path, Path], tmp_path: Path
+) -> None:
+    proc, splits = processed
+    assert (splits / "heldout_experiment.json").exists()
+    res = runner.invoke(
+        app,
+        [
+            "eval",
+            "--model",
+            "b1",
+            "--split",
+            "heldout_experiment",
+            "--partition",
+            "val",
+            "--processed",
+            str(proc),
+            "--splits-dir",
+            str(splits),
+            "--out",
+            str(tmp_path),
+            "--min-persons",
+            "2",
+            "--n-seeds",
+            "3",
+        ],
+    )
+    assert res.exit_code == 0, res.output
+    data = json.loads((tmp_path / "metrics.json").read_text())
+    eff = data["effects"]
+    assert eff["n_pairs"] == 1 and "E01" in eff["pairs"]
+    # B1 never saw either arm: every scored row is an unseen item (uniform), so it has no
+    # information about the effect. (Its sampled d is pure noise, not exactly zero.)
+    assert data["individual"]["unseen_item_rows"] == data["n_rows"]

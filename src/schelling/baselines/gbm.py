@@ -84,7 +84,7 @@ class GradientBoosted:
             probs = (
                 np.tile(model, (int(mask.sum()), 1))
                 if isinstance(model, np.ndarray)
-                else model.predict(x[mask])
+                else np.asarray(model.predict(x[mask]))
             )
             probs = np.clip(probs, 1e-6, None)
             probs = probs / probs.sum(axis=1, keepdims=True)

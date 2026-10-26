@@ -21,7 +21,11 @@ SPLIT_NAMES = (
     "heldout_domain",
     "temporal",
     "retest",
+    "heldout_experiment",
 )
+# Eligible experiments are few (8), so 10% would hold out less than one: use 2 val + 2 test.
+VAL_EXPERIMENTS = 2
+TEST_EXPERIMENTS = 2
 VAL_FRAC = 0.10
 TEST_FRAC = 0.10
 
@@ -92,6 +96,18 @@ def _assign(frame: pd.DataFrame, name: str, seed: int, direction: str) -> pd.Ser
             out[order[a:b]] = "val"
             out[order[b:]] = "test"
         return out
+    if name == "heldout_experiment":
+        # Both arms of every contrast in effects_pairs.yaml land in the same partition, so a
+        # model cannot have seen one arm of an effect it is asked to predict.
+        from schelling.eval.effects import experiment_of_item
+
+        exp = frame["item_id"].map(experiment_of_item())
+        names = sorted(exp.dropna().unique(), key=lambda e: _h(seed, name, str(e)))
+        label = {e: "val" for e in names[:VAL_EXPERIMENTS]}
+        label |= {e: "test" for e in names[VAL_EXPERIMENTS : VAL_EXPERIMENTS + TEST_EXPERIMENTS]}
+        return exp.map(
+            lambda e, lab=label: lab.get(e, "train") if isinstance(e, str) else "train"
+        ).astype(object)
     if name == "retest":
         # Wave-4 answers only; used to measure the test-retest ceiling, never to train.
         out = pd.Series(None, index=frame.index, dtype=object)

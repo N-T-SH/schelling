@@ -59,6 +59,18 @@ def twin2k(rng: random.Random) -> None:
             "BlockName": "Personality",
         },
         mc(
+            "QID157",
+            "Disease program preference (gain frame)?",
+            ["fav A", "slight A", "slight B", "fav B"],
+            "Disease - gain",
+        ),
+        mc(
+            "QID158",
+            "Disease program preference (loss frame)?",
+            ["fav A", "slight A", "slight B", "fav B"],
+            "Disease-loss",
+        ),
+        mc(
             "QID101",
             "Would you buy the product at this price?",
             ["Yes", "No"],
@@ -138,6 +150,9 @@ def twin2k(rng: random.Random) -> None:
         row = {"pid": pid}
         for qid, n in n_opts.items():
             row[qid] = rng.randint(1, n)
+        # between-subject: each person sees one frame; the loss frame shifts answers towards B
+        arm = random.Random(pid)
+        row["QID157" if pid % 2 else "QID158"] = arm.randint(1, 3) if pid % 2 else arm.randint(2, 4)
         for i in range(1, 7):
             row[f"QID25_{i}"] = rng.randint(1, 5)
         for i in range(1, 4):
