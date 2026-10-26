@@ -103,3 +103,29 @@ def test_run_effects_is_deterministic() -> None:
     a = fx.run_effects(f, draws, min_persons=30, pairs=PAIR, n_boot=200, seed=1)
     b = fx.run_effects(f, draws, min_persons=30, pairs=PAIR, n_boot=200, seed=1)
     assert a == b
+
+
+def test_pooling_two_folds_equals_scoring_them_together() -> None:
+    f1, f2 = (
+        _frame(300, 1.0, seed=3),
+        _frame(300, 0.0, seed=4).assign(item_id=lambda d: d.item_id.map({"A": "C", "B": "D"})),
+    )
+    pairs = [PAIR[0], {"id": "T2", "experiment": "y", "arm_a": "C", "arm_b": "D"}]
+    both = pd.concat([f1, f2], ignore_index=True)
+    draws = np.random.default_rng(0).integers(0, 4, size=(len(both), 3))
+    joint = fx.run_effects(both, draws, min_persons=30, pairs=pairs, n_boot=100)
+    r1 = fx.run_effects(f1, draws[: len(f1)], min_persons=30, pairs=pairs, n_boot=100)
+    r2 = fx.run_effects(f2, draws[len(f1) :], min_persons=30, pairs=pairs, n_boot=100)
+    pooled = fx.pool_runs([r1, r2])
+    assert pooled is not None and joint is not None
+    for k in pooled["per_seed"]:
+        assert pooled["per_seed"][k] == joint["per_seed"][k], k
+    assert pooled["n_pairs"] == joint["n_pairs"] == 2
+    assert set(pooled["pairs"]) == {"T1", "T2"}
+
+
+def test_pooling_rejects_a_pair_scored_twice() -> None:
+    f = _frame(100, 1.0)
+    r = fx.run_effects(f, f["response"].to_numpy()[:, None], min_persons=30, pairs=PAIR, n_boot=50)
+    with pytest.raises(ValueError):
+        fx.pool_runs([r, r])

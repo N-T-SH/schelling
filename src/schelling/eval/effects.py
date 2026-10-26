@@ -199,29 +199,9 @@ def run_effects(
 
     human = np.array([u["human_d"] for u in used])
     null_mask = np.array([u["human_null"] for u in used])
-    per_seed: dict[str, list[float | None]] = {
-        k: []
-        for k in (
-            "correlation",
-            "sign_agreement",
-            "false_positive_rate_pairs",
-            "false_positive_rate_pairs_and_placebo",
-        )
-    }
-    for s in range(n_seeds):
-        model = np.array([u["synth_d"][s] for u in used])
-        sig = np.array([u["sig"][s] for u in used])
-        ok = ~(np.isnan(human) | np.isnan(model))
-        agg = effect_size_agreement(human[ok], model[ok], null_mask[ok], sig[ok])
-        per_seed["correlation"].append(agg["correlation"])
-        per_seed["sign_agreement"].append(agg["sign_agreement"])
-        per_seed["false_positive_rate_pairs"].append(agg["false_positive_rate"])
-        n_null, n_pl = int(null_mask[ok].sum()), placebo.shape[0]
-        per_seed["false_positive_rate_pairs_and_placebo"].append(
-            (int(sig[ok][null_mask[ok]].sum()) + int(placebo[:, s].sum())) / (n_null + n_pl)
-            if n_null + n_pl
-            else None
-        )
+    synth = np.array([u["synth_d"] for u in used])  # pairs x seeds
+    sig = np.array([u["sig"] for u in used])
+    per_seed = _aggregate(human, null_mask, synth, sig, placebo.sum(axis=0), placebo.shape[0])
     return {
         "n_pairs": len(used),
         "n_human_null": int(null_mask.sum()),
@@ -236,13 +216,88 @@ def run_effects(
                 "human_ci": [u["ci"][0], u["ci"][1]],
                 "human_null": u["human_null"],
                 "synthetic_d_per_seed": [_none(v) for v in u["synth_d"]],
+                "significant_per_seed": [bool(v) for v in u["sig"]],
             }
             for u in used
         },
+        "placebo_significant_per_seed": [int(v) for v in placebo.sum(axis=0)],
         "per_seed": per_seed,
         "summary": {k: _mean_sd(v) for k, v in per_seed.items()},
         "placebo_false_positive_rate_per_seed": [float(v) for v in placebo.mean(axis=0)]
         if placebo.size
         else [],
         "skipped": skipped,
+    }
+
+
+def _aggregate(
+    human: np.ndarray,
+    null_mask: np.ndarray,
+    synth: np.ndarray,
+    sig: np.ndarray,
+    placebo_sig_counts: np.ndarray,
+    n_placebo: int,
+) -> dict[str, list[float | None]]:
+    """Per-seed metrics from pair-level arrays (pairs x seeds) and placebo significance counts."""
+    per_seed: dict[str, list[float | None]] = {
+        k: []
+        for k in (
+            "correlation",
+            "sign_agreement",
+            "false_positive_rate_pairs",
+            "false_positive_rate_pairs_and_placebo",
+        )
+    }
+    for s in range(synth.shape[1]):
+        model = synth[:, s]
+        ok = ~(np.isnan(human) | np.isnan(model))
+        agg = effect_size_agreement(human[ok], model[ok], null_mask[ok], sig[ok, s])
+        per_seed["correlation"].append(agg["correlation"])
+        per_seed["sign_agreement"].append(agg["sign_agreement"])
+        per_seed["false_positive_rate_pairs"].append(agg["false_positive_rate"])
+        n_null = int(null_mask[ok].sum())
+        per_seed["false_positive_rate_pairs_and_placebo"].append(
+            (int(sig[ok, s][null_mask[ok]].sum()) + int(placebo_sig_counts[s]))
+            / (n_null + n_placebo)
+            if n_null + n_placebo
+            else None
+        )
+    return per_seed
+
+
+def pool_runs(runs: Sequence[dict[str, Any]]) -> dict[str, Any] | None:
+    """Pool `effects` sections of several runs (the 8 leave-one-experiment-out folds).
+
+    Pairs are concatenated, so every contrast is scored by a model that never saw its experiment;
+    the per-seed metrics are then recomputed over the union. Seeds must match across runs.
+    """
+    runs = [r for r in runs if r]
+    if not runs:
+        return None
+    n_seeds = {len(next(iter(r["pairs"].values()))["synthetic_d_per_seed"]) for r in runs}
+    if len(n_seeds) != 1:
+        raise ValueError("runs use different numbers of population seeds")
+    pairs: dict[str, Any] = {}
+    for r in runs:
+        for pid, v in r["pairs"].items():
+            if pid in pairs:
+                raise ValueError(f"pair {pid} appears in more than one fold")
+            pairs[pid] = v
+    human = np.array([np.nan if v["human_d"] is None else v["human_d"] for v in pairs.values()])
+    null_mask = np.array([v["human_null"] for v in pairs.values()])
+    synth = np.array(
+        [[np.nan if x is None else x for x in v["synthetic_d_per_seed"]] for v in pairs.values()]
+    )
+    sig = np.array([v["significant_per_seed"] for v in pairs.values()])
+    placebo = np.sum([r["placebo_significant_per_seed"] for r in runs], axis=0)
+    n_placebo = sum(r["n_placebo_contrasts"] for r in runs)
+    per_seed = _aggregate(human, null_mask, synth, sig, placebo, n_placebo)
+    return {
+        "n_pairs": len(pairs),
+        "n_human_null": int(null_mask.sum()),
+        "n_placebo_contrasts": n_placebo,
+        "iteration_metric": "false_positive_rate_pairs",
+        "pairs": pairs,
+        "per_seed": per_seed,
+        "summary": {k: _mean_sd(v) for k, v in per_seed.items()},
     }

@@ -1,0 +1,18 @@
+{
+  "assignment_hash": "454e4f6ec63fe72ec7783a67ee9029b861590421da31224837aa373a3f432921",
+  "counts": {
+    "excluded": 275539,
+    "test": 412,
+    "train": 1091784,
+    "val": 412
+  },
+  "fractions": {
+    "test": 0.1,
+    "val": 0.1
+  },
+  "held_out_experiment": "wta_wtp",
+  "manifest_hash": "4dd41261c20334cbd9856534de6f5756d3b8d4ed78851b06d9d39c5f16ab7586",
+  "name": "heldout_experiment_f5",
+  "removed_item_ids": [],
+  "seed": 0
+}

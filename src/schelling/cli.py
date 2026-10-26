@@ -127,6 +127,45 @@ def data_splits(
     (out / "contamination_heldout_item.json").write_text(json.dumps(summary, indent=2) + "\n")
 
 
+@app.command("effects-pool")
+def effects_pool(
+    run: Annotated[
+        list[Path], typer.Option(help="run directory with metrics.json; repeat per fold")
+    ],
+    out: Annotated[Path, typer.Option(help="where to write the pooled effects.json")],
+) -> None:
+    """Pool treatment-effect results across leave-one-experiment-out folds."""
+    from schelling.eval import provenance
+    from schelling.eval.effects import pool_runs
+
+    metrics = [json.loads((r / "metrics.json").read_text()) for r in run]
+    pooled = pool_runs([m["effects"] for m in metrics])
+    if pooled is None:
+        typer.echo("no estimable contrasts in these runs", err=True)
+        raise typer.Exit(code=1)
+    payload = {
+        "git_sha": provenance.git_sha(),
+        "dirty": provenance.git_dirty(),
+        "created_at": provenance.now_iso(),
+        "models": sorted({m["model"] for m in metrics}),
+        "source_runs": [
+            {
+                "split": m["split"],
+                "partition": m["partition"],
+                "seed": m["seed"],
+                "split_manifest_hash": m["split_manifest_hash"],
+                "config_hash": m["config_hash"],
+                "git_sha": m["git_sha"],
+            }
+            for m in metrics
+        ],
+        "effects": pooled,
+    }
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
+    typer.echo(f"wrote {out}")
+
+
 @app.command()
 def train() -> None:
     """Train a model from a YAML config."""

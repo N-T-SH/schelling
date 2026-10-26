@@ -1,0 +1,18 @@
+{
+  "assignment_hash": "ea78f9491ad7014a71941ca4c72c6f5e589edcb93dfc3cde5a09cec2d46691ec",
+  "counts": {
+    "excluded": 275539,
+    "test": 412,
+    "train": 1091784,
+    "val": 412
+  },
+  "fractions": {
+    "test": 0.1,
+    "val": 0.1
+  },
+  "held_out_experiment": "proportion_dominance_2",
+  "manifest_hash": "f2fb615266e8eee06511d8d3c7f5b86c546b65174fdd7dba2beae31232ef1886",
+  "name": "heldout_experiment_f3",
+  "removed_item_ids": [],
+  "seed": 0
+}

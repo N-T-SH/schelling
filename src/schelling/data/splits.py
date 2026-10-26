@@ -21,13 +21,20 @@ SPLIT_NAMES = (
     "heldout_domain",
     "temporal",
     "retest",
-    "heldout_experiment",
+    # Leave-one-experiment-out: fold k holds out one of the 8 experiments in effects_pairs.yaml.
+    *(f"heldout_experiment_f{k}" for k in range(8)),
 )
-# Eligible experiments are few (8), so 10% would hold out less than one: use 2 val + 2 test.
-VAL_EXPERIMENTS = 2
-TEST_EXPERIMENTS = 2
+EXPERIMENT_PREFIX = "heldout_experiment_f"
 VAL_FRAC = 0.10
 TEST_FRAC = 0.10
+
+
+def fold_experiment(fold: int, seed: int) -> str:
+    """The experiment held out in LOEO fold `fold` (experiments ranked by seeded hash)."""
+    from schelling.eval.effects import load_pairs
+
+    names = sorted({p["experiment"] for p in load_pairs()}, key=lambda e: _h(seed, "loeo", e))
+    return names[fold]
 
 
 def _h(seed: int, salt: str, key: str) -> str:
@@ -96,18 +103,21 @@ def _assign(frame: pd.DataFrame, name: str, seed: int, direction: str) -> pd.Ser
             out[order[a:b]] = "val"
             out[order[b:]] = "test"
         return out
-    if name == "heldout_experiment":
-        # Both arms of every contrast in effects_pairs.yaml land in the same partition, so a
-        # model cannot have seen one arm of an effect it is asked to predict.
+    if name.startswith(EXPERIMENT_PREFIX):
+        # Fold k: experiment e_k is absent from train for everyone. Its val and test rows are the
+        # val and test persons of heldout_person; every other row of val and test persons is
+        # excluded, so val/test contain only unseen-experiment, unseen-person rows.
         from schelling.eval.effects import experiment_of_item
 
         exp = frame["item_id"].map(experiment_of_item())
-        names = sorted(exp.dropna().unique(), key=lambda e: _h(seed, name, str(e)))
-        label = {e: "val" for e in names[:VAL_EXPERIMENTS]}
-        label |= {e: "test" for e in names[VAL_EXPERIMENTS : VAL_EXPERIMENTS + TEST_EXPERIMENTS]}
-        return exp.map(
-            lambda e, lab=label: lab.get(e, "train") if isinstance(e, str) else "train"
-        ).astype(object)
+        held_exp = fold_experiment(int(name[len(EXPERIMENT_PREFIX) :]), seed)
+        person_part = _rank_assign(frame["person_id"], frame["source"], seed, "heldout_person")
+        out = pd.Series(None, index=frame.index, dtype=object)
+        is_held = exp == held_exp
+        out[(person_part == "train") & ~is_held] = "train"
+        out[is_held & (person_part == "val")] = "val"
+        out[is_held & (person_part == "test")] = "test"
+        return out
     if name == "retest":
         # Wave-4 answers only; used to measure the test-retest ceiling, never to train.
         out = pd.Series(None, index=frame.index, dtype=object)
@@ -130,15 +140,13 @@ def split_manifest(
     body = {
         "name": name,
         "seed": seed,
-        "fractions": (
-            {"val_experiments": VAL_EXPERIMENTS, "test_experiments": TEST_EXPERIMENTS}
-            if name == "heldout_experiment"
-            else {"val": VAL_FRAC, "test": TEST_FRAC}
-        ),
+        "fractions": {"val": VAL_FRAC, "test": TEST_FRAC},
         "counts": {k: int(counts.get(k, 0)) for k in ("train", "val", "test", "excluded")},
         "removed_item_ids": sorted(exclude_item_ids),
         "assignment_hash": hashlib.sha256(joined.encode()).hexdigest(),
     }
+    if name.startswith(EXPERIMENT_PREFIX):
+        body["held_out_experiment"] = fold_experiment(int(name[len(EXPERIMENT_PREFIX) :]), seed)
     body["manifest_hash"] = hashlib.sha256(json.dumps(body, sort_keys=True).encode()).hexdigest()
     return body
 

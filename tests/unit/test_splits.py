@@ -41,7 +41,7 @@ def test_all_five_splits_plus_retest_exist() -> None:
         "heldout_domain",
         "temporal",
         "retest",
-        "heldout_experiment",
+        *(f"heldout_experiment_f{k}" for k in range(8)),
     }
 
 
@@ -136,57 +136,62 @@ def _experiment_frame() -> pd.DataFrame:
     from schelling.eval.effects import load_pairs
 
     items = sorted({a for p in load_pairs() for a in (p["arm_a"], p["arm_b"])})
+    persons = [f"p{k}" for k in range(100)]
     rows = [
         {
             "record_id": f"{i}-{k}",
             "source": "twin2k",
             "study_id": "s",
             "item_id": i,
-            "person_id": f"p{k}",
+            "person_id": k,
             "trial_idx": None,
             "wave": 1,
         }
-        for i in items
-        for k in range(5)
-    ]
-    rows += [
-        {
-            "record_id": f"o-{k}",
-            "source": "twin2k",
-            "study_id": "s",
-            "item_id": "QID999",
-            "person_id": f"p{k}",
-            "trial_idx": None,
-            "wave": 1,
-        }
-        for k in range(5)
+        for i in [*items, "QID999"]
+        for k in persons
     ]
     return pd.DataFrame(rows)
 
 
-def test_heldout_experiment_keeps_both_arms_together_and_other_items_in_train() -> None:
-    from schelling.eval.effects import experiment_of_item, load_pairs
+def test_each_experiment_is_held_out_in_exactly_one_fold() -> None:
+    from schelling.data.splits import fold_experiment
+
+    held = [fold_experiment(k, 0) for k in range(8)]
+    assert len(set(held)) == 8
+
+
+def test_fold_keeps_held_out_experiment_out_of_train_and_is_person_disjoint() -> None:
+    from schelling.data.splits import fold_experiment
+    from schelling.eval.effects import experiment_of_item
 
     f = _experiment_frame()
-    f = f.assign(partition=assign_partitions(f, "heldout_experiment", seed=0))
-    for p in load_pairs():
-        a = set(f[f.item_id == p["arm_a"]].partition)
-        b = set(f[f.item_id == p["arm_b"]].partition)
-        assert a == b and len(a) == 1
-    by_exp = f.assign(exp=f.item_id.map(experiment_of_item())).dropna(subset=["exp"])
-    assert by_exp.groupby("exp").partition.nunique().max() == 1
-    counts = by_exp.drop_duplicates("exp").partition.value_counts()
-    assert counts["val"] == 2 and counts["test"] == 2 and counts["train"] == 4
-    assert (f[f.item_id == "QID999"].partition == "train").all()
+    exp = f.item_id.map(experiment_of_item())
+    for k in range(8):
+        held = fold_experiment(k, 0)
+        g = f.assign(partition=assign_partitions(f, f"heldout_experiment_f{k}", seed=0), exp=exp)
+        assert not (g[g.exp == held].partition == "train").any()
+        # val/test hold only the held-out experiment; everything else outside train is excluded
+        assert set(g[g.partition.isin(["val", "test"])].exp) == {held}
+        train_p = set(g[g.partition == "train"].person_id)
+        assert train_p.isdisjoint(set(g[g.partition.isin(["val", "test"])].person_id))
+        assert (
+            g[g.item_id == "QID999"].partition.isin(["train"])
+            | g[g.item_id == "QID999"].partition.isna()
+        ).all()
 
 
-def test_heldout_experiment_depends_on_seed_and_is_deterministic() -> None:
+def test_fold_person_assignment_matches_heldout_person() -> None:
     f = _experiment_frame()
-    chosen = {
-        s: tuple(sorted(set(f[assign_partitions(f, "heldout_experiment", s) == "val"].item_id)))
-        for s in range(6)
-    }
-    assert chosen[0] == tuple(
-        sorted(set(f[assign_partitions(f, "heldout_experiment", 0) == "val"].item_id))
-    )
-    assert len(set(chosen.values())) > 1
+    base = assign_partitions(f, "heldout_person", seed=0)
+    fold = assign_partitions(f, "heldout_experiment_f3", seed=0)
+    val_persons = set(f[base == "val"].person_id)
+    assert set(f[fold == "val"].person_id) <= val_persons
+
+
+def test_fold_is_deterministic_and_seed_dependent() -> None:
+    from schelling.data.splits import fold_experiment
+
+    f = _experiment_frame()
+    a = assign_partitions(f, "heldout_experiment_f0", seed=0)
+    assert a.equals(assign_partitions(f, "heldout_experiment_f0", seed=0))
+    assert len({fold_experiment(0, s) for s in range(8)}) > 1
