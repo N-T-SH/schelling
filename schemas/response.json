@@ -1,0 +1,56 @@
+{
+  "properties": {
+    "entropy": {
+      "minimum": 0,
+      "title": "Entropy",
+      "type": "number"
+    },
+    "expected_level": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Expected Level"
+    },
+    "p_yes": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "P Yes"
+    },
+    "probs": {
+      "items": {
+        "type": "number"
+      },
+      "title": "Probs",
+      "type": "array"
+    },
+    "type": {
+      "enum": [
+        "noul",
+        "choice",
+        "score"
+      ],
+      "title": "Type",
+      "type": "string"
+    }
+  },
+  "required": [
+    "type",
+    "probs",
+    "entropy"
+  ],
+  "title": "Answer",
+  "type": "object"
+}

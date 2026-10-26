@@ -10,3 +10,4 @@ All notable changes to this project are documented here. The format follows
 
 - Project brief: build spec, coding-agent instructions, research protocol, assumptions
   register and templates.
+- M0 scaffold: package skeleton, typed request/response schemas with JSON Schema export, CLI stubs, ruff/mypy/pre-commit, CI workflow.

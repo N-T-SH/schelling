@@ -1,0 +1,238 @@
+{
+  "$defs": {
+    "Choice": {
+      "properties": {
+        "options": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 20,
+          "minItems": 2,
+          "title": "Options",
+          "type": "array"
+        },
+        "prompt": {
+          "title": "Prompt",
+          "type": "string"
+        },
+        "type": {
+          "const": "choice",
+          "default": "choice",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "prompt",
+        "options"
+      ],
+      "title": "Choice",
+      "type": "object"
+    },
+    "HistoryItem": {
+      "description": "A prior (question, options, answer) triple from the same person.",
+      "properties": {
+        "answer": {
+          "minimum": 0,
+          "title": "Answer",
+          "type": "integer"
+        },
+        "options": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Options",
+          "type": "array"
+        },
+        "question": {
+          "title": "Question",
+          "type": "string"
+        }
+      },
+      "required": [
+        "question",
+        "options",
+        "answer"
+      ],
+      "title": "HistoryItem",
+      "type": "object"
+    },
+    "Noul": {
+      "properties": {
+        "false_description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "False Description"
+        },
+        "proposition": {
+          "minLength": 1,
+          "title": "Proposition",
+          "type": "string"
+        },
+        "true_description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "True Description"
+        },
+        "type": {
+          "const": "noul",
+          "default": "noul",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "proposition"
+      ],
+      "title": "Noul",
+      "type": "object"
+    },
+    "PersonContext": {
+      "properties": {
+        "attributes": {
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "integer"
+              }
+            ]
+          },
+          "title": "Attributes",
+          "type": "object"
+        },
+        "history": {
+          "items": {
+            "$ref": "#/$defs/HistoryItem"
+          },
+          "title": "History",
+          "type": "array"
+        },
+        "person_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Person Id"
+        }
+      },
+      "title": "PersonContext",
+      "type": "object"
+    },
+    "Score": {
+      "properties": {
+        "levels": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 10,
+          "minItems": 2,
+          "title": "Levels",
+          "type": "array"
+        },
+        "prompt": {
+          "title": "Prompt",
+          "type": "string"
+        },
+        "type": {
+          "const": "score",
+          "default": "score",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "prompt",
+        "levels"
+      ],
+      "title": "Score",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "person": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/PersonContext"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "questions": {
+      "additionalProperties": {
+        "discriminator": {
+          "mapping": {
+            "choice": "#/$defs/Choice",
+            "noul": "#/$defs/Noul",
+            "score": "#/$defs/Score"
+          },
+          "propertyName": "type"
+        },
+        "oneOf": [
+          {
+            "$ref": "#/$defs/Noul"
+          },
+          {
+            "$ref": "#/$defs/Choice"
+          },
+          {
+            "$ref": "#/$defs/Score"
+          }
+        ]
+      },
+      "title": "Questions",
+      "type": "object"
+    },
+    "state": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      ],
+      "title": "State"
+    }
+  },
+  "required": [
+    "state",
+    "questions"
+  ],
+  "title": "DecisionRequest",
+  "type": "object"
+}
