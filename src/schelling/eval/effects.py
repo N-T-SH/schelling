@@ -131,6 +131,8 @@ def run_effects(
             rows_of.get(p["arm_a"], np.array([], dtype=int)),
             rows_of.get(p["arm_b"], np.array([], dtype=int)),
         )
+        if len(ia) == 0 and len(ib) == 0:
+            continue  # the pair belongs to another partition; not a skip
         if len(ia) < min_persons or len(ib) < min_persons:
             skipped[p["id"]] = f"fewer than {min_persons} persons in an arm ({len(ia)}, {len(ib)})"
             continue

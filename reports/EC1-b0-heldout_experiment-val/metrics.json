@@ -14,7 +14,7 @@
     ]
   },
   "config_hash": "7d905b96811018dde15421c27b7dd7f647cc95c3b48907ec80008ca8e1b89e65",
-  "created_at": "2026-10-26T09:44:18+00:00",
+  "created_at": "2026-10-26T09:46:51+00:00",
   "dirty": false,
   "effects": {
     "iteration_metric": "false_positive_rate_pairs",
@@ -301,14 +301,14 @@
     }
   },
   "efficiency": {
-    "batch_decisions_per_s": 802945.269796105,
-    "decisions_per_s": 9063.75242402817,
+    "batch_decisions_per_s": 713648.5783206201,
+    "decisions_per_s": 8835.843335323993,
     "device": "cpu",
     "n_requests": 200.0,
-    "p50_ms": 0.10747901978902519,
-    "p95_ms": 0.12048059143126008
+    "p50_ms": 0.10933299199678004,
+    "p95_ms": 0.127381258062087
   },
-  "git_sha": "1616058b2082e6eac1e4a1e3bdb657c6db2cbade",
+  "git_sha": "3adc37f5ab1067096b21ba30ed95095b686ea443",
   "individual": {
     "by_source": {
       "twin2k": {
@@ -524,5 +524,5 @@
   },
   "seed": 0,
   "split": "heldout_experiment",
-  "split_manifest_hash": "e49bf341f507fcb301ca4307bed610f1f2fcc23d67ce92f3fc08f056efc732dc"
+  "split_manifest_hash": "4dd34065a776325eeefc477d47f6e2e4afb6c8beed417a743a4a5e368d41bfe7"
 }

@@ -14,7 +14,7 @@
     ]
   },
   "config_hash": "758fa36dacae23d62572902e227825115f4082fff43c5b98977c4b6e9ab55233",
-  "created_at": "2026-10-26T09:44:31+00:00",
+  "created_at": "2026-10-26T09:47:03+00:00",
   "dirty": false,
   "effects": {
     "iteration_metric": "false_positive_rate_pairs",
@@ -301,14 +301,14 @@
     }
   },
   "efficiency": {
-    "batch_decisions_per_s": 208414.7449095706,
-    "decisions_per_s": 6476.520001481016,
+    "batch_decisions_per_s": 230514.33512209167,
+    "decisions_per_s": 6679.4889404005735,
     "device": "cpu",
     "n_requests": 200.0,
-    "p50_ms": 0.1482914958614856,
-    "p95_ms": 0.19765238685067735
+    "p50_ms": 0.14775001909583807,
+    "p95_ms": 0.1586972939549014
   },
-  "git_sha": "1616058b2082e6eac1e4a1e3bdb657c6db2cbade",
+  "git_sha": "3adc37f5ab1067096b21ba30ed95095b686ea443",
   "individual": {
     "by_source": {
       "twin2k": {
@@ -524,5 +524,5 @@
   },
   "seed": 0,
   "split": "heldout_experiment",
-  "split_manifest_hash": "e49bf341f507fcb301ca4307bed610f1f2fcc23d67ce92f3fc08f056efc732dc"
+  "split_manifest_hash": "4dd34065a776325eeefc477d47f6e2e4afb6c8beed417a743a4a5e368d41bfe7"
 }
