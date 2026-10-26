@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import os
 from pathlib import Path
 
@@ -34,10 +35,20 @@ def load_records(processed_dir: Path) -> pd.DataFrame:
     return pd.concat([pd.read_parquet(p) for p in parts], ignore_index=True)
 
 
-def load_partition(processed_dir: Path, split: str, partition: str, seed: int = 0) -> pd.DataFrame:
+def load_partition(
+    processed_dir: Path,
+    split: str,
+    partition: str,
+    seed: int = 0,
+    splits_dir: Path = Path("splits"),
+) -> pd.DataFrame:
     # Check the guard before touching any data.
     if partition == "test" and os.environ.get(ALLOW_TEST_ENV) != "1":
         select_partition(pd.DataFrame({"partition": []}), partition)
     frame = load_records(processed_dir)
-    frame["partition"] = assign_partitions(frame, split, seed)
+    removed: list[str] = []
+    manifest_path = splits_dir / f"{split}.json"
+    if manifest_path.exists():  # contamination removals are part of the committed split
+        removed = json.loads(manifest_path.read_text()).get("removed_item_ids", [])
+    frame["partition"] = assign_partitions(frame, split, seed, exclude_item_ids=removed)
     return select_partition(frame, partition)

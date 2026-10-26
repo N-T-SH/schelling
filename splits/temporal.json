@@ -10,7 +10,8 @@
     "test": 0.1,
     "val": 0.1
   },
-  "manifest_hash": "6d8f95adbc831dbc5b36040f80d52ab5a5badced3c3bc53dec82f229530b2dc9",
+  "manifest_hash": "124fc6cb6462df2f1fb517dd6aecfe40d2a81d8ac0385eb03c7bb2158305678f",
   "name": "temporal",
+  "removed_item_ids": [],
   "seed": 0
 }

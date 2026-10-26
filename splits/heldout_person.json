@@ -10,7 +10,8 @@
     "test": 0.1,
     "val": 0.1
   },
-  "manifest_hash": "87431774eeab48c8396a7eb693da7a9c40c8dc2932f8ec9cf342e4285135b706",
+  "manifest_hash": "c77fe1b963008c710d8f9740ad977a54cd69b19e01943ec96095e509e2b00297",
   "name": "heldout_person",
+  "removed_item_ids": [],
   "seed": 0
 }

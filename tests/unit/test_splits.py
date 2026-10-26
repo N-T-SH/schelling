@@ -114,3 +114,18 @@ def test_manifest_hash_is_stable_and_changes_with_assignment(frame: pd.DataFrame
     c = split_manifest(frame, "heldout_person", seed=1)
     assert a == b and a["manifest_hash"] != c["manifest_hash"]
     assert set(a["counts"]) >= {"train", "val", "test"}
+
+
+def test_excluded_items_leave_val_and_test_but_not_train(frame: pd.DataFrame) -> None:
+    base = assign_partitions(frame, "heldout_item", seed=0)
+    held_items = sorted(set(frame[base.isin(["val", "test"])].item_id))[:5]
+    train_items = sorted(set(frame[base == "train"].item_id))[:5]
+    part = assign_partitions(
+        frame, "heldout_item", seed=0, exclude_item_ids=[*held_items, *train_items]
+    )
+    f = frame.assign(partition=part)
+    assert f[f.item_id.isin(held_items)].partition.isna().all()
+    assert (f[f.item_id.isin(train_items)].partition == "train").all()
+    assert set(split_manifest(frame, "heldout_item", 0, held_items)["removed_item_ids"]) == set(
+        held_items
+    )

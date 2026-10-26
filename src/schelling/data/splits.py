@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+from collections.abc import Collection
 from pathlib import Path
 from typing import Any
 
@@ -43,9 +44,25 @@ def _rank_assign(units: pd.Series, source: pd.Series, seed: int, salt: str) -> p
 
 
 def assign_partitions(
-    frame: pd.DataFrame, name: str, seed: int, direction: str = "lab_to_survey"
+    frame: pd.DataFrame,
+    name: str,
+    seed: int,
+    direction: str = "lab_to_survey",
+    exclude_item_ids: Collection[str] = (),
 ) -> pd.Series:
-    """Return train/val/test (or None for rows the split excludes), indexed like `frame`."""
+    """Return train/val/test (or None for rows the split excludes), indexed like `frame`.
+
+    `exclude_item_ids` are removed from val and test (contamination removal); train is untouched.
+    """
+    out = _assign(frame, name, seed, direction)
+    if exclude_item_ids:
+        out = out.mask(
+            frame["item_id"].isin(set(exclude_item_ids)) & out.isin(["val", "test"]), None
+        )
+    return out
+
+
+def _assign(frame: pd.DataFrame, name: str, seed: int, direction: str) -> pd.Series:
     if name == "heldout_person":
         return _rank_assign(frame["person_id"], frame["source"], seed, name)
     if name == "heldout_item":
@@ -86,8 +103,10 @@ def assign_partitions(
     raise ValueError(f"unknown split {name!r}; choose from {SPLIT_NAMES}")
 
 
-def split_manifest(frame: pd.DataFrame, name: str, seed: int) -> dict[str, Any]:
-    part = assign_partitions(frame, name, seed)
+def split_manifest(
+    frame: pd.DataFrame, name: str, seed: int, exclude_item_ids: Collection[str] = ()
+) -> dict[str, Any]:
+    part = assign_partitions(frame, name, seed, exclude_item_ids=exclude_item_ids)
     counts = part.fillna("excluded").value_counts().to_dict()
     joined = "\n".join(
         f"{rid}:{p}" for rid, p in sorted(zip(frame["record_id"], part.fillna("-"), strict=True))
@@ -97,6 +116,7 @@ def split_manifest(frame: pd.DataFrame, name: str, seed: int) -> dict[str, Any]:
         "seed": seed,
         "fractions": {"val": VAL_FRAC, "test": TEST_FRAC},
         "counts": {k: int(counts.get(k, 0)) for k in ("train", "val", "test", "excluded")},
+        "removed_item_ids": sorted(exclude_item_ids),
         "assignment_hash": hashlib.sha256(joined.encode()).hexdigest(),
     }
     body["manifest_hash"] = hashlib.sha256(json.dumps(body, sort_keys=True).encode()).hexdigest()

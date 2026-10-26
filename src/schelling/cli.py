@@ -99,12 +99,10 @@ def data_splits(
     from schelling.data.loader import load_records
 
     frame = load_records(processed)
-    for name in splits.SPLIT_NAMES:
-        path = splits.write_split(splits.split_manifest(frame, name, seed), out)
-        typer.echo(f"wrote {path}")
+    # Contamination is measured on heldout_item's raw partition, then those items are removed
+    # from its val and test. Compare question plus options: Likert rows share a long
+    # instruction, so question text alone would flag every row as a sibling's near duplicate.
     part = splits.assign_partitions(frame, "heldout_item", seed)
-    # Compare question plus answer options: Likert rows share a long instruction, so question
-    # text alone would flag every row as a near duplicate of its siblings.
     keyed = frame.assign(
         question=frame["question"]
         + " | "
@@ -114,9 +112,19 @@ def data_splits(
     rep = contamination.contamination_report(
         keyed[part == "train"], keyed[part.isin(["val", "test"])]
     )
-    rep.pop("exact"), rep.pop("near")  # ids only; counts are the reviewable summary
-    rep["n_removed"] = len(rep.pop("remove_item_ids"))
-    (out / "contamination_heldout_item.json").write_text(json.dumps(rep, indent=2) + "\n")
+    removed = rep["remove_item_ids"]
+    for name in splits.SPLIT_NAMES:
+        excl = removed if name == "heldout_item" else ()
+        path = splits.write_split(splits.split_manifest(frame, name, seed, excl), out)
+        typer.echo(f"wrote {path}")
+    summary = {
+        "threshold": rep["threshold"],
+        "n_held_items": rep["n_held_items"],
+        "n_exact": len(rep["exact"]),
+        "n_near": len(rep["near"]),
+        "n_removed": len(removed),
+    }
+    (out / "contamination_heldout_item.json").write_text(json.dumps(summary, indent=2) + "\n")
 
 
 @app.command()

@@ -10,7 +10,8 @@
     "test": 0.1,
     "val": 0.1
   },
-  "manifest_hash": "b8efb618c860d72bf8db097ad27022ba664b1b31bdfb28754ac3e15b37a1512b",
+  "manifest_hash": "8188b5cbd2771702f90d94990d1808abd0ab792a06d7dd486e12b53054491bea",
   "name": "retest",
+  "removed_item_ids": [],
   "seed": 0
 }

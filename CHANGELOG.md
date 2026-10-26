@@ -11,4 +11,4 @@ All notable changes to this project are documented here. The format follows
 - Project brief: build spec, coding-agent instructions, research protocol, assumptions
   register and templates.
 - M0 scaffold: package skeleton, typed request/response schemas with JSON Schema export, CLI stubs, ruff/mypy/pre-commit, CI workflow.
-- M1 data: unified `DecisionRecord`, Psych-101 and Twin-2K-500 adapters, manifests with checksums, six splits, MinHash contamination report, sealed-test loader guard, `schelling data build|splits`.
+- M1 data: unified `DecisionRecord`, Psych-101 and Twin-2K-500 adapters, manifests with checksums, six splits, MinHash contamination report, sealed-test loader guard, near-duplicate removal from heldout_item, `schelling data build|splits`.

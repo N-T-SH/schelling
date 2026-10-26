@@ -6,9 +6,9 @@ checkpoint. A fresh agent should be able to resume from it alone.
 ## Now
 
 - **Mode:** BUILD
-- **Milestone:** M1 Data (complete, awaiting sign-off)
+- **Milestone:** M2 Harness + baselines (not started)
 - **Campaign:** none
-- **Next step:** wait for human sign-off on `research/reports/M1.md` and decisions on its three findings; then plan M2.
+- **Next step:** plan M2 (assumptions A08, A09, A14), then implement.
 - **Done so far:** M0 signed off 2026-10-26. M1 built; real data built (Psych-101 1% sample).
 
 ## Plan for the current milestone or phase
@@ -27,10 +27,11 @@ Done when: adapter, split, contamination, guard and leakage tests pass; `schelli
 
 ## Blocked: needs the human
 
-M1 checkpoint: sign-off and three decisions needed (see `research/reports/M1.md`, section Findings).
+_(none)_
 
 ## Done
 
 | Date | Milestone / phase | Report | Signed off |
 | --- | --- | --- | --- |
 | 2026-10-26 | M0 Scaffold | research/reports/M0.md | yes |
+| 2026-10-26 | M1 Data | research/reports/M1.md | yes (near duplicates removed) |

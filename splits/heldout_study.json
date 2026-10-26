@@ -10,7 +10,8 @@
     "test": 0.1,
     "val": 0.1
   },
-  "manifest_hash": "db18b41b6cfbcf6859f84ca6f60139e29dd3237ba19bc4904f9a329169dc9be7",
+  "manifest_hash": "0b47e7be1958fb9f454acee0251ba24759cb1a0d313b2a1ececa225e39194981",
   "name": "heldout_study",
+  "removed_item_ids": [],
   "seed": 0
 }

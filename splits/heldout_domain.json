@@ -10,7 +10,8 @@
     "test": 0.1,
     "val": 0.1
   },
-  "manifest_hash": "2c574d863c4fc4b0b605289a17eaa47c21974f43148cdf3c5d578652f4433409",
+  "manifest_hash": "a7ac74c7403d4430b22819a5652f310f263d1e11505ba5bbaf9efa5e19771f50",
   "name": "heldout_domain",
+  "removed_item_ids": [],
   "seed": 0
 }
