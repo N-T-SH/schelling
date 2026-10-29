@@ -30,3 +30,16 @@ def test_bad_override_syntax_is_an_error(tmp_path: Path) -> None:
     f.write_text("name: x\n")
     with pytest.raises(ValueError):
         load_config(f, ["no-equals-sign"])
+
+
+def test_two_tower_options_have_defaults_and_validate(tmp_path: Path) -> None:
+    cfg = TrainConfig.model_validate(
+        {"name": "x", "model": {"architecture": "two_tower", "dim": 64, "use_person": False}}
+    )
+    assert (
+        cfg.model.architecture == "two_tower"
+        and cfg.model.use_person is False
+        and cfg.model.prior_weight == 1.0
+    )
+    with pytest.raises(ValidationError):
+        TrainConfig.model_validate({"name": "x", "model": {"architecture": "mystery"}})

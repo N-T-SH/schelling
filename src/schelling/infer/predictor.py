@@ -8,11 +8,11 @@ from pathlib import Path
 from typing import Any
 
 import torch
-from transformers import AutoTokenizer
+from transformers import AutoTokenizer, PretrainedConfig
 
 from schelling.infer.batching import build_tensors, options_of
 from schelling.infer.text import person_text
-from schelling.model import SchellingModel
+from schelling.model import SchellingModel, SchellingTwoTower
 from schelling.schema import Answer, Choice, DecisionRequest, Noul, PersonContext, Score
 
 Item = tuple[int, str, DecisionRequest, "Noul | Choice | Score"]
@@ -30,13 +30,15 @@ def _entropy(probs: list[float]) -> float:
 
 
 class Predictor:
-    def __init__(self, model: SchellingModel, tokenizer: Any) -> None:
+    def __init__(self, model: SchellingModel | SchellingTwoTower, tokenizer: Any) -> None:
         self.model = model.eval()
         self.tokenizer = tokenizer
 
     @classmethod
     def from_pretrained(cls, repo_or_path: str | Path, revision: str | None = None) -> Predictor:
-        model = SchellingModel.from_pretrained(str(repo_or_path), revision=revision or "main")
+        cfg, _ = PretrainedConfig.get_config_dict(str(repo_or_path), revision=revision or "main")
+        cls_ = SchellingTwoTower if cfg.get("model_type") == "schelling_tt" else SchellingModel
+        model = cls_.from_pretrained(str(repo_or_path), revision=revision or "main")
         tokenizer = AutoTokenizer.from_pretrained(
             str(repo_or_path), revision=revision or "main", trust_remote_code=False
         )
@@ -47,7 +49,7 @@ class Predictor:
         self.tokenizer.save_pretrained(str(path))
 
     def encode_person(self, person: PersonContext | None) -> PersonEmbedding:
-        return PersonEmbedding(person_text(person, self.model.config.history_items))
+        return PersonEmbedding(person_text(person, getattr(self.model.config, "history_items", 0)))
 
     # -- batching ---------------------------------------------------------------------------
 

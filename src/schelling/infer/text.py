@@ -92,3 +92,36 @@ def build_context(
             lo, hi = (mid, hi) if fits else (lo, mid - 1)
         text = render(person_text(person, 0, n_attr), s[len(s) - lo :] if lo else "")
     return text
+
+
+def attribute_strings(person: PersonContext | None, max_attributes: int) -> list[str]:
+    """One short `key: value` string per attribute, sorted by key (two-tower person tower)."""
+    if person is None:
+        return []
+    return [f"{k}: {_short(v)}" for k, v in sorted(person.attributes.items())[:max_attributes]]
+
+
+def build_question_context(
+    state: str | dict[str, object] | list[str],
+    question: Noul | Choice | Score,
+    tokenizer: Any,
+    max_tokens: int,
+) -> str:
+    """`[STATE] ... [QUESTION] ...` for the question tower: no person. The question is never cut;
+    an over-long state keeps its end."""
+    q = question_text(question)
+    s = state_text(state)
+
+    def render(st: str) -> str:
+        return f"[STATE] {st} [QUESTION] {q}"
+
+    def n_tokens(text: str) -> int:
+        return len(tokenizer(text, add_special_tokens=True)["input_ids"])
+
+    if n_tokens(render(s)) <= max_tokens:
+        return render(s)
+    lo, hi = 0, len(s)
+    while lo < hi:
+        mid = (lo + hi + 1) // 2
+        lo, hi = (mid, hi) if n_tokens(render(s[len(s) - mid :])) <= max_tokens else (lo, mid - 1)
+    return render(s[len(s) - lo :] if lo else "")

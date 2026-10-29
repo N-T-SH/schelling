@@ -247,6 +247,10 @@ def _collate(rows: _Rows, idx: np.ndarray, rng: np.random.Generator, augment: bo
 
 
 def train(cfg: TrainConfig) -> TrainResult:
+    if cfg.model.architecture == "two_tower":
+        from schelling.train.cached_trainer import train_cached
+
+        return train_cached(cfg)
     t_start = time.time()
     _seed_all(cfg.seed, cfg.deterministic)
     device = _device(cfg)

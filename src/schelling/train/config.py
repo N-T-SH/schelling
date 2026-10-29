@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 import yaml
 from pydantic import BaseModel, ConfigDict
@@ -14,6 +14,7 @@ class _Strict(BaseModel):
 
 
 class ModelCfg(_Strict):
+    architecture: Literal["cross", "two_tower"] = "cross"
     backbone: str = "answerdotai/ModernBERT-base"
     tiny_vocab: str | None = None  # path to a vocab file: build a tiny random BERT (tests, CI)
     history_items: int = 0
@@ -21,6 +22,15 @@ class ModelCfg(_Strict):
     max_option_tokens: int = 16
     head_hidden: int = 256
     freeze_layers: int = 0  # freeze the embeddings and this many lowest encoder layers
+    # two-tower (decision 0004)
+    dim: int = 256
+    person_heads: int = 4
+    dropout: float = 0.1
+    use_person: bool = True  # ablation: False removes the person tower's effect
+    prior_weight: float = 1.0  # weight of the item-prior-only loss
+    max_question_tokens: int = 192
+    max_attr_tokens: int = 16
+    max_attributes: int = 32
 
 
 class DataCfg(_Strict):
