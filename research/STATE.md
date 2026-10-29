@@ -6,7 +6,7 @@ checkpoint. A fresh agent should be able to resume from it alone.
 ## Now
 
 - **Mode:** BUILD
-- **Milestone:** M4 Real training (run complete; criterion NOT met; awaiting human decision)
+- **Milestone:** M4 redesign: two-tower model (decision 0004), in progress
 - **Campaign:** none
 - **Next step:** human chooses among the three options in the M4 report. No work is queued.
 - **Eval change:** treatment-effect metrics and LOEO folds merged (`research/reports/EC1-treatment-effects.md`, decisions 0002 and 0003).
@@ -14,19 +14,12 @@ checkpoint. A fresh agent should be able to resume from it alone.
 
 ## Plan for the current milestone or phase
 
-M4 Real training (SPEC milestone 5). Standing instruction: continue past M3 when it leaves no decision points (it did). M4 ends at a human checkpoint regardless.
+M4 redesign per `docs/decisions/0004-two-tower-model.md` (human approved 2026-10-29). M5 is NOT started (human instruction). The M4 done-criterion is unchanged: beat B1 on Twin-2K-500 `heldout_person` val NLL; Psych-101 excluded (decision 0001).
 
-Done when (SPEC, read with decision 0001): trained ModernBERT-base beats B1 on NLL on `heldout_person` val for Twin-2K-500 (Psych-101 excluded from the bar); goldens frozen. If it does not, that is the result: report it plainly.
-
-Hardware reality (A12 + benchmark 2026-10-26, Apple M4, MPS): ModernBERT-base full fine-tune runs at about 2,200 tokens/s (about 16 examples/s at 128 context tokens); freezing the embeddings and lowest 14 of 22 layers doubles that. So the budget is on the order of 100,000 to 150,000 example presentations (about a tenth of one epoch of the Twin train partition) in 1 to 1.5 hours, and the full validation evaluation of about 136,000 rows will take tens of minutes. This is a smoke-scale run of the idea, not a tuned one. Decision for the report: single seed, one config, no tuning on val beyond early stopping.
-
-Design:
-- `train/config.py` (pydantic, YAML, `--set key=value`), `train/losses.py` (hard and soft CE, Noul BCE, Choice CE with masks, Score CORN loss which equals the NLL of the distribution; tested), `train/sampler.py` (study temperature sampling, p proportional to n^0.5), `train/trainer.py` (AdamW with separate head and backbone learning rates, cosine schedule with warmup, early stopping on val NLL of `heldout_person`, best and last checkpoints, TensorBoard, `run.json` with config, git sha, dirty flag, split manifest hash, package versions, seeds), `model/calibration.py` (per-head temperature fitted on val logits, stored in the config), `infer/batching.py` (shared tensorisation so training and inference cannot differ), `infer/baseline_adapter.py` (a saved model as a `predict_proba` baseline so `schelling eval --model <dir>` works unchanged).
-- Heads expose raw logits so calibration can refit temperatures without re-running the encoder; behaviour unchanged (existing tests guard it).
-- Training input: person attributes only (`history_items` 0): conditioning on a person's other answers is campaign C01, not M4. Random option permutation augmentation for Choice. Psych-101 included in training through the sampler; its results stay labelled uninformative.
-- Option texts are deduplicated per batch in the model (done, numerically identical).
-- Tests first: `test_losses`, `test_calibration`, `test_sampler`, `test_train_config`, integration (50-step fixture run: loss decreases, `run.json` complete, safetensors, two runs bitwise identical = A13, CLI smoke, `eval --model <dir>` works), regression golden (slow).
-- Goldens: `tests/golden/metrics.json` created once from the fixture run by `scripts/make_golden.py`; updating needs `[golden-update]` in the commit message.
+Build: `model/{configuration_schelling_tt,heads_tt,modeling_schelling_tt}.py`; `infer/text.py` question context; `infer/batching.py` dispatch on `model_type`; `Predictor` dispatch; `train/cached_trainer.py` (Stage A: frozen backbone, cached vectors, Twin only); `schelling train` dispatch on `model.architecture`.
+Tests first: head shapes and zero-init residual, order-equivariance and set-invariance (Hypothesis), batch equals single, cache on/off identical, cached-training path equals live forward, save/load and fresh-process custom-code load, cached trainer integration (loss decreases, run.json, determinism, ablation flags), eval of the saved model through the unchanged harness.
+Experiments (validation only, protocol: 5 seeds for the final config): full model; ablations (no person tower, no prior loss); `heldout_person` against the criterion; extra evidence on `heldout_item` and the eight `heldout_experiment` folds with pooled effects; baselines on `heldout_item` for comparison.
+Report: `research/reports/M4b.md` with audited numbers; stop at the checkpoint.
 
 ## Blocked: needs the human
 
