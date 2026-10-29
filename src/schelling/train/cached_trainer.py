@@ -94,6 +94,7 @@ def build_cache(
 ) -> CachedData:
     cfg = model.config
     q_text: dict[str, int] = {}
+    ctx_memo: dict[tuple[str, str, str], str] = {}
     o_text: dict[str, int] = {}
     a_text: dict[str, int] = {}
     person_ix: dict[str, int] = {}
@@ -117,12 +118,12 @@ def build_cache(
             state or "",
             attrs.get(str(pid)),
         )
-        q_idx.append(
-            q_text.setdefault(
-                build_question_context(req.state, q, tokenizer, cfg.max_question_tokens),
-                len(q_text),
+        mkey = (qtype, text, state or "")
+        if mkey not in ctx_memo:  # the same item recurs for every person
+            ctx_memo[mkey] = build_question_context(
+                req.state, q, tokenizer, cfg.max_question_tokens
             )
-        )
+        q_idx.append(q_text.setdefault(ctx_memo[mkey], len(q_text)))
         if str(pid) not in person_ix:
             person_ix[str(pid)] = len(person_ix)
             person_attr.append(
