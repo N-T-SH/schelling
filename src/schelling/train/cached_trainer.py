@@ -433,6 +433,7 @@ def train_cached(cfg: TrainConfig) -> TrainResult:
     model = model.to(device)  # type: ignore[arg-type]
     train_data = build_cache(model, tokenizer, train_df, attrs, device)
     val_data = build_cache(model, tokenizer, val_df, attrs, device)
+    model.heads.set_input_stats(train_data.U, train_data.E, train_data.A)
     monitor = _subset(val_data, cfg.eval.max_rows, cfg.seed)
     print(
         f"[cache] train rows {train_data.n}, question vectors {train_data.U.shape[0]}, "

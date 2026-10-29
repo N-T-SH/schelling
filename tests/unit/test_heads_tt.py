@@ -126,3 +126,25 @@ def test_use_person_false_disables_the_residual_branch() -> None:
     x = _inputs()
     out = comb(m, "choice", **x)
     assert out.residual.abs().max().item() == 0.0
+
+
+def test_input_standardisation_is_applied_and_saved_with_the_weights() -> None:
+    m = tiny_tt_model(residual_std=0.5)
+    x = _inputs()
+    mean, std = torch.full((H,), 2.0), torch.full((H,), 4.0)
+    ref = comb(
+        m,
+        "choice",
+        **{
+            **x,
+            "u": (x["u"] - mean) / std,
+            "attr_vecs": (x["attr_vecs"] - mean) / std,
+            "e": (x["e"] - mean) / std,
+        },
+    )
+    for name in ("u", "e", "a"):
+        getattr(m.heads, f"{name}_mean").copy_(mean)
+        getattr(m.heads, f"{name}_std").copy_(std)
+    got = comb(m, "choice", **x)
+    assert got.logits == pytest.approx(ref.logits, abs=1e-5)
+    assert {"u_mean", "e_std", "a_mean"} <= set(m.heads.state_dict())

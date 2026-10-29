@@ -69,6 +69,18 @@ class TwoTowerHeads(nn.Module):
         self.use_person = use_person
         self.u_proj, self.e_proj, self.a_proj = (nn.Linear(hidden, d) for _ in range(3))
         self.drop = nn.Dropout(dropout)
+        # Per-dimension input statistics. Frozen mean-pooled backbone vectors of different items
+        # are nearly parallel (median cosine about 0.95), so they are standardised first. Identity
+        # until `set_input_stats` is called with the training vectors.
+        self.u_mean: torch.Tensor
+        self.u_std: torch.Tensor
+        self.e_mean: torch.Tensor
+        self.e_std: torch.Tensor
+        self.a_mean: torch.Tensor
+        self.a_std: torch.Tensor
+        for name in ("u", "e", "a"):
+            self.register_buffer(f"{name}_mean", torch.zeros(hidden))
+            self.register_buffer(f"{name}_std", torch.ones(hidden))
         # prior: item (and options) only
         self.noul_prior = _mlp(d, d, 1)
         self.choice_prior = _mlp(3 * d, d, 1)
@@ -87,6 +99,14 @@ class TwoTowerHeads(nn.Module):
             if isinstance(m, nn.Linear):
                 m.reset_parameters()
         self.zero_residual()
+
+    @torch.no_grad()
+    def set_input_stats(self, u: torch.Tensor, e: torch.Tensor, a: torch.Tensor) -> None:
+        """Fit the standardisation on the (unique) training vectors of each kind."""
+        for name, x in (("u", u), ("e", e), ("a", a)):
+            if len(x) > 1:
+                getattr(self, f"{name}_mean").copy_(x.mean(0))
+                getattr(self, f"{name}_std").copy_(x.std(0).clamp_min(1e-3))
 
     def zero_residual(self) -> None:
         """Re-zero the residual outputs (the framework's weight init overwrites the zero init)."""
@@ -109,6 +129,8 @@ class TwoTowerHeads(nn.Module):
         option_mask: torch.Tensor | None,
     ) -> TTOut:
         """u (B, H) question vectors; attr_vecs (B, A, H); e (B, K, H) option or level vectors."""
+        u = (u - self.u_mean) / self.u_std
+        attr_vecs = (attr_vecs - self.a_mean) / self.a_std
         q = self.drop(self.u_proj(u))
         if task == "noul":
             prior = self.noul_prior(q).squeeze(-1)
@@ -116,7 +138,7 @@ class TwoTowerHeads(nn.Module):
             res = self.noul_res(r).squeeze(-1) if self.use_person else torch.zeros_like(prior)
             return TTOut(prior, res, None)
         assert e is not None and option_mask is not None
-        ev = self.drop(self.e_proj(e))
+        ev = self.drop(self.e_proj((e - self.e_mean) / self.e_std))
         ebar = masked_mean(ev, option_mask)
         if task == "choice":
             ctx = torch.cat(
