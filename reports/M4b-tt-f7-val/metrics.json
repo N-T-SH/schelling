@@ -1,0 +1,457 @@
+{
+  "config": {
+    "fit_rows": 1091784,
+    "min_persons": 30,
+    "model": "runs/tt-f7/final",
+    "n_seeds": 20,
+    "partition": "val",
+    "population_excludes": "wave 4",
+    "split": "heldout_experiment_f7",
+    "subgroup_columns": [
+      "sex",
+      "age_band",
+      "party_id"
+    ]
+  },
+  "config_hash": "572e1b785298dc02b44ae37091850ff276c51503de34040906faa2f5f4cc96c8",
+  "created_at": "2026-11-05T09:43:05+00:00",
+  "dirty": false,
+  "effects": {
+    "iteration_metric": "false_positive_rate_pairs",
+    "n_human_null": 1,
+    "n_pairs": 1,
+    "n_placebo_contrasts": 40,
+    "pairs": {
+      "E04": {
+        "experiment": "myside",
+        "human_ci": [
+          -0.07619785519667102,
+          0.4545043588986032
+        ],
+        "human_d": 0.18789580833220856,
+        "human_null": true,
+        "n_a": 105,
+        "n_b": 101,
+        "significant_per_seed": [
+          false,
+          false,
+          false,
+          true,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          true,
+          false,
+          true,
+          false,
+          false,
+          false,
+          false
+        ],
+        "synthetic_d_per_seed": [
+          -0.19210141848260473,
+          -0.24195824849133166,
+          -0.027404298399354533,
+          -0.36500626160130534,
+          0.11558644671410992,
+          -0.0063762476473746745,
+          -0.0600316932758139,
+          -0.07787162020410658,
+          -0.17371883218006734,
+          -0.06369464405196536,
+          0.1530977759587707,
+          -0.07671846903383674,
+          -6.783242178042871e-05,
+          -0.3502187936531386,
+          0.0257084878548403,
+          -0.3378732928890728,
+          -0.1003919842352597,
+          -0.03785049135356387,
+          0.09747519009869457,
+          -0.1806377392016864
+        ]
+      }
+    },
+    "per_seed": {
+      "correlation": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "false_positive_rate_pairs": [
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "false_positive_rate_pairs_and_placebo": [
+        0.024390243902439025,
+        0.024390243902439025,
+        0.04878048780487805,
+        0.0975609756097561,
+        0.0,
+        0.024390243902439025,
+        0.0,
+        0.04878048780487805,
+        0.07317073170731707,
+        0.0,
+        0.024390243902439025,
+        0.0,
+        0.024390243902439025,
+        0.07317073170731707,
+        0.0,
+        0.04878048780487805,
+        0.07317073170731707,
+        0.07317073170731707,
+        0.024390243902439025,
+        0.07317073170731707
+      ],
+      "sign_agreement": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    "placebo_false_positive_rate_per_seed": [
+      0.025,
+      0.025,
+      0.05,
+      0.075,
+      0.0,
+      0.025,
+      0.0,
+      0.05,
+      0.075,
+      0.0,
+      0.025,
+      0.0,
+      0.025,
+      0.05,
+      0.0,
+      0.025,
+      0.075,
+      0.075,
+      0.025,
+      0.075
+    ],
+    "placebo_significant_per_seed": [
+      1,
+      1,
+      2,
+      3,
+      0,
+      1,
+      0,
+      2,
+      3,
+      0,
+      1,
+      0,
+      1,
+      2,
+      0,
+      1,
+      3,
+      3,
+      1,
+      3
+    ],
+    "skipped": {},
+    "summary": {
+      "correlation": {
+        "mean": null,
+        "sd": null
+      },
+      "false_positive_rate_pairs": {
+        "mean": 0.15,
+        "sd": 0.36634754853252327
+      },
+      "false_positive_rate_pairs_and_placebo": {
+        "mean": 0.03780487804878048,
+        "sd": 0.031129322550284493
+      },
+      "sign_agreement": {
+        "mean": null,
+        "sd": null
+      }
+    }
+  },
+  "efficiency": {
+    "batch_decisions_per_s": 141.73286382032563,
+    "decisions_per_s": 21.318470019259568,
+    "device": "cpu",
+    "n_requests": 200.0,
+    "p50_ms": 26.026104053016752,
+    "p95_ms": 133.35863576503465
+  },
+  "git_sha": "f8fa5459f2dffd165582331842b1658b83e7c33f",
+  "individual": {
+    "by_source": {
+      "twin2k": {
+        "accuracy": 0.24029126213592233,
+        "brier": 0.7906035571549228,
+        "calibration_intercept": -0.3332786887776323,
+        "calibration_slope": 0.8609622844877717,
+        "ece": 0.06335356788149157,
+        "n": 412,
+        "nll": 1.646400556744051
+      }
+    },
+    "by_source_qtype": {
+      "twin2k__choice": {
+        "accuracy": 0.24029126213592233,
+        "brier": 0.7906035571549228,
+        "calibration_intercept": -0.3332786887776323,
+        "calibration_slope": 0.8609622844877717,
+        "ece": 0.06335356788149157,
+        "n": 412,
+        "nll": 1.646400556744051
+      }
+    },
+    "overall": {
+      "accuracy": 0.24029126213592233,
+      "brier": 0.7906035571549228,
+      "calibration_intercept": -0.3332786887776323,
+      "calibration_slope": 0.8609622844877717,
+      "ece": 0.06335356788149157,
+      "n": 412,
+      "nll": 1.646400556744051
+    }
+  },
+  "model": "runs/tt-f7/final",
+  "n_rows": 412,
+  "not_run": [
+    "paraphrase_invariance (needs paraphrased items, M5)",
+    "memorisation_probe (needs paraphrased items, M5)",
+    "regression_sign_agreement (needs pre-registered models)"
+  ],
+  "partition": "val",
+  "population": {
+    "twin2k": {
+      "correlation_frobenius": null,
+      "correlation_items": 0,
+      "n_items": 2,
+      "per_seed": {
+        "entropy_ratio": [
+          1.0032064610492162,
+          1.0100864409152543,
+          1.068747800956249,
+          0.9890497001395758,
+          1.014750341173186,
+          1.0140253324282116,
+          1.0301855402021367,
+          1.0081293525013066,
+          1.0238718583220694,
+          0.9637570222089251,
+          0.9978955699759449,
+          1.0553916036818607,
+          1.0034080183458651,
+          0.9916491552102198,
+          0.9877640411835352,
+          1.0147869386350936,
+          0.9961483169087805,
+          1.0151518514514204,
+          0.997409745986384,
+          0.9922424814510675
+        ],
+        "mode_collapse_rate": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "sd_ratio": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "tvd": [
+          0.17406883545497406,
+          0.1504479019330504,
+          0.12244224422442244,
+          0.12588401697312585,
+          0.11159830268741158,
+          0.09731258840169729,
+          0.11598302687411596,
+          0.1552098066949552,
+          0.14644035832154645,
+          0.12055634134842054,
+          0.10664780763790663,
+          0.11673738802451673,
+          0.12588401697312587,
+          0.11654879773691651,
+          0.1256954266855257,
+          0.11654879773691654,
+          0.14512022630834515,
+          0.131023102310231,
+          0.13597359735973596,
+          0.1256954266855257
+        ],
+        "w1": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ]
+      },
+      "subgroups": {
+        "age_band": {
+          "levels": {
+            "30-49": 0.18214285714285716,
+            "50-64": 0.2533854166666667
+          },
+          "worst_group_gap": 0.07124255952380953
+        },
+        "party_id": {
+          "levels": {
+            "Democrat": 0.17894813519813518,
+            "Independent": 0.2157142857142857,
+            "Republican": 0.1921875
+          },
+          "worst_group_gap": 0.03676615051615051
+        },
+        "sex": {
+          "levels": {
+            "Female": 0.18671310629514962,
+            "Male": 0.20179166666666667
+          },
+          "worst_group_gap": 0.015078560371517058
+        }
+      },
+      "summary": {
+        "entropy_ratio": {
+          "mean": 1.008882878636315,
+          "sd": 0.02349548154854092
+        },
+        "mode_collapse_rate": {
+          "mean": 0.0,
+          "sd": 0.0
+        },
+        "sd_ratio": {
+          "mean": null,
+          "sd": null
+        },
+        "tvd": {
+          "mean": 0.1282909005186233,
+          "sd": 0.01832000651579179
+        },
+        "w1": {
+          "mean": null,
+          "sd": null
+        }
+      }
+    }
+  },
+  "retest": null,
+  "robustness": {
+    "permutation_max_abs_dp": 1.1920928955078125e-07
+  },
+  "seed": 0,
+  "split": "heldout_experiment_f7",
+  "split_manifest_hash": "7c4676fc4196493e587d717bf5b31dfbec8facc0d47e51c4ecd58248d0522240"
+}
