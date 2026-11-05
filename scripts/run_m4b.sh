@@ -30,7 +30,7 @@ if has 2; then {
   for k in 0 1 2 3 4 5 6 7; do echo "uv run schelling eval --model runs/tt-f$k/final --split heldout_experiment_f$k --partition val --out reports/M4b-tt-f$k-val --seed 0"; done
   echo "uv run schelling eval --model runs/tt-item/final --split heldout_item --partition val --out reports/M4b-tt-item-val --seed 0"
   for m in b0 b1 b2 b3; do echo "uv run schelling eval --model $m --split heldout_item --partition val --out reports/M4b-$m-heldout_item-val --seed 0"; done
-} | xargs -P 1 -I{} bash -c '{} > /dev/null 2>&1 || echo "FAILED: {}"'
+} | while read -r cmd; do bash -c "$cmd" > /dev/null 2>&1 || echo "FAILED: $cmd"; done
 fi
 # Stage 3: pooled treatment effects over the eight leave-one-experiment-out folds
 if has 3; then
