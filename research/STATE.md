@@ -6,9 +6,9 @@ checkpoint. A fresh agent should be able to resume from it alone.
 ## Now
 
 - **Mode:** BUILD
-- **Milestone:** M4 redesign: two-tower model (decision 0004), in progress
+- **Milestone:** M4b two-tower model (decision 0004): signed off 2026-11-10
 - **Campaign:** none
-- **Next step:** human chooses among the three options in the M4 report. No work is queued.
+- **Next step:** human chooses between a C01 contract and a revised M5 scope; guard-metric eval-change (decision 0005) awaits approval of its definitions. No work is queued.
 - **Eval change:** treatment-effect metrics and LOEO folds merged (`research/reports/EC1-treatment-effects.md`, decisions 0002 and 0003).
 - **Done so far:** M0 signed off 2026-10-26. M1 built; real data built (Psych-101 1% sample).
 
@@ -23,7 +23,9 @@ Report: `research/reports/M4b.md` with audited numbers; stop at the checkpoint.
 
 ## Blocked: needs the human
 
-M4 checkpoint (`research/reports/M4.md`): the done-criterion is not met (model worse than B1 on Twin-2K-500 validation NLL). Decide the next step: (1) design record for a two-tower model with an item prior (recommended), (2) approve paid GPU compute for a longer run of the current design, (3) accept and go to C01. M5 is not started.
+1. Decision 0005 (draft): add population TVD and held-out-person NLL as guard metrics on an `eval-change/guard-metrics` branch. The human agreed in principle; the exact definitions and thresholds need approval before anything is built.
+2. Next work: a C01 contract (person conditioning) or a revised M5 scope. M5 is NOT started.
+3. Decided 2026-11-10: model evaluation stays on CPU (no eval-change for the device label).
 
 ## Done
 
@@ -33,4 +35,5 @@ M4 checkpoint (`research/reports/M4.md`): the done-criterion is not met (model w
 | 2026-10-26 | M1 Data | research/reports/M1.md | yes (near duplicates removed) |
 | 2026-10-26 | M2 Harness + baselines | research/reports/M2.md | yes; Psych-101 excluded from M4 bar (docs/decisions/0001) |
 | 2026-10-26 | M3 Model v0 | research/reports/M3.md | accepted under standing instruction (no open decision points) |
-| 2026-10-26 | M4 Real training | research/reports/M4.md | no: criterion not met, awaiting decision |
+| 2026-10-26 | M4 Real training | research/reports/M4.md | no: criterion not met; superseded by M4b |
+| 2026-11-05 | M4b Two-tower model | research/reports/M4b.md | yes, 2026-11-10 (caveats on record) |

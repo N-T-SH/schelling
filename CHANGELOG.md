@@ -17,3 +17,4 @@ All notable changes to this project are documented here. The format follows
 - Eval change EC1: treatment-effect metrics (16 pre-registered contrasts), leave-one-experiment-out split folds, `schelling effects-pool`.
 - M3 model v0: SchellingConfig/SchellingModel with Noul, Choice and Score heads, Predictor API, `schelling simulate`, CPU torch in CI.
 - M4 training: trainer, losses, study sampler, temperature calibration, `schelling train`, model scoring via `schelling eval --model <dir>`, frozen golden metrics. First ModernBERT-base run does not beat the item-mean baseline on Twin-2K-500 (see research/reports/M4.md).
+- M4b two-tower model (decision 0004): `SchellingTwoTower`, cached Stage A trainer, M4 criterion met on Twin-2K-500 `heldout_person` validation by a small margin over B1; population TVD slightly worse than B1 and treatment-effect fidelity at chance (see research/reports/M4b.md).
