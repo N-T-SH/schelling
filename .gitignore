@@ -44,3 +44,4 @@ wandb/
 .vscode/
 .DS_Store
 !/reports/**/effects.json
+!/reports/**/guards.json
