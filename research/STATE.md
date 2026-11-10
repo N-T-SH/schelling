@@ -23,9 +23,10 @@ Report: `research/reports/M4b.md` with audited numbers; stop at the checkpoint.
 
 ## Blocked: needs the human
 
-1. Decision 0005 (draft): add population TVD and held-out-person NLL as guard metrics on an `eval-change/guard-metrics` branch. The human agreed in principle; the exact definitions and thresholds need approval before anything is built.
-2. Next work: a C01 contract (person conditioning) or a revised M5 scope. M5 is NOT started.
-3. Decided 2026-11-10: model evaluation stays on CPU (no eval-change for the device label).
+1. Decision 0005 approved with option 3 (record now, bind later): `eval-change/guard-metrics` adds `schelling guards`; PR awaiting human review. Making the TVD guard binding is a later decision.
+2. C01 contract draft is being written in its own session (branch `c01-contract`); nothing runs until the human approves it.
+3. M5 is NOT started.
+4. Decided 2026-11-10: model evaluation stays on CPU (no eval-change for the device label).
 
 ## Done
 

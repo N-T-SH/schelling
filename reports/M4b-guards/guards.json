@@ -1,0 +1,60 @@
+{
+  "all_pass": false,
+  "binding_pass": true,
+  "created_at": "2026-11-10T10:07:41+00:00",
+  "dirty": true,
+  "git_sha": "c175b7ad681bff85bc4ebf7eda42a8caf6887ae9",
+  "guards": {
+    "ece": {
+      "binding": true,
+      "limit": 0.05,
+      "pass": true,
+      "value": 0.003974186185234359
+    },
+    "permutation": {
+      "binding": true,
+      "limit": 0.01,
+      "pass": true,
+      "value": 2.384185791015625e-07
+    },
+    "person_nll": {
+      "binding": true,
+      "pass": true,
+      "reference": 0.9976418491895362,
+      "value": 0.9864359490289794
+    },
+    "population_tvd": {
+      "binding": false,
+      "pass": false,
+      "reference": 0.05365386445840472,
+      "value": 0.05731023830538393
+    },
+    "sd_ratio": {
+      "band": [
+        0.85,
+        1.15
+      ],
+      "binding": true,
+      "pass": true,
+      "value": 0.9946091448364136
+    }
+  },
+  "reference": {
+    "config_hash": "007bbe8bb7fa90b1304701788350ab1f1009d48bc86687044433b033b1f859ca",
+    "dirty": false,
+    "git_sha": "6ef570f654e9d2ec9b83712c51470796c20c1403",
+    "partition": "val",
+    "seed": 0,
+    "split": "heldout_person",
+    "split_manifest_hash": "c77fe1b963008c710d8f9740ad977a54cd69b19e01943ec96095e509e2b00297"
+  },
+  "run": {
+    "config_hash": "88086145fd28c426c75276efb1fe24f6d6271f420ce8d8f2df580ca6639bf5f1",
+    "dirty": false,
+    "git_sha": "50eab8a76dda05ab55596661ce8a155d2e8b7d5d",
+    "partition": "val",
+    "seed": 0,
+    "split": "heldout_person",
+    "split_manifest_hash": "c77fe1b963008c710d8f9740ad977a54cd69b19e01943ec96095e509e2b00297"
+  }
+}

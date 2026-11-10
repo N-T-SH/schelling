@@ -167,6 +167,32 @@ def effects_pool(
 
 
 @app.command()
+def guards(
+    run: Annotated[Path, typer.Option(help="run directory with the model's metrics.json")],
+    reference: Annotated[Path, typer.Option(help="run directory of B1 on the same split")],
+    out: Annotated[Path, typer.Option(help="where to write guards.json")],
+) -> None:
+    """Check the guard metrics of a run against a B1 reference (decision 0005)."""
+    from schelling.eval import provenance
+    from schelling.eval.guards import compute_guards
+
+    run_m = json.loads((run / "metrics.json").read_text())
+    ref_m = json.loads((reference / "metrics.json").read_text())
+    ident = ("git_sha", "dirty", "config_hash", "split", "partition", "seed", "split_manifest_hash")
+    payload = {
+        "git_sha": provenance.git_sha(),
+        "dirty": provenance.git_dirty(),
+        "created_at": provenance.now_iso(),
+        "run": {k: run_m.get(k) for k in ident},
+        "reference": {k: ref_m.get(k) for k in ident},
+        **compute_guards(run_m, ref_m),
+    }
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
+    typer.echo(f"binding guards {'pass' if payload['binding_pass'] else 'FAIL'}: {out}")
+
+
+@app.command()
 def train(
     config: Annotated[Path, typer.Option(help="YAML training config")],
     set_: Annotated[

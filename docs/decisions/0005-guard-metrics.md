@@ -1,6 +1,6 @@
 # 0005: Population TVD and held-out-person NLL become guard metrics
 
-**Date:** 2026-11-10 · **Status:** draft. Nitesh agreed in principle on 2026-11-10; the definitions and thresholds below need approval before any evaluator change is built.
+**Date:** 2026-11-10 · **Status:** approved with option 3 (Nitesh, 2026-11-10: "Records now, set the guard later"). The TVD guard is recorded but not binding; making it binding is a later decision.
 
 ## Context
 
@@ -8,7 +8,7 @@ M4b (`research/reports/M4b.md`) met the M4 criterion on held-out-person NLL by a
 
 ## Decision (proposed)
 
-Add a `guards` block to `metrics.json`, computed from numbers the harness already produces, and listed in every report. A guard fails or passes; it never changes a metric.
+Add a separate `guards.json`, written by a new `schelling guards` command from a run's `metrics.json` and a B1 reference `metrics.json` on the same split. It uses only numbers the harness already produces, leaves `metrics.json` and its schema untouched, and marks each guard `binding` or not. A guard passes or fails; it never changes a metric.
 
 | guard | definition | pass condition (proposed) |
 | --- | --- | --- |
@@ -28,6 +28,6 @@ My recommendation is option 1 as the target and option 3 as the interim: report 
 
 ## Consequences
 
-- Changes only `src/schelling/eval/report.py`, a golden metrics entry and its test, on `eval-change/guard-metrics`; no existing metric definition changes.
-- Existing `metrics.json` files lack the block. Reports compute guards from the numbers they already contain, so no model needs re-evaluation.
+- Adds `src/schelling/eval/guards.py`, a CLI command and unit tests on `eval-change/guard-metrics`. No existing metric definition, `metrics.json` schema or golden file changes (a deviation from the first draft, which put the block in `report.py`: a separate file keeps the sealed schema stable).
+- Works on existing `metrics.json` files, so no model needs re-evaluation. The TVD guard is `binding: false` until you say otherwise.
 - Evaluation stays on CPU (decided 2026-11-10); the efficiency module is not touched.
