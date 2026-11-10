@@ -12,8 +12,9 @@ import pandas as pd
 import torch
 
 from schelling.infer.batching import Question, build_tensors, options_of
+from schelling.infer.history import history_for_frame
 from schelling.infer.predictor import Predictor
-from schelling.schema import Choice, DecisionRequest, Noul, PersonContext, Score
+from schelling.schema import Choice, DecisionRequest, HistoryItem, Noul, PersonContext, Score
 
 Item = tuple[DecisionRequest, Question]
 
@@ -36,9 +37,10 @@ def make_item(
     levels: list[str] | None,
     state: str,
     attributes: Mapping[str, Any] | None,
+    history: list[HistoryItem] | None = None,
 ) -> Item:
     person = PersonContext.model_construct(
-        person_id=None, attributes=dict(attributes or {}), history=[]
+        person_id=None, attributes=dict(attributes or {}), history=history or []
     )
     q = make_question(qtype, text, options, levels)
     return DecisionRequest.model_construct(person=person, state=state, questions={}), q
@@ -71,15 +73,21 @@ def predict_items(
     return out  # type: ignore[return-value]
 
 
-def frame_items(frame: pd.DataFrame, attributes: Mapping[str, Mapping[str, Any]]) -> list[Item]:
+def frame_items(
+    frame: pd.DataFrame, attributes: Mapping[str, Mapping[str, Any]], history_k: int = 0
+) -> list[Item]:
+    """Items for each frame row. With `history_k` > 0 each person also carries their other
+    answers from the same frame, the row's own item masked (see `infer.history`)."""
+    histories = history_for_frame(frame, history_k)
     items = []
-    for pid, qtype, text, opts, lv, state in zip(
+    for pid, qtype, text, opts, lv, state, hist in zip(
         frame["person_id"],
         frame["qtype"],
         frame["question"],
         frame["options"],
         frame["levels"],
         frame["state"],
+        histories,
         strict=True,
     ):
         items.append(
@@ -90,6 +98,7 @@ def frame_items(frame: pd.DataFrame, attributes: Mapping[str, Mapping[str, Any]]
                 None if lv is None else list(lv),
                 state or "",
                 attributes.get(str(pid)),
+                hist,
             )
         )
     return items
@@ -119,11 +128,18 @@ class ModelBaseline:
         self.attributes = person_attributes(persons) if "person_id" in persons.columns else {}
         return self
 
+    @property
+    def history_k(self) -> int:
+        # Opt-in: only two-tower configs that declare `history_items` see answer history, so
+        # every model scored before C01 gets exactly the inputs it always did.
+        cfg = self.predictor.model.config
+        return int(getattr(cfg, "history_items", 0)) if cfg.model_type == "schelling_tt" else 0
+
     def predict_proba(self, frame: pd.DataFrame) -> list[np.ndarray]:
         return predict_items(
             self.predictor.model,
             self.predictor.tokenizer,
-            frame_items(frame, self.attributes),
+            frame_items(frame, self.attributes, self.history_k),
             self.batch_size,
         )
 

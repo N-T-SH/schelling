@@ -24,7 +24,7 @@ Report: `research/reports/M4b.md` with audited numbers; stop at the checkpoint.
 ## Blocked: needs the human
 
 1. Decision 0005 approved with option 3 (record now, bind later): `eval-change/guard-metrics` adds `schelling guards`; PR awaiting human review. Making the TVD guard binding is a later decision.
-2. C01 contract approved 2026-11-10 (`research/campaigns/C01-person-conditioning/task.md`). Phase 1 has not started; its first task is to verify that history can reach the model without an evaluator change.
+2. C01 contract approved 2026-11-10 (`research/campaigns/C01-person-conditioning/task.md`). The first task is done: history can reach the model without an evaluator change (`research/campaigns/C01-person-conditioning/history-check.md`). Idea I01 (history encoder) is drafted in `research/campaigns/C01-person-conditioning/ideas/`; it awaits human approval before any run.
 3. M5 is NOT started.
 4. Decided 2026-11-10: model evaluation stays on CPU (no eval-change for the device label).
 
