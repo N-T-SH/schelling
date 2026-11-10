@@ -45,3 +45,4 @@ wandb/
 .DS_Store
 !/reports/**/effects.json
 !/reports/**/guards.json
+!/reports/**/summary.json
