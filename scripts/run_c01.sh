@@ -2,7 +2,7 @@
 # Every run behind campaign C01 idea I01 (research/campaigns/C01-person-conditioning/ideas).
 # Training: I01 and an M4b re-run at the same commit, seeds 0 to 2, two jobs at a time.
 # Then the unchanged harness on heldout_person val, one evaluation at a time, then guards.
-# STAGES="2 3" re-runs only evaluation and guards.
+# A training run with a finished metrics.json is skipped. STAGES="2 3" re-runs only evaluation and guards.
 set -u
 cd "$(dirname "$0")/.."
 export OMP_NUM_THREADS=2 MKL_NUM_THREADS=2
@@ -11,6 +11,7 @@ STAGES=${STAGES:-"1 2 3"}
 has() { [[ " $STAGES " == *" $1 "* ]]; }
 train() { # config, name, extra --set args...
   local cfg=$1 name=$2; shift 2
+  if [ -f "runs/$name/metrics.json" ]; then echo "skip $name (finished)"; return; fi
   uv run schelling train --config "$cfg" --set "name=$name" --set "out_dir=runs/$name" "$@" > "runs/$name.log" 2>&1 || echo "FAILED $name"
 }
 export -f train

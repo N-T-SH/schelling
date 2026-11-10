@@ -100,3 +100,16 @@ def test_the_history_tower_is_trained_by_the_loss() -> None:
     h(**x, **_hist()).logits.sum().backward()
     grads = [p.grad for n, p in h.named_parameters() if "hist" in n]
     assert grads and all(g is not None and g.abs().sum() > 0 for g in grads)
+
+
+@torch.no_grad()
+def test_table_and_vector_histories_give_identical_logits() -> None:
+    h, x = _heads(), _inputs()
+    g = torch.Generator().manual_seed(9)
+    ut, et = torch.randn(7, H, generator=g), torch.randn(5, H, generator=g)
+    qi = torch.randint(0, 7, (B, K), generator=g)
+    oi = torch.randint(0, 5, (B, K), generator=g)
+    mask = torch.rand(B, K, generator=g) > 0.3
+    vec = dict(hist_u=ut[qi], hist_e=et[oi], hist_mask=mask)
+    tab = dict(hist_tables=(ut, et), hist_idx=(qi, oi), hist_mask=mask)
+    assert torch.allclose(h(**x, **vec).logits, h(**x, **tab).logits, atol=1e-5)

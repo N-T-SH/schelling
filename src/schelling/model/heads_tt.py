@@ -144,15 +144,21 @@ class TwoTowerHeads(nn.Module):
         hist_u: torch.Tensor | None = None,
         hist_e: torch.Tensor | None = None,
         hist_mask: torch.Tensor | None = None,
+        hist_tables: tuple[torch.Tensor, torch.Tensor] | None = None,
+        hist_idx: tuple[torch.Tensor, torch.Tensor] | None = None,
     ) -> TTOut:
         """u (B, H) question vectors; attr_vecs (B, A, H); e (B, K, H) option or level vectors;
-        hist_u and hist_e (B, L, H) are the earlier questions and the options the person chose."""
+        hist_u and hist_e (B, L, H) are the earlier questions and the options the person chose.
+        The same history can instead be given as vector tables plus (B, L) row indices, which is
+        mathematically identical and far cheaper when many rows share a few hundred vectors."""
         u = (u - self.u_mean) / self.u_std
         attr_vecs = (attr_vecs - self.a_mean) / self.a_std
         q = self.drop(self.u_proj(u))
         if task == "noul":
             prior = self.noul_prior(q).squeeze(-1)
-            r = self._person_mix(q, attr_vecs, attr_mask, hist_u, hist_e, hist_mask)
+            r = self._person_mix(
+                q, attr_vecs, attr_mask, hist_u, hist_e, hist_mask, hist_tables, hist_idx
+            )
             res = self.noul_res(r).squeeze(-1) if self.use_person else torch.zeros_like(prior)
             return TTOut(prior, res, None)
         assert e is not None and option_mask is not None
@@ -170,7 +176,9 @@ class TwoTowerHeads(nn.Module):
                 [q.unsqueeze(1).expand_as(unit), unit, ebar.unsqueeze(1).expand_as(unit)], dim=-1
             )
             prior = self.score_prior(ctx).squeeze(-1)
-        r = self._person_mix(q, attr_vecs, attr_mask, hist_u, hist_e, hist_mask)
+        r = self._person_mix(
+            q, attr_vecs, attr_mask, hist_u, hist_e, hist_mask, hist_tables, hist_idx
+        )
         if self.use_person:
             res_net = self.choice_res if task == "choice" else self.score_res
             res = res_net(torch.cat([r.unsqueeze(1).expand_as(unit), unit], dim=-1)).squeeze(-1)
@@ -184,13 +192,29 @@ class TwoTowerHeads(nn.Module):
         hist_u: torch.Tensor | None,
         hist_e: torch.Tensor | None,
         hist_mask: torch.Tensor | None,
+        tables: tuple[torch.Tensor, torch.Tensor] | None = None,
+        idx: tuple[torch.Tensor, torch.Tensor] | None = None,
     ) -> torch.Tensor:
         """Attention over the person's earlier answers; zeros when there are none."""
-        if hist_u is None or hist_e is None or hist_mask is None:
+        if hist_mask is None:
             return torch.zeros_like(q)
-        hu = self.drop(self.u_proj((hist_u - self.u_mean) / self.u_std))
-        he = self.drop(self.e_proj((hist_e - self.e_mean) / self.e_std))
-        x = self.hist_item(torch.cat([hu, he], dim=-1))
+        if tables is not None and idx is not None:
+            # Project the few hundred distinct vectors once, then gather. The first layer of
+            # `hist_item` is split so it too runs on the tables rather than on every history row.
+            pu = self.drop(self.u_proj((tables[0] - self.u_mean) / self.u_std))
+            pe = self.drop(self.e_proj((tables[1] - self.e_mean) / self.e_std))
+            first, last = self.hist_item[0], self.hist_item[2]
+            assert isinstance(first, nn.Linear)
+            w = first.weight
+            a = pu @ w[:, : self.d].T + first.bias
+            b = pe @ w[:, self.d :].T
+            x = last(torch.nn.functional.gelu(a[idx[0].clamp(min=0)] + b[idx[1].clamp(min=0)]))
+        elif hist_u is not None and hist_e is not None:
+            hu = self.drop(self.u_proj((hist_u - self.u_mean) / self.u_std))
+            he = self.drop(self.e_proj((hist_e - self.e_mean) / self.e_std))
+            x = self.hist_item(torch.cat([hu, he], dim=-1))
+        else:
+            return torch.zeros_like(q)
         score = (self.hist_query(q).unsqueeze(1) * self.hist_key(x)).sum(-1) / self.d**0.5
         alpha = torch.softmax(score.masked_fill(~hist_mask, -1e9), dim=-1) * hist_mask
         return (alpha.unsqueeze(-1) * x).sum(1)  # an all-masked row gives zeros
@@ -203,9 +227,11 @@ class TwoTowerHeads(nn.Module):
         hist_u: torch.Tensor | None = None,
         hist_e: torch.Tensor | None = None,
         hist_mask: torch.Tensor | None = None,
+        hist_tables: tuple[torch.Tensor, torch.Tensor] | None = None,
+        hist_idx: tuple[torch.Tensor, torch.Tensor] | None = None,
     ) -> torch.Tensor:
         p = self.person(self.drop(self.a_proj(attr_vecs)), attr_mask)
         if not self.use_history:
             return self.mix(torch.cat([p, q, p * q], dim=-1))
-        h = self._history(q, hist_u, hist_e, hist_mask)
+        h = self._history(q, hist_u, hist_e, hist_mask, hist_tables, hist_idx)
         return self.mix(torch.cat([p, h, q, p * q, h * q], dim=-1))

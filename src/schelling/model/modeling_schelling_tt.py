@@ -106,10 +106,15 @@ class SchellingTwoTower(PreTrainedModel):
         hist_u: torch.Tensor | None = None,
         hist_e: torch.Tensor | None = None,
         hist_mask: torch.Tensor | None = None,
+        hist_tables: tuple[torch.Tensor, torch.Tensor] | None = None,
+        hist_idx: tuple[torch.Tensor, torch.Tensor] | None = None,
     ) -> TTOut:
         if task not in TASKS:
             raise ValueError(f"task must be one of {TASKS}, got {task!r}")
-        return self.heads(task, u, attr_vecs, attr_mask, e, option_mask, hist_u, hist_e, hist_mask)
+        return self.heads(
+            task, u, attr_vecs, attr_mask, e, option_mask,
+            hist_u, hist_e, hist_mask, hist_tables, hist_idx,
+        )  # fmt: skip
 
     def raw_parts(
         self,

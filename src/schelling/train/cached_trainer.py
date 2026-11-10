@@ -259,12 +259,9 @@ def sample_history(
 
 def _hist_tensors(
     data: CachedData, hq: torch.Tensor, ho: torch.Tensor, keep: torch.Tensor
-) -> dict[str, torch.Tensor | None]:
-    return {
-        "hist_u": data.U[hq.clamp(min=0)],
-        "hist_e": data.E[ho.clamp(min=0)],
-        "hist_mask": keep,
-    }
+) -> dict[str, Any]:
+    # Tables plus indices: the heads project the shared vectors once instead of every history row.
+    return {"hist_tables": (data.U, data.E), "hist_idx": (hq, ho), "hist_mask": keep}
 
 
 def _gather(data: CachedData, rows: torch.Tensor) -> dict[str, torch.Tensor | None]:
