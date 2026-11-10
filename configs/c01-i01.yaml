@@ -1,0 +1,23 @@
+# C01 idea I01: twotower-a plus the history tower (50 earlier answers at evaluation).
+# Training draws 0, 5, 20 or 50 history items per example.
+name: c01-i01
+seed: 0
+split: heldout_person
+processed_dir: data/processed
+splits_dir: splits
+out_dir: runs/c01-i01
+device: auto
+model:
+  architecture: two_tower
+  backbone: answerdotai/ModernBERT-base
+  dim: 256
+  person_heads: 4
+  dropout: 0.1
+  prior_weight: 1.0
+  history_items: 50
+  max_question_tokens: 192
+  max_option_tokens: 16
+  max_attr_tokens: 16
+data: {sources: [twin2k], study_temperature: 1.0}
+optim: {steps: 4000, batch_size: 1024, lr_head: 0.001, lr_backbone: 0.0, weight_decay: 0.01, warmup_frac: 0.05}
+eval: {every: 250, max_rows: 30000, patience: 6, calibration_rows: 30000}
