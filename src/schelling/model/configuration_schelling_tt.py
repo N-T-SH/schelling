@@ -25,6 +25,7 @@ class SchellingTwoTowerConfig(PretrainedConfig):
         max_option_tokens: int = 16,
         max_attr_tokens: int = 16,
         max_attributes: int = 32,
+        history_items: int = 0,
         **kwargs: Any,
     ) -> None:
         self.backbone_config = backbone_config or {}
@@ -40,6 +41,7 @@ class SchellingTwoTowerConfig(PretrainedConfig):
         self.max_option_tokens = max_option_tokens
         self.max_attr_tokens = max_attr_tokens
         self.max_attributes = max_attributes
+        self.history_items = history_items  # 0: no answer history (M4b); > 0: C01 history tower
         super().__init__(**kwargs)
 
     @property

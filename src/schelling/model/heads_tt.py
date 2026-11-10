@@ -63,10 +63,18 @@ class PersonEncoder(nn.Module):
 
 class TwoTowerHeads(nn.Module):
     def __init__(
-        self, hidden: int, d: int, person_heads: int, dropout: float, use_person: bool
+        self,
+        hidden: int,
+        d: int,
+        person_heads: int,
+        dropout: float,
+        use_person: bool,
+        use_history: bool = False,
     ) -> None:
         super().__init__()
         self.use_person = use_person
+        self.use_history = use_history
+        self.d = d
         self.u_proj, self.e_proj, self.a_proj = (nn.Linear(hidden, d) for _ in range(3))
         self.drop = nn.Dropout(dropout)
         # Per-dimension input statistics. Frozen mean-pooled backbone vectors of different items
@@ -87,7 +95,13 @@ class TwoTowerHeads(nn.Module):
         self.score_prior = _mlp(3 * d, d, 1)
         # residual: person-dependent, zero-initialised last layers
         self.person = PersonEncoder(d, person_heads, dropout)
-        self.mix = _mlp(3 * d, d, d)
+        # history tower (C01): each earlier answer is (question vector, chosen option vector); the
+        # set is pooled by attention keyed to the target question. Absent in M4b models.
+        self.mix = _mlp((5 if use_history else 3) * d, d, d)
+        if use_history:
+            self.hist_item = _mlp(2 * d, d, d)
+            self.hist_query = nn.Linear(d, d)
+            self.hist_key = nn.Linear(d, d)
         self.noul_res = _mlp(d, d, 1, zero_last=True)
         self.choice_res = _mlp(2 * d, d, 1, zero_last=True)
         self.score_res = _mlp(2 * d, d, 1, zero_last=True)
@@ -127,14 +141,18 @@ class TwoTowerHeads(nn.Module):
         attr_mask: torch.Tensor,
         e: torch.Tensor | None,
         option_mask: torch.Tensor | None,
+        hist_u: torch.Tensor | None = None,
+        hist_e: torch.Tensor | None = None,
+        hist_mask: torch.Tensor | None = None,
     ) -> TTOut:
-        """u (B, H) question vectors; attr_vecs (B, A, H); e (B, K, H) option or level vectors."""
+        """u (B, H) question vectors; attr_vecs (B, A, H); e (B, K, H) option or level vectors;
+        hist_u and hist_e (B, L, H) are the earlier questions and the options the person chose."""
         u = (u - self.u_mean) / self.u_std
         attr_vecs = (attr_vecs - self.a_mean) / self.a_std
         q = self.drop(self.u_proj(u))
         if task == "noul":
             prior = self.noul_prior(q).squeeze(-1)
-            r = self._person_mix(q, attr_vecs, attr_mask)
+            r = self._person_mix(q, attr_vecs, attr_mask, hist_u, hist_e, hist_mask)
             res = self.noul_res(r).squeeze(-1) if self.use_person else torch.zeros_like(prior)
             return TTOut(prior, res, None)
         assert e is not None and option_mask is not None
@@ -152,7 +170,7 @@ class TwoTowerHeads(nn.Module):
                 [q.unsqueeze(1).expand_as(unit), unit, ebar.unsqueeze(1).expand_as(unit)], dim=-1
             )
             prior = self.score_prior(ctx).squeeze(-1)
-        r = self._person_mix(q, attr_vecs, attr_mask)
+        r = self._person_mix(q, attr_vecs, attr_mask, hist_u, hist_e, hist_mask)
         if self.use_person:
             res_net = self.choice_res if task == "choice" else self.score_res
             res = res_net(torch.cat([r.unsqueeze(1).expand_as(unit), unit], dim=-1)).squeeze(-1)
@@ -160,8 +178,34 @@ class TwoTowerHeads(nn.Module):
             res = torch.zeros_like(prior)
         return TTOut(prior, res, option_mask)
 
+    def _history(
+        self,
+        q: torch.Tensor,
+        hist_u: torch.Tensor | None,
+        hist_e: torch.Tensor | None,
+        hist_mask: torch.Tensor | None,
+    ) -> torch.Tensor:
+        """Attention over the person's earlier answers; zeros when there are none."""
+        if hist_u is None or hist_e is None or hist_mask is None:
+            return torch.zeros_like(q)
+        hu = self.drop(self.u_proj((hist_u - self.u_mean) / self.u_std))
+        he = self.drop(self.e_proj((hist_e - self.e_mean) / self.e_std))
+        x = self.hist_item(torch.cat([hu, he], dim=-1))
+        score = (self.hist_query(q).unsqueeze(1) * self.hist_key(x)).sum(-1) / self.d**0.5
+        alpha = torch.softmax(score.masked_fill(~hist_mask, -1e9), dim=-1) * hist_mask
+        return (alpha.unsqueeze(-1) * x).sum(1)  # an all-masked row gives zeros
+
     def _person_mix(
-        self, q: torch.Tensor, attr_vecs: torch.Tensor, attr_mask: torch.Tensor
+        self,
+        q: torch.Tensor,
+        attr_vecs: torch.Tensor,
+        attr_mask: torch.Tensor,
+        hist_u: torch.Tensor | None = None,
+        hist_e: torch.Tensor | None = None,
+        hist_mask: torch.Tensor | None = None,
     ) -> torch.Tensor:
         p = self.person(self.drop(self.a_proj(attr_vecs)), attr_mask)
-        return self.mix(torch.cat([p, q, p * q], dim=-1))
+        if not self.use_history:
+            return self.mix(torch.cat([p, q, p * q], dim=-1))
+        h = self._history(q, hist_u, hist_e, hist_mask)
+        return self.mix(torch.cat([p, h, q, p * q, h * q], dim=-1))

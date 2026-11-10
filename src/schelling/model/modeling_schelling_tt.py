@@ -31,6 +31,7 @@ class SchellingTwoTower(PreTrainedModel):
             config.person_heads,
             config.dropout,
             config.use_person,
+            config.history_items > 0,
         )
         self.use_cache = True  # inference only; ignored while training or with gradients enabled
         self._cache: dict[bytes, torch.Tensor] = {}
@@ -102,10 +103,13 @@ class SchellingTwoTower(PreTrainedModel):
         attr_mask: torch.Tensor,
         e: torch.Tensor | None = None,
         option_mask: torch.Tensor | None = None,
+        hist_u: torch.Tensor | None = None,
+        hist_e: torch.Tensor | None = None,
+        hist_mask: torch.Tensor | None = None,
     ) -> TTOut:
         if task not in TASKS:
             raise ValueError(f"task must be one of {TASKS}, got {task!r}")
-        return self.heads(task, u, attr_vecs, attr_mask, e, option_mask)
+        return self.heads(task, u, attr_vecs, attr_mask, e, option_mask, hist_u, hist_e, hist_mask)
 
     def raw_parts(
         self,
@@ -118,6 +122,11 @@ class SchellingTwoTower(PreTrainedModel):
         option_input_ids: torch.Tensor | None = None,
         option_attention_mask: torch.Tensor | None = None,
         option_mask: torch.Tensor | None = None,
+        hist_input_ids: torch.Tensor | None = None,
+        hist_attention_mask: torch.Tensor | None = None,
+        hist_option_input_ids: torch.Tensor | None = None,
+        hist_option_attention_mask: torch.Tensor | None = None,
+        hist_mask: torch.Tensor | None = None,
     ) -> TTOut:
         u = self.encode_texts(input_ids, attention_mask)
         attrs = self._encode_grouped(attr_input_ids, attr_attention_mask, attr_mask)
@@ -126,7 +135,18 @@ class SchellingTwoTower(PreTrainedModel):
             if option_input_ids is None or option_attention_mask is None or option_mask is None:
                 raise ValueError(f"{task} needs option tensors")
             e = self._encode_grouped(option_input_ids, option_attention_mask, option_mask)
-        return self.combine(task, u, attrs, attr_mask, e, option_mask)
+        hu = he = None
+        if hist_mask is not None:
+            if (
+                hist_input_ids is None
+                or hist_attention_mask is None
+                or hist_option_input_ids is None
+                or hist_option_attention_mask is None
+            ):
+                raise ValueError("history needs question and option tensors")
+            hu = self._encode_grouped(hist_input_ids, hist_attention_mask, hist_mask)
+            he = self._encode_grouped(hist_option_input_ids, hist_option_attention_mask, hist_mask)
+        return self.combine(task, u, attrs, attr_mask, e, option_mask, hu, he, hist_mask)
 
     def raw(self, task: str, **tensors: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor | None]:
         out = self.raw_parts(task, **tensors)

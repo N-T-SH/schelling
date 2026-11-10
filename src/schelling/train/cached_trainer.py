@@ -28,7 +28,8 @@ from schelling.data.loader import load_records, partition_frame, select_partitio
 from schelling.data.splits import split_manifest
 from schelling.eval import provenance
 from schelling.infer.baseline_adapter import make_item, person_attributes
-from schelling.infer.batching import options_of
+from schelling.infer.batching import history_question_context, options_of
+from schelling.infer.history import history_for_frame
 from schelling.infer.predictor import Predictor
 from schelling.infer.text import attribute_strings, build_question_context
 from schelling.model import SchellingTwoTower, SchellingTwoTowerConfig, calibration
@@ -55,6 +56,17 @@ class CachedData:
     attr_idx: torch.Tensor  # (P, Amax) attribute vectors per person, -1 padding
     study: np.ndarray
     source: np.ndarray
+    # Answer history (C01). Training samples a person's other answers per step from the evidence
+    # tables; evaluation uses fixed histories identical to `infer.history.history_for_frame`.
+    history_k: int = 0
+    ev_q: torch.Tensor | None = None  # (P, L) question vector of each earlier answer, -1 padding
+    ev_o: torch.Tensor | None = None  # (P, L) vector of the option chosen
+    ev_key: torch.Tensor | None = None  # (P, L) id of the question text, for masking the target
+    row_key: torch.Tensor | None = None  # (N,) id of each row's own question text
+    hist_q: torch.Tensor | None = None  # (N, Kfix) fixed history, -1 padding
+    hist_o: torch.Tensor | None = None
+    q_ctx: list[str] | None = None  # text behind each question vector (tests, debugging)
+    o_txt: list[str] | None = None
 
     @property
     def n(self) -> int:
@@ -91,7 +103,11 @@ def build_cache(
     frame: pd.DataFrame,
     attrs: dict[str, dict[str, Any]],
     device: torch.device,
+    history_k: int = 0,
+    fixed_history: bool = False,
 ) -> CachedData:
+    """`history_k` > 0 adds answer history: evidence tables for sampling at training time, or,
+    with `fixed_history`, the exact history `history_for_frame` gives each row (evaluation)."""
     cfg = model.config
     q_text: dict[str, int] = {}
     ctx_memo: dict[tuple[str, str, str], str] = {}
@@ -100,7 +116,19 @@ def build_cache(
     person_ix: dict[str, int] = {}
     person_attr: list[list[int]] = []
     q_idx, p_idx, task, y, opts = [], [], [], [], []
-    for pid, qtype, text, o, lv, state, resp in zip(
+    qkey: dict[str, int] = {}
+    row_key: list[int] = []
+    person_ev: dict[int, list[tuple[int, int, int]]] = {}
+    hctx: dict[str, int] = {}  # question text -> vector index of its history context
+    sampled = history_k > 0 and not fixed_history
+
+    def hist_q(text: str) -> int:
+        if text not in hctx:
+            ctx = history_question_context(text, tokenizer, cfg.max_question_tokens)
+            hctx[text] = q_text.setdefault(ctx, len(q_text))
+        return hctx[text]
+
+    for pid, qtype, text, o, lv, state, resp, wave in zip(
         frame["person_id"],
         frame["qtype"],
         frame["question"],
@@ -108,6 +136,7 @@ def build_cache(
         frame["levels"],
         frame["state"],
         frame["response"],
+        frame["wave"],
         strict=True,
     ):
         req, q = make_item(
@@ -136,6 +165,22 @@ def build_cache(
         task.append(TASK_ID[qtype])
         y.append(int(resp))
         opts.append([o_text.setdefault(t, len(o_text)) for t in options_of(q)])
+        if sampled:
+            row_key.append(qkey.setdefault(text, len(qkey)))
+            if wave != 4:  # retest repeats are never evidence
+                chosen = ("no", "yes")[int(resp)] if qtype == "noul" else options_of(q)[int(resp)]
+                person_ev.setdefault(person_ix[str(pid)], []).append(
+                    (hist_q(text), o_text.setdefault(chosen, len(o_text)), qkey[text])
+                )
+    fixed: list[list[tuple[int, int]]] = []
+    if history_k > 0 and fixed_history:
+        for hist in history_for_frame(frame, history_k):
+            fixed.append(
+                [
+                    (hist_q(h.question), o_text.setdefault(h.options[h.answer], len(o_text)))
+                    for h in hist
+                ]
+            )
     k = max((len(o) for o in opts), default=1) or 1
     amax = max((len(a) for a in person_attr), default=1) or 1
     opt_idx = torch.full((len(opts), k), -1, dtype=torch.long)
@@ -146,6 +191,28 @@ def build_cache(
         if a:
             attr_idx[i, : len(a)] = torch.tensor(a, dtype=torch.long)
     dev = device
+    extra: dict[str, Any] = {}
+    if sampled:
+        width = max((len(v) for v in person_ev.values()), default=1)
+        ev = torch.full((3, len(person_ix), width), -1, dtype=torch.long)
+        for pi, items in person_ev.items():
+            ev[:, pi, : len(items)] = torch.tensor(items, dtype=torch.long).T
+        extra = {
+            "history_k": history_k,
+            "ev_q": ev[0].to(dev),
+            "ev_o": ev[1].to(dev),
+            "ev_key": ev[2].to(dev),
+            "row_key": torch.tensor(row_key, device=dev),
+        }
+    elif fixed:
+        width = max((len(h) for h in fixed), default=1) or 1
+        fq = torch.full((len(fixed), width), -1, dtype=torch.long)
+        fo = torch.full((len(fixed), width), -1, dtype=torch.long)
+        for i, h in enumerate(fixed):
+            if h:
+                fq[i, : len(h)] = torch.tensor([a for a, _ in h])
+                fo[i, : len(h)] = torch.tensor([b for _, b in h])
+        extra = {"history_k": history_k, "hist_q": fq.to(dev), "hist_o": fo.to(dev)}
     return CachedData(
         U=_vectors(model, tokenizer, list(q_text), cfg.max_question_tokens, dev),
         E=_vectors(model, tokenizer, list(o_text), cfg.max_option_tokens, dev),
@@ -158,7 +225,46 @@ def build_cache(
         attr_idx=attr_idx.to(dev),
         study=frame["study_id"].to_numpy(),
         source=frame["source"].to_numpy(),
+        q_ctx=list(q_text),
+        o_txt=list(o_text),
+        **extra,
     )
+
+
+def sample_history(
+    data: CachedData, rows: torch.Tensor, gen: torch.Generator, ks: tuple[int, ...]
+) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+    """A random history per row: the person's other first-pass answers, never the row's own
+    question (so never its answer), of a size drawn from `ks`. Returns (question vector index,
+    chosen-option vector index, validity mask), each (B, L)."""
+    assert data.ev_q is not None and data.ev_o is not None and data.ev_key is not None
+    assert data.row_key is not None
+    dev = data.q_idx.device
+    pi = data.person_idx[rows]
+    evq, evo, evk = data.ev_q[pi], data.ev_o[pi], data.ev_key[pi]
+    valid = (evq >= 0) & (evk != data.row_key[rows].unsqueeze(1))
+    width = min(data.history_k, evq.shape[1])
+    noise = torch.rand(evq.shape, generator=gen).to(dev).masked_fill(~valid, 2.0)
+    top = noise.topk(width, dim=1, largest=False).indices
+    size = torch.tensor([min(k, width) for k in ks])[
+        torch.randint(len(ks), (len(rows),), generator=gen)
+    ]
+    keep = (
+        torch.arange(width, device=dev).unsqueeze(0) < size.to(dev).unsqueeze(1)
+    ) & valid.gather(1, top)
+    hq = evq.gather(1, top).masked_fill(~keep, -1)
+    ho = evo.gather(1, top).masked_fill(~keep, -1)
+    return hq, ho, keep
+
+
+def _hist_tensors(
+    data: CachedData, hq: torch.Tensor, ho: torch.Tensor, keep: torch.Tensor
+) -> dict[str, torch.Tensor | None]:
+    return {
+        "hist_u": data.U[hq.clamp(min=0)],
+        "hist_e": data.E[ho.clamp(min=0)],
+        "hist_mask": keep,
+    }
 
 
 def _gather(data: CachedData, rows: torch.Tensor) -> dict[str, torch.Tensor | None]:
@@ -203,10 +309,23 @@ def _nll_vec(
     return losses.hard_cross_entropy(model.probs_from(task, logits, mask), y, reduction="none")
 
 
-def _combine(model: SchellingTwoTower, data: CachedData, task: str, rows: torch.Tensor):  # type: ignore[no-untyped-def]
+def _combine(  # type: ignore[no-untyped-def]
+    model: SchellingTwoTower,
+    data: CachedData,
+    task: str,
+    rows: torch.Tensor,
+    hist: tuple[torch.Tensor, torch.Tensor, torch.Tensor] | None = None,
+):
     g = _gather(data, rows)
     if task == "noul":
         g["e"], g["option_mask"] = None, None
+    if model.config.history_items > 0:
+        if hist is None and data.hist_q is not None and data.hist_o is not None:
+            fq, fo = data.hist_q[rows], data.hist_o[rows]  # fixed history (evaluation)
+            width = max(1, int((fq >= 0).sum(1).max()))
+            hist = (fq[:, :width], fo[:, :width], fq[:, :width] >= 0)
+        if hist is not None:
+            g.update(_hist_tensors(data, *hist))
     return model.combine(task, **g)  # type: ignore[arg-type]
 
 
@@ -265,6 +384,7 @@ def fit_combiner(
     warmup_frac: float = 0.05,
     eval_every: int = 0,
     on_eval: Callable[[int], bool] | None = None,
+    history_sizes: tuple[int, ...] = (0, 5, 20, 50),
 ) -> list[float]:
     """Train the towers' small networks on cached vectors. Returns the per-step training loss."""
     torch.manual_seed(seed)
@@ -283,13 +403,16 @@ def fit_combiner(
     sampler = StudySampler(pd.Series(data.study), study_temperature, seed)
     device = data.q_idx.device
     curve: list[float] = []
+    use_history = model.config.history_items > 0 and data.ev_q is not None
+    hist_gen = torch.Generator().manual_seed(seed + 1)
     model.train()
     for step in range(steps):
         rows = torch.tensor(sampler.sample(batch_size), device=device)
         total = torch.zeros((), device=device)
         full_sum = torch.zeros((), device=device)
         for task, sel in _task_rows(data, rows).items():
-            o = _combine(model, data, task, sel)
+            hist = sample_history(data, sel, hist_gen, history_sizes) if use_history else None
+            o = _combine(model, data, task, sel, hist)
             y = data.y[sel]
             f = _nll_vec(model, task, o.logits, o.mask, y)
             full_sum = full_sum + f.sum()
@@ -323,6 +446,7 @@ def _build_model(cfg: TrainConfig) -> tuple[SchellingTwoTower, Any]:
         max_option_tokens=m.max_option_tokens,
         max_attr_tokens=m.max_attr_tokens,
         max_attributes=m.max_attributes,
+        history_items=m.history_items,
     )
     if m.tiny_vocab:
         vocab = {tok: i for i, tok in enumerate(Path(m.tiny_vocab).read_text().split())}
@@ -364,6 +488,15 @@ def _subset(data: CachedData, n: int, seed: int) -> CachedData:
         attr_idx=data.attr_idx,
         study=data.study[keep.cpu().numpy()],
         source=data.source[keep.cpu().numpy()],
+        history_k=data.history_k,
+        ev_q=data.ev_q,
+        ev_o=data.ev_o,
+        ev_key=data.ev_key,
+        row_key=None if data.row_key is None else data.row_key[keep],
+        hist_q=None if data.hist_q is None else data.hist_q[keep],
+        hist_o=None if data.hist_o is None else data.hist_o[keep],
+        q_ctx=data.q_ctx,
+        o_txt=data.o_txt,
     )
 
 
@@ -431,8 +564,11 @@ def train_cached(cfg: TrainConfig) -> TrainResult:
 
     model, tokenizer = _build_model(cfg)
     model = model.to(device)  # type: ignore[arg-type]
-    train_data = build_cache(model, tokenizer, train_df, attrs, device)
-    val_data = build_cache(model, tokenizer, val_df, attrs, device)
+    hk = cfg.model.history_items
+    train_data = build_cache(model, tokenizer, train_df, attrs, device, history_k=hk)
+    val_data = build_cache(
+        model, tokenizer, val_df, attrs, device, history_k=hk, fixed_history=hk > 0
+    )
     model.heads.set_input_stats(train_data.U, train_data.E, train_data.A)
     monitor = _subset(val_data, cfg.eval.max_rows, cfg.seed)
     print(
