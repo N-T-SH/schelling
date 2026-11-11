@@ -8,7 +8,7 @@ checkpoint. A fresh agent should be able to resume from it alone.
 - **Mode:** BUILD
 - **Milestone:** M4b two-tower model (decision 0004): signed off 2026-11-10
 - **Campaign:** none
-- **Next step:** human chooses between a C01 contract and a revised M5 scope; guard-metric eval-change (decision 0005) awaits approval of its definitions. No work is queued.
+- **Next step:** human approves `docs/decisions/0006-revised-m5-scope.md` (revised M5: survey sources and paraphrase augmentation, no encoder or regulariser work). Then M5 step 1: check assumptions A16 to A18 (survey licences). Not started.
 - **Eval change:** treatment-effect metrics and LOEO folds merged (`research/reports/EC1-treatment-effects.md`, decisions 0002 and 0003).
 - **Done so far:** M0 signed off 2026-10-26. M1 built; real data built (Psych-101 1% sample).
 
@@ -25,7 +25,7 @@ Report: `research/reports/M4b.md` with audited numbers; stop at the checkpoint.
 
 1. Decision 0005 approved with option 3 (record now, bind later): `eval-change/guard-metrics` adds `schelling guards`; PR awaiting human review. Making the TVD guard binding is a later decision.
 2. C01 contract approved 2026-11-10 (`research/campaigns/C01-person-conditioning/task.md`). The first task is done: history can reach the model without an evaluator change (`research/campaigns/C01-person-conditioning/history-check.md`). Idea I01 (history encoder) is drafted in `research/campaigns/C01-person-conditioning/ideas/`; it awaits human approval before any run.
-3. M5 is NOT started.
+3. M5 is NOT started. Decision 0006 (revised scope) awaits approval; direction chosen by the human 2026-11-11.
 4. Decided 2026-11-10: model evaluation stays on CPU (no eval-change for the device label).
 
 ## Done
