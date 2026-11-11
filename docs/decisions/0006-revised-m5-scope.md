@@ -1,6 +1,6 @@
 # 0006: Revised M5 scope (data levers, not encoder work)
 
-**Date:** 2026-11-11 · **Status:** proposed (direction chosen by the human on 2026-11-11; this record awaits approval because it changes a milestone's contents)
+**Date:** 2026-11-11 · **Status:** approved (human, 2026-11-11)
 
 ## Context
 
