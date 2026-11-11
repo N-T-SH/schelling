@@ -73,7 +73,7 @@ cache miss raises. `schelling eval` then scores it exactly like B0 to B3. No eva
   population metrics, so this is tens of calls per model per split. Scored for every row by giving every
   person the same distribution.
 - *Persona prompt* (E2, E3): one call per (person, question). The full `heldout_item` val partition is
-  65,804 <!-- src: reports/M4b-tt-item-val/metrics.json#individual.by_source.twin2k.n --> Twin-2K-500 rows,
+  65804 <!-- src: reports/M4b-tt-item-val/metrics.json#individual.by_source.twin2k.n --> Twin-2K-500 rows,
   too many for a frontier model. Use a fixed, seeded subsample of persons (proposal: 100), and compare
   every model on those same rows from the saved `predictions.parquet` using the functions in
   `src/schelling/eval/metrics.py`. First task of D01 is to confirm this works without an evaluator change.
