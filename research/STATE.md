@@ -26,7 +26,7 @@ Report: `research/reports/M4b.md` with audited numbers; stop at the checkpoint.
 **Idea:** the model sees one wording per question. Frozen-backbone vectors are cached, so paraphrases are cheap: embed K wordings per training question once, and sample one wording per step. Evaluation stays on original wording (evaluator is sealed).
 
 **Steps**
-1. Check assumptions first (no code): A19 a local instruct model (Apache-2.0 or similar, fits 16 GiB, usable on CPU in tolerable time) is available and licensed for generating training text; A20 paraphrases keep meaning (measure: embedding similarity filter plus a hand-read sample of 50, recorded).
+1. Check assumptions first (no code): A19 (now Fireworks, see `research/ASSUMPTIONS.md`): chosen model's licence allows generating training text, then a paid-run budget approved by the human; A20 paraphrases keep meaning (measure: embedding similarity filter plus a hand-read sample of 50, recorded).
 2. Tests first: paraphrases only for `train`-partition questions; none for val/test items; option semantics unchanged (Noul yes/no, Choice order, Score scale); store keyed by hash of source text and generator version; cached-trainer determinism unchanged when augmentation is off.
 3. Build: `scripts/make_paraphrases.py` (offline, once, cached to disk, never at train time); paraphrase store loader; `cached_trainer` option `paraphrases_per_question` (default 0 keeps M4b behaviour).
 4. Run: M4b config with and without augmentation, 5 seeds, harness val on `heldout_person`, plus `heldout_item` (where wording robustness should show). Report population metrics and guards with sources.
