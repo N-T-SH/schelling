@@ -8,7 +8,7 @@ checkpoint. A fresh agent should be able to resume from it alone.
 - **Mode:** BUILD
 - **Milestone:** M4b two-tower model (decision 0004): signed off 2026-11-10
 - **Campaign:** none
-- **Next step:** M5 step 1 (licence checks) done: none of GSS, ANES, WVS is cleared for a released model (A16 partly true, A17 unverified, A18 false). Human decides: seek written permission, supply ANES terms, or run M5 as augmentation only. See A16 to A18 in `research/ASSUMPTIONS.md`.
+- **Next step:** M5 (augmentation only, decision 0006 addendum). Plan below awaits the human's go before any download or code. Survey sources are out unless permission is obtained.
 - **Eval change:** treatment-effect metrics and LOEO folds merged (`research/reports/EC1-treatment-effects.md`, decisions 0002 and 0003).
 - **Done so far:** M0 signed off 2026-10-26. M1 built; real data built (Psych-101 1% sample).
 
@@ -20,6 +20,19 @@ Build: `model/{configuration_schelling_tt,heads_tt,modeling_schelling_tt}.py`; `
 Tests first: head shapes and zero-init residual, order-equivariance and set-invariance (Hypothesis), batch equals single, cache on/off identical, cached-training path equals live forward, save/load and fresh-process custom-code load, cached trainer integration (loss decreases, run.json, determinism, ablation flags), eval of the saved model through the unchanged harness.
 Experiments (validation only, protocol: 5 seeds for the final config): full model; ablations (no person tower, no prior loss); `heldout_person` against the criterion; extra evidence on `heldout_item` and the eight `heldout_experiment` folds with pooled effects; baselines on `heldout_item` for comparison.
 Report: `research/reports/M4b.md` with audited numbers; stop at the checkpoint.
+
+## M5 plan (augmentation only; awaiting go)
+
+**Idea:** the model sees one wording per question. Frozen-backbone vectors are cached, so paraphrases are cheap: embed K wordings per training question once, and sample one wording per step. Evaluation stays on original wording (evaluator is sealed).
+
+**Steps**
+1. Check assumptions first (no code): A19 a local instruct model (Apache-2.0 or similar, fits 16 GiB, usable on CPU in tolerable time) is available and licensed for generating training text; A20 paraphrases keep meaning (measure: embedding similarity filter plus a hand-read sample of 50, recorded).
+2. Tests first: paraphrases only for `train`-partition questions; none for val/test items; option semantics unchanged (Noul yes/no, Choice order, Score scale); store keyed by hash of source text and generator version; cached-trainer determinism unchanged when augmentation is off.
+3. Build: `scripts/make_paraphrases.py` (offline, once, cached to disk, never at train time); paraphrase store loader; `cached_trainer` option `paraphrases_per_question` (default 0 keeps M4b behaviour).
+4. Run: M4b config with and without augmentation, 5 seeds, harness val on `heldout_person`, plus `heldout_item` (where wording robustness should show). Report population metrics and guards with sources.
+5. Report `research/reports/M5.md` through `audit_report.py`; stop at the checkpoint.
+
+**Needs from the human:** go for step 1; approval for any paid API (default is a local model); the ablation table is the done criterion.
 
 ## Blocked: needs the human
 
