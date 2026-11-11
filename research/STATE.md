@@ -8,7 +8,7 @@ checkpoint. A fresh agent should be able to resume from it alone.
 - **Mode:** BUILD
 - **Milestone:** M4b two-tower model (decision 0004): signed off 2026-11-10
 - **Campaign:** none
-- **Next step:** M5 (augmentation only, decision 0006 addendum). Plan below awaits the human's go before any download or code. Survey sources are out unless permission is obtained.
+- **Next step:** M5 step 4: run the ablation `scripts/run_m5.sh` (aug vs base, seeds 0 to 2, heldout_person val, six trainings and evals, compute only, roughly a day throttled). Trainer option built and tested; paraphrases generated (A19 verified, A20 partly). Awaiting the human's go.
 - **Eval change:** treatment-effect metrics and LOEO folds merged (`research/reports/EC1-treatment-effects.md`, decisions 0002 and 0003).
 - **Done so far:** M0 signed off 2026-10-26. M1 built; real data built (Psych-101 1% sample).
 
