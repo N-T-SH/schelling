@@ -146,3 +146,29 @@ def test_cli_train_then_eval_through_the_unchanged_harness(
     data = json.loads((out / "metrics.json").read_text())
     MetricsFile.model_validate(data)
     assert data["individual"]["by_source"]["twin2k"]["n"] > 0
+
+
+def test_history_run_trains_saves_and_scores_through_the_harness(
+    fixture_processed: tuple[Path, Path], tmp_path: Path
+) -> None:
+    proc, splits = fixture_processed
+    cfg = _cfg(tmp_path, proc, splits, name="hist", history_items=8)
+    res = train(load_config(cfg, []))
+    saved = json.loads((res.run_dir / "final" / "config.json").read_text())
+    assert saved["history_items"] == 8
+    metrics = json.loads((res.run_dir / "metrics.json").read_text())
+    curve = metrics["train_loss_curve"]
+    assert sum(curve[-10:]) / 10 < sum(curve[:10]) / 10
+    out = tmp_path / "hist_eval"
+    r = runner.invoke(
+        app,
+        [
+            "eval", "--model", str(res.run_dir / "final"), "--split", "heldout_person",
+            "--partition", "val", "--processed", str(proc), "--splits-dir", str(splits),
+            "--out", str(out), "--min-persons", "2",
+        ],
+    )  # fmt: skip
+    assert r.exit_code == 0, r.output
+    harness = json.loads((out / "metrics.json").read_text())["individual"]["by_source"]["twin2k"]
+    # the cached evaluation and the harness agree on the same rows and the same histories
+    assert harness["nll"] == pytest.approx(metrics["final_val_nll"], rel=1e-3)

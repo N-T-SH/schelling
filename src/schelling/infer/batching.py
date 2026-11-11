@@ -10,7 +10,7 @@ from typing import Any
 import torch
 
 from schelling.infer.text import attribute_strings, build_context, build_question_context
-from schelling.schema import Choice, DecisionRequest, Noul, Score
+from schelling.schema import Choice, DecisionRequest, HistoryItem, Noul, Score
 
 Question = Noul | Choice | Score
 
@@ -32,6 +32,55 @@ def _options(
         "option_input_ids": enc["input_ids"].reshape(len(items), k, -1),
         "option_attention_mask": enc["attention_mask"].reshape(len(items), k, -1),
         "option_mask": torch.tensor([[i < len(o) for i in range(k)] for o in opts]),
+    }
+
+
+def history_question_context(question: str, tokenizer: Any, max_tokens: int) -> str:
+    """The question-tower text for an earlier answer. Same function and empty state as for a
+    scored item, so the vector equals the one cached for that item."""
+    return build_question_context(
+        "", Noul.model_construct(type="noul", proposition=question), tokenizer, max_tokens
+    )
+
+
+def _history(
+    tokenizer: Any, config: Any, items: list[tuple[DecisionRequest, Question]]
+) -> dict[str, torch.Tensor]:
+    """Earlier answers of each person: question texts and the text of the option chosen."""
+    hists: list[list[HistoryItem]] = [
+        (req.person.history[-config.history_items :] if req.person else []) for req, _ in items
+    ]
+    length = max(1, max(len(h) for h in hists))
+    ctx: dict[str, int] = {}
+    opt: dict[str, int] = {}
+    qi = [[-1] * length for _ in items]
+    oi = [[-1] * length for _ in items]
+    for b, h in enumerate(hists):
+        for j, it in enumerate(h):
+            c = history_question_context(it.question, tokenizer, config.max_question_tokens)
+            qi[b][j] = ctx.setdefault(c, len(ctx))
+            oi[b][j] = opt.setdefault(it.options[it.answer], len(opt))
+    q_enc = tokenizer(
+        [*ctx, ""],
+        padding="max_length",
+        truncation=True,
+        max_length=config.max_question_tokens,
+        return_tensors="pt",
+    )
+    o_enc = tokenizer(
+        [*opt, ""],
+        padding="max_length",
+        truncation=True,
+        max_length=config.max_option_tokens,
+        return_tensors="pt",
+    )
+    qix, oix = torch.tensor(qi), torch.tensor(oi)
+    return {
+        "hist_input_ids": q_enc["input_ids"][qix],  # -1 picks the blank last row
+        "hist_attention_mask": q_enc["attention_mask"][qix],
+        "hist_option_input_ids": o_enc["input_ids"][oix],
+        "hist_option_attention_mask": o_enc["attention_mask"][oix],
+        "hist_mask": qix >= 0,
     }
 
 
@@ -68,6 +117,8 @@ def _build_two_tower(
     }
     if task != "noul":
         out.update(_options(tokenizer, config.max_option_tokens, items))
+    if getattr(config, "history_items", 0) > 0:
+        out.update(_history(tokenizer, config, items))
     return out
 
 

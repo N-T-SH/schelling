@@ -37,11 +37,33 @@ M4b's ablation shows the whole gain over B1 comes from the person tower, which s
 
 ## Runs
 
-| run_id | seed | primary | guards | status |
-| --- | --- | --- | --- | --- |
+Rows from `research/campaigns/C01-person-conditioning/experiments.jsonl` (Twin-2K-500 `heldout_person` val, harness-evaluated, git SHA 2fa356a, not dirty).
 
-_Rows generated from `experiments.jsonl`, not typed by hand. Planned: `C01-I01-s0` to `s2` (search) and an M4b re-run at the frozen SHA with the same three seeds, so the paired bootstrap uses identical persons._
+| run_id | seed | NLL | ECE | SD ratio | TVD (recorded) | wall clock (s) |
+| --- | --- | --- | --- | --- | --- | --- |
+| C01-I01-s0 | 0 | 0.9856 | 0.0056 | 0.987 | 0.0572 | 7528 |
+| C01-I01-s1 | 1 | 0.9827 | 0.0037 | 0.994 | 0.0582 | 7405 |
+| C01-I01-s2 | 2 | 0.9841 | 0.0041 | 0.993 | 0.0580 | 16687 |
+| C01-M4B-s0 | 0 | 0.9864 | 0.0040 | 0.995 | 0.0573 | 2587 |
+| C01-M4B-s1 | 1 | 0.9861 | 0.0045 | 1.006 | 0.0571 | 2237 |
+| C01-M4B-s2 | 2 | 0.9897 | 0.0078 | 1.005 | 0.0629 | 14446 |
+
+Seed-2 wall clocks include time the runs were paused by the owner. All six runs were throttled (2 threads, lowest priority, two at a time), so no run is comparable to the 30-minute cap, which was set for an unthrottled machine. Logged as over cap; the 12 h campaign budget was not at risk.
+
+Source for the paired figures below: `research/campaigns/C01-person-conditioning/ideas/I01-bootstrap.json` (persons bootstrap, 10,000 resamples, 206 persons, seeds averaged per person).
 
 ## Outcome
 
-_Not run._
+**I01 beats the M4b re-run by 0.0033 NLL (95% CI −0.0056 to −0.0009), which is below the 0.005 drop threshold and below the 0.010 campaign margin. Pre-registered rule: drop.**
+
+- Mean NLL: I01 0.9841, M4b re-run 0.9874; paired difference −0.0033 (CI excludes 0).
+- Against B1: −0.0135 (CI −0.0176 to −0.0095); against B3: −0.0080 (CI −0.0109 to −0.0051).
+- Per seed the gain varies: −0.0008 (CI includes 0), −0.0033, −0.0056. The seed spread is about as large as the effect.
+- Prediction was about 0.015 (range 0.005–0.040). Observed is under the bottom of the range.
+- Binding guards (person NLL ≤ B1, ECE ≤ 0.05, SD ratio in 0.85–1.15, permutation ≤ 0.01) pass for all six runs (`reports/C01-guards/*.json`). TVD is recorded only and is not better than M4b.
+- No leak signal: NLL did not drop by more than 20%, and the leakage tests pass.
+- Not run: treatment-effect metrics, subgroup analysis, ablations, test partition.
+
+Reading: history helps a little and consistently in sign, but far less than predicted. Open for the human: drop I01 as pre-registered, or approve a variant (for example longer training or a different history summary) as the next idea cycle.
+
+**Decision (human, 2026-11-11): I01 dropped as pre-registered.** No variant approved. No further I01 runs.
