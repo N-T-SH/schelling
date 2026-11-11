@@ -8,7 +8,7 @@ checkpoint. A fresh agent should be able to resume from it alone.
 - **Mode:** BUILD
 - **Milestone:** M4b two-tower model (decision 0004): signed off 2026-11-10
 - **Campaign:** C01 person conditioning, Phase 1 (investigation): idea I01 run; at checkpoint
-- **Next step:** human decides what to do with I01 (outcome in `research/campaigns/C01-person-conditioning/ideas/I01-history-encoder.md`): drop as pre-registered, or approve a variant. No further runs queued.
+- **Next step:** human chooses the next C01 idea (or ends the campaign). No work is queued.
 - **Eval change:** treatment-effect metrics and LOEO folds merged (`research/reports/EC1-treatment-effects.md`, decisions 0002 and 0003).
 - **Done so far:** M0 signed off 2026-10-26. M1 built; real data built (Psych-101 1% sample).
 
@@ -24,7 +24,7 @@ Report: `research/reports/M4b.md` with audited numbers; stop at the checkpoint.
 ## Blocked: needs the human
 
 1. Decision 0005 approved with option 3 (record now, bind later): `eval-change/guard-metrics` adds `schelling guards`; PR awaiting human review. Making the TVD guard binding is a later decision.
-2. C01 I01 finished (3 seeds plus M4b re-run, harness val). Gain over M4b is below the 0.005 drop threshold; binding guards pass. Decision needed: drop I01 or approve a variant. Details in the I01 file; paired figures in `ideas/I01-bootstrap.json`; runs in `experiments.jsonl`.
+2. C01 I01 dropped 2026-11-11 (human decision; gain over M4b below the 0.005 threshold). Phase 1 continues only with a new idea approved by the human; none is drafted.
 3. M5 is NOT started.
 4. Decided 2026-11-10: model evaluation stays on CPU (no eval-change for the device label).
 

@@ -65,3 +65,5 @@ Source for the paired figures below: `research/campaigns/C01-person-conditioning
 - Not run: treatment-effect metrics, subgroup analysis, ablations, test partition.
 
 Reading: history helps a little and consistently in sign, but far less than predicted. Open for the human: drop I01 as pre-registered, or approve a variant (for example longer training or a different history summary) as the next idea cycle.
+
+**Decision (human, 2026-11-11): I01 dropped as pre-registered.** No variant approved. No further I01 runs.
