@@ -8,7 +8,7 @@ checkpoint. A fresh agent should be able to resume from it alone.
 - **Mode:** BUILD
 - **Milestone:** M4b two-tower model (decision 0004): signed off 2026-11-10
 - **Campaign:** none
-- **Next step:** M5 ablation done, null result on `heldout_person` (`research/reports/M5.md`, audited). Human decides: run `heldout_item` (3 seeds) to test wording robustness, or stop M5 and move on. PR 9 holds all M5 work.
+- **Next step:** M5 stopped by the human (2026-11-11) after the null result on `heldout_person` (`research/reports/M5.md`, audited). `heldout_item` was not run. Awaiting sign-off to start M6; PR 9 holds all M5 work.
 - **Eval change:** treatment-effect metrics and LOEO folds merged (`research/reports/EC1-treatment-effects.md`, decisions 0002 and 0003).
 - **Done so far:** M0 signed off 2026-10-26. M1 built; real data built (Psych-101 1% sample).
 
