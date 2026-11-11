@@ -35,3 +35,7 @@ Done criterion (unchanged in spirit): population metrics reported with an ablati
 - First work item is assumption checks only (A16 to A18), no code. If a source fails its licence check, M5 shrinks to augmentation alone and I report that.
 - Psych-101 stays excluded from the primary criterion (decision 0001).
 - Risk: more data may not move TVD or treatment-effect correlation; a null result is reported as such.
+
+## Addendum (2026-11-11)
+
+Licence checks A16 to A18 cleared none of GSS, ANES or WVS for a released model (`research/ASSUMPTIONS.md`). The human chose augmentation only. Survey sources are out of M5; they return only if written permission is obtained (GSS via NORC) or the ANES terms are supplied and allow it. M5 is now: paraphrase augmentation plus its ablation table.

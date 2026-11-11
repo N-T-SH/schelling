@@ -1,0 +1,27 @@
+# M5: configs/twotower-a.yaml plus offline question paraphrases (training cache only).
+name: m5-aug
+seed: 0
+split: heldout_person
+processed_dir: data/processed
+splits_dir: splits
+out_dir: runs/m5-aug
+device: auto
+model:
+  architecture: two_tower
+  backbone: answerdotai/ModernBERT-base
+  dim: 256
+  person_heads: 4
+  dropout: 0.1
+  prior_weight: 1.0
+  max_question_tokens: 192
+  max_option_tokens: 16
+  max_attr_tokens: 16
+data:
+  sources: [twin2k]
+  study_temperature: 1.0
+  paraphrase_path: data/paraphrases/twin2k-gpt-oss-120b-v1.jsonl
+  paraphrase_generator: accounts/fireworks/models/gpt-oss-120b@v1
+  paraphrases_per_question: 6
+  paraphrase_prob: 0.5
+optim: {steps: 4000, batch_size: 1024, lr_head: 0.001, lr_backbone: 0.0, weight_decay: 0.01, warmup_frac: 0.05}
+eval: {every: 250, max_rows: 30000, patience: 6, calibration_rows: 30000}

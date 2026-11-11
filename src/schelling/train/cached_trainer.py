@@ -24,6 +24,7 @@ import torch
 import yaml
 from transformers import AutoTokenizer, BertTokenizer
 
+from schelling.augment.paraphrases import ParaphraseStore
 from schelling.data.loader import load_records, partition_frame, select_partition
 from schelling.data.splits import split_manifest
 from schelling.eval import provenance
@@ -55,6 +56,8 @@ class CachedData:
     attr_idx: torch.Tensor  # (P, Amax) attribute vectors per person, -1 padding
     study: np.ndarray
     source: np.ndarray
+    # (n_question_vectors, n_alt): other wordings of a question, -1 padded, left-aligned
+    q_alt: torch.Tensor | None = None
 
     @property
     def n(self) -> int:
@@ -91,8 +94,11 @@ def build_cache(
     frame: pd.DataFrame,
     attrs: dict[str, dict[str, Any]],
     device: torch.device,
+    paraphrases: ParaphraseStore | None = None,
+    n_alt: int = 0,
 ) -> CachedData:
     cfg = model.config
+    first: dict[tuple[str, str, str], tuple[str, str, Any, Any, str]] = {}
     q_text: dict[str, int] = {}
     ctx_memo: dict[tuple[str, str, str], str] = {}
     o_text: dict[str, int] = {}
@@ -120,6 +126,7 @@ def build_cache(
         )
         mkey = (qtype, text, state or "")
         if mkey not in ctx_memo:  # the same item recurs for every person
+            first[mkey] = (qtype, text, o, lv, state or "")
             ctx_memo[mkey] = build_question_context(
                 req.state, q, tokenizer, cfg.max_question_tokens
             )
@@ -136,6 +143,28 @@ def build_cache(
         task.append(TASK_ID[qtype])
         y.append(int(resp))
         opts.append([o_text.setdefault(t, len(o_text)) for t in options_of(q)])
+    alt_lists: dict[int, list[int]] = {}
+    if paraphrases is not None and n_alt > 0:
+        # Other wordings of the question stem only: options, levels and state are unchanged,
+        # so a label means the same thing in every wording.
+        for mkey, (qtype, text, o, lv, state) in first.items():
+            base = q_text[ctx_memo[mkey]]
+            for alt in paraphrases.get(text)[:n_alt]:
+                req, q = make_item(
+                    qtype,
+                    alt,
+                    None if o is None else list(o),
+                    None if lv is None else list(lv),
+                    state,
+                    None,
+                )
+                ctx = build_question_context(req.state, q, tokenizer, cfg.max_question_tokens)
+                alt_lists.setdefault(base, []).append(q_text.setdefault(ctx, len(q_text)))
+    q_alt = None
+    if alt_lists:
+        q_alt = torch.full((len(q_text), n_alt), -1, dtype=torch.long)
+        for base, alts in alt_lists.items():
+            q_alt[base, : len(alts)] = torch.tensor(alts, dtype=torch.long)
     k = max((len(o) for o in opts), default=1) or 1
     amax = max((len(a) for a in person_attr), default=1) or 1
     opt_idx = torch.full((len(opts), k), -1, dtype=torch.long)
@@ -158,11 +187,29 @@ def build_cache(
         attr_idx=attr_idx.to(dev),
         study=frame["study_id"].to_numpy(),
         source=frame["source"].to_numpy(),
+        q_alt=None if q_alt is None else q_alt.to(dev),
     )
 
 
-def _gather(data: CachedData, rows: torch.Tensor) -> dict[str, torch.Tensor | None]:
-    u = data.U[data.q_idx[rows]]
+def _swap_wording(
+    data: CachedData, rows: torch.Tensor, gen: torch.Generator, prob: float
+) -> torch.Tensor:
+    """Question vector per row, replacing the original wording by a stored one with prob."""
+    q = data.q_idx[rows]
+    if data.q_alt is None or prob <= 0:
+        return q
+    alts = data.q_alt[q]
+    n_valid = (alts >= 0).sum(1)
+    r = torch.rand(len(rows), generator=gen).to(q.device)
+    pick = (torch.rand(len(rows), generator=gen).to(q.device) * n_valid).long()
+    chosen = alts.gather(1, pick.clamp(max=alts.shape[1] - 1).unsqueeze(1)).squeeze(1)
+    return torch.where((n_valid > 0) & (r < prob), chosen, q)
+
+
+def _gather(
+    data: CachedData, rows: torch.Tensor, q: torch.Tensor | None = None
+) -> dict[str, torch.Tensor | None]:
+    u = data.U[data.q_idx[rows] if q is None else q]
     ai = data.attr_idx[data.person_idx[rows]]
     attr_mask = ai >= 0
     attr_vecs = (
@@ -203,8 +250,14 @@ def _nll_vec(
     return losses.hard_cross_entropy(model.probs_from(task, logits, mask), y, reduction="none")
 
 
-def _combine(model: SchellingTwoTower, data: CachedData, task: str, rows: torch.Tensor):  # type: ignore[no-untyped-def]
-    g = _gather(data, rows)
+def _combine(  # type: ignore[no-untyped-def]
+    model: SchellingTwoTower,
+    data: CachedData,
+    task: str,
+    rows: torch.Tensor,
+    q: torch.Tensor | None = None,
+):
+    g = _gather(data, rows, q)
     if task == "noul":
         g["e"], g["option_mask"] = None, None
     return model.combine(task, **g)  # type: ignore[arg-type]
@@ -265,6 +318,7 @@ def fit_combiner(
     warmup_frac: float = 0.05,
     eval_every: int = 0,
     on_eval: Callable[[int], bool] | None = None,
+    paraphrase_prob: float = 0.0,
 ) -> list[float]:
     """Train the towers' small networks on cached vectors. Returns the per-step training loss."""
     torch.manual_seed(seed)
@@ -283,13 +337,17 @@ def fit_combiner(
     sampler = StudySampler(pd.Series(data.study), study_temperature, seed)
     device = data.q_idx.device
     curve: list[float] = []
+    # separate stream: switching augmentation on never disturbs the sampler or the init
+    wording_gen = torch.Generator().manual_seed(seed + 2)
     model.train()
     for step in range(steps):
         rows = torch.tensor(sampler.sample(batch_size), device=device)
+        qb = _swap_wording(data, rows, wording_gen, paraphrase_prob)
+        tb = data.task[rows]
         total = torch.zeros((), device=device)
         full_sum = torch.zeros((), device=device)
         for task, sel in _task_rows(data, rows).items():
-            o = _combine(model, data, task, sel)
+            o = _combine(model, data, task, sel, qb[tb == TASK_ID[task]])
             y = data.y[sel]
             f = _nll_vec(model, task, o.logits, o.mask, y)
             full_sum = full_sum + f.sum()
@@ -431,7 +489,15 @@ def train_cached(cfg: TrainConfig) -> TrainResult:
 
     model, tokenizer = _build_model(cfg)
     model = model.to(device)  # type: ignore[arg-type]
-    train_data = build_cache(model, tokenizer, train_df, attrs, device)
+    store = (
+        ParaphraseStore(Path(cfg.data.paraphrase_path), cfg.data.paraphrase_generator)
+        if cfg.data.paraphrase_path and cfg.data.paraphrases_per_question > 0
+        else None
+    )
+    # Paraphrases touch the training cache only; val is always scored on the original wording.
+    train_data = build_cache(
+        model, tokenizer, train_df, attrs, device, store, cfg.data.paraphrases_per_question
+    )
     val_data = build_cache(model, tokenizer, val_df, attrs, device)
     model.heads.set_input_stats(train_data.U, train_data.E, train_data.A)
     monitor = _subset(val_data, cfg.eval.max_rows, cfg.seed)
@@ -467,6 +533,7 @@ def train_cached(cfg: TrainConfig) -> TrainResult:
         cfg.optim.warmup_frac,
         cfg.eval.every,
         on_eval,
+        cfg.data.paraphrase_prob if store is not None else 0.0,
     )
     if best["state"] is not None:
         model.heads.load_state_dict(best["state"])
