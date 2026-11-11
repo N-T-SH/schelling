@@ -8,7 +8,7 @@ checkpoint. A fresh agent should be able to resume from it alone.
 - **Mode:** BUILD
 - **Milestone:** M4b two-tower model (decision 0004): signed off 2026-11-10
 - **Campaign:** none
-- **Next step:** decision 0006 approved 2026-11-11 (revised M5: survey sources and paraphrase augmentation, no encoder or regulariser work). M5 step 1: check assumptions A16 to A18 (survey licences). Not started.
+- **Next step:** M5 step 1 (licence checks) done: none of GSS, ANES, WVS is cleared for a released model (A16 partly true, A17 unverified, A18 false). Human decides: seek written permission, supply ANES terms, or run M5 as augmentation only. See A16 to A18 in `research/ASSUMPTIONS.md`.
 - **Eval change:** treatment-effect metrics and LOEO folds merged (`research/reports/EC1-treatment-effects.md`, decisions 0002 and 0003).
 - **Done so far:** M0 signed off 2026-10-26. M1 built; real data built (Psych-101 1% sample).
 
