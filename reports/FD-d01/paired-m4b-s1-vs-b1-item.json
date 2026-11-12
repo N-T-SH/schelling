@@ -1,0 +1,30 @@
+{
+  "a": "reports/FD-m4b-item-s1-val",
+  "b": "reports/FD-b1-item-val",
+  "split": "heldout_item",
+  "partition": "val",
+  "source": "twin2k",
+  "unit": "item_id",
+  "n_rows": 65804,
+  "n_persons": 2058,
+  "n_items": 28,
+  "row_nll_a": 1.276048569830509,
+  "row_nll_b": 1.3533652808783667,
+  "paired": {
+    "n_units": 28,
+    "mean_a": 1.3268202166045617,
+    "mean_b": 1.415353091051531,
+    "mean_diff": -0.08853287444696921,
+    "ci_low": -0.1615478787748558,
+    "ci_high": -0.017073342703874263,
+    "units_a_better": 23,
+    "n_boot": 10000,
+    "seed": 0,
+    "level": 0.95
+  },
+  "a_metrics_sha": "745d6c0fb39ab6106a83da3d43d3fc956285d5eb",
+  "b_metrics_sha": "745d6c0fb39ab6106a83da3d43d3fc956285d5eb",
+  "git_sha": "59b9cbe6a42c5bea54cc5382ee39f4552fb56cff",
+  "dirty": false,
+  "created_at": "2026-11-12T09:55:31.562262+00:00"
+}

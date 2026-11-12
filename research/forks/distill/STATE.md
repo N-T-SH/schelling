@@ -23,10 +23,19 @@ The fork's own state file. `research/STATE.md` belongs to the mainline and is no
   cache replay, cache miss raises). `schelling eval --model <spec.json>` scores it through the unchanged
   harness. Specs for E3 in `configs/fork-distill/`.
 - Dry-run sizing script `scripts/fd_llm_calls.py` (paid calls only with `--go --cap-usd`).
-- M4b reference on `heldout_item` val, seeds 0 to 2, and B1: first set finished but is flagged
-  `dirty: true` (files were being edited in the worktree while it ran). Kept as `*-dirty`; a clean
-  re-run at the committed SHA was started 2026-11-12 (`scripts/fd_run_d01_m4b.sh`). Do not quote the
-  dirty numbers in a report.
+- M4b reference on `heldout_item` val, seeds 0 to 2, and B1, clean at SHA 745d6c0 (`reports/FD-m4b-item-s*-val`,
+  `reports/FD-b1-item-val`; summary `reports/FD-d01/m4b-item-summary.json`). Twin-2K-500 NLL mean 1.2825
+  <!-- src: reports/FD-d01/m4b-item-summary.json#metrics.nll.mean -->, seed SD 0.0099
+  <!-- src: reports/FD-d01/m4b-item-summary.json#metrics.nll.sd -->; B1 1.3534
+  <!-- src: reports/FD-b1-item-val/metrics.json#individual.by_source.twin2k.nll -->. Every seed beats B1 with the
+  item-bootstrap interval excluding 0 (`reports/FD-d01/paired-m4b-s*-vs-b1-item.json`).
+- Two things to know about the reference on unseen questions: ECE is over the 0.05 limit on two of three seeds
+  (max 0.0815 <!-- src: reports/FD-d01/m4b-item-summary.json#metrics.ece.max -->), and the SD ratio reaches 1.1210
+  <!-- src: reports/FD-d01/m4b-item-summary.json#metrics.sd_ratio.max -->, close to the 1.15 bound.
+- An earlier set of the same runs was flagged `dirty: true` (files edited while it ran); kept locally as
+  `*-dirty`, never quoted. The clean set reproduces it.
+- Consequence for D02 (not approved yet): three seed SDs is about 0.03 NLL, which becomes the H1 margin when
+  the D02 contract is put up for approval.
 
 ## Dry-run estimates for E3 (`gpt-oss-120b`, $0.15 in / $0.60 out per million tokens, A19)
 
