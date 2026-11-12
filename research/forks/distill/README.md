@@ -14,7 +14,7 @@ questions by distillation, then correct it on real human answers. See `DESIGN.md
 | Campaign ids | `D01` to `D05` | `C…` |
 | Configs | `configs/fork-distill/` | existing configs |
 | Outputs | `reports/FD-*`, `runs/fd-*`, `data/synth/` | `reports/M*`, `reports/C*`, `data/processed/` |
-| Spend log | `cache/llm/usage-fork-distill.jsonl` | the mainline usage log |
+| Spend log | `cache/llm/usage.jsonl` inside the fork worktree (its own `cache/`) | the main checkout's `cache/` |
 | Sealed | nothing | `src/schelling/eval/`, `tests/golden/`, `splits/`, `data/manifests/`, the test partition |
 
 - **Shared code** (`cached_trainer.py`, `config.py`): additive, default-off, with a test proving existing

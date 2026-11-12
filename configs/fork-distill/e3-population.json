@@ -1,0 +1,1 @@
+{"name": "e3-gpt-oss-120b-population", "model": "accounts/fireworks/models/gpt-oss-120b", "form": "population", "wording": 0, "person_subsample": 0, "subsample_seed": 0, "extra": {"reasoning_effort": "low"}}

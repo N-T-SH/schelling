@@ -16,6 +16,10 @@ def make_baseline(name: str, seed: int = 0) -> Baseline:
         return DemoCellMean()
     if name == "b3":
         return GradientBoosted(seed=seed)
+    if name.endswith(".json") and Path(name).is_file():  # an LLM baseline spec (B5)
+        from schelling.baselines.llm_prompt import LLMPromptBaseline
+
+        return LLMPromptBaseline.from_spec(name)
     if Path(name).is_dir():  # a saved SchellingModel
         from schelling.infer.baseline_adapter import ModelBaseline
 

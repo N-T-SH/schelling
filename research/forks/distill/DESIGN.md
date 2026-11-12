@@ -205,7 +205,7 @@ that knows less than "no information" has nothing to distil.
    threads, and is paused whenever a mainline job is running. API calls are network-only and do not
    compete.
 8. **Separate money.** A fork spend cap approved by the human, a separate usage log
-   (`cache/llm/usage-fork-distill.jsonl`), and a dry run before every paid batch.
+   (`cache/llm/usage.jsonl` in the fork worktree), and a dry run before every paid batch.
 9. **Merging is the human's call.** If the fork wins, it comes back through a normal decision record
    and PR. If it loses, the branch is kept as the record and nothing in mainline changes.
 
