@@ -67,6 +67,17 @@ PROMPTS = f'{WORK}/d01_prompts.jsonl'
 RESULTS = f'{WORK}/results'
 assert os.path.exists(PROMPTS), f'upload d01_prompts.jsonl to {WORK} first'
 os.makedirs(RESULTS, exist_ok=True)
+
+import subprocess, sys
+def run(*args):
+    # Echo the scorer's output and raise on failure, so Run all stops here
+    # (a plain !python line carries on after an error).
+    cmd = [sys.executable, '-u', '/content/score_logprobs.py', *map(str, args)]
+    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+    for line in proc.stdout:
+        print(line, end='')
+    if proc.wait() != 0:
+        raise RuntimeError(f'scorer failed (exit {proc.returncode}); see the output above')
 """),
         md("The scorer (generated from `scripts/d01/score_logprobs.py`; do not edit here)."),
         code("%%writefile /content/score_logprobs.py\n" + scorer),
@@ -75,17 +86,13 @@ os.makedirs(RESULTS, exist_ok=True)
 is not affected. Read the `/s` rate it prints to estimate the full run.
 """),
         code("""
-!python /content/score_logprobs.py --prompts $PROMPTS --out /content/timing \\
-    --base unsloth/Qwen3-4B-Base --adapter socius/Qwentaur-4B-LoRA-r16 \\
-    --variants adapter --dtype float16 --batch-size 8 --limit 64
+run('--prompts', PROMPTS, '--out', '/content/timing', '--base', 'unsloth/Qwen3-4B-Base', '--adapter', 'socius/Qwentaur-4B-LoRA-r16', '--variants', 'adapter', '--dtype', 'float16', '--batch-size', '8', '--limit', '64')
 """),
         md("""
 **Main run: Qwentaur-4B and its base model, fp16.** Re-run this cell after a disconnect.
 """),
         code("""
-!python /content/score_logprobs.py --prompts $PROMPTS --out $RESULTS \\
-    --base unsloth/Qwen3-4B-Base --adapter socius/Qwentaur-4B-LoRA-r16 \\
-    --variants adapter,base --dtype float16 --batch-size 8
+run('--prompts', PROMPTS, '--out', RESULTS, '--base', 'unsloth/Qwen3-4B-Base', '--adapter', 'socius/Qwentaur-4B-LoRA-r16', '--variants', 'adapter,base', '--dtype', 'float16', '--batch-size', '8')
 """),
         md("""
 **Optional scale check: Qwentaur-14B and its base, 4-bit** (fits a T4 only quantised).
@@ -93,9 +100,7 @@ Both variants use the same 4-bit weights, so the comparison stays fair; do not c
 numbers with the fp16 4B run as if precision were equal.
 """),
         code("""
-!python /content/score_logprobs.py --prompts $PROMPTS --out $RESULTS \\
-    --base unsloth/Qwen3-14B-Base --adapter socius/Qwentaur-14B-LoRA-r16 \\
-    --variants adapter,base --load-4bit --batch-size 4
+run('--prompts', PROMPTS, '--out', RESULTS, '--base', 'unsloth/Qwen3-14B-Base', '--adapter', 'socius/Qwentaur-14B-LoRA-r16', '--variants', 'adapter,base', '--load-4bit', '--batch-size', '4')
 """),
         md("Progress: prompts finished per model folder."),
         code("""
