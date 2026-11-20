@@ -35,6 +35,15 @@ ENDPOINTS = {
 EPS = 1e-4
 
 
+def billed_usd(usage: dict[str, object], in_per_m: float, out_per_m: float) -> float:
+    """OpenRouter reports the charge per call (`cost`, after time-of-day discounts); use it
+    when present, else list price from token counts."""
+    cost = usage.get("cost")
+    if isinstance(cost, int | float):
+        return float(cost)
+    return spend_usd(usage, in_per_m, out_per_m)
+
+
 @app.command()
 def main(
     prompts: Annotated[Path, typer.Option()],
@@ -100,7 +109,7 @@ def main(
                 else:
                     if not resp["cached"]:
                         fresh += 1
-                        spent += spend_usd(resp["usage"], in_per_m, out_per_m)
+                        spent += billed_usd(resp["usage"], in_per_m, out_per_m)
                     try:
                         probs = parse_probs(str(resp["text"] or ""), len(r["labels"]), EPS).tolist()
                     except ParseError:
