@@ -84,6 +84,24 @@ class FireworksClient:
             raise RuntimeError(f"{self.key_env} is not set (put it in the git-ignored .env)")
         return key
 
+    def cached(
+        self,
+        model: str,
+        messages: list[dict[str, str]],
+        *,
+        max_tokens: int = 512,
+        temperature: float = 0.0,
+        **extra: Any,
+    ) -> dict[str, Any] | None:
+        """The cached response for this exact request, or None. Never calls the network."""
+        params = {"max_tokens": max_tokens, "temperature": temperature, **extra}
+        digest = request_key(model, messages, params)
+        path = self.cache_dir / digest[:2] / f"{digest}.json"
+        if not path.exists():
+            return None
+        hit: dict[str, Any] = json.loads(path.read_text())
+        return {**hit, "cached": True}
+
     def chat(
         self,
         model: str,

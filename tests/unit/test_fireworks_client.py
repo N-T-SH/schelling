@@ -98,3 +98,20 @@ def test_dropped_connection_becomes_retryable_error(monkeypatch: pytest.MonkeyPa
     monkeypatch.setattr(urllib.request, "urlopen", boom)
     with pytest.raises(RuntimeError, match="RemoteDisconnected"):
         fireworks._urllib_transport("https://example.invalid", {}, {})
+
+
+def test_cached_lookup_never_calls_network(tmp_path: Path) -> None:
+    calls: list[int] = []
+
+    def transport(_u: str, _h: dict[str, str], _b: dict[str, Any]) -> dict[str, Any]:
+        calls.append(1)
+        return {"choices": [{"message": {"content": "hi"}}], "usage": {}}
+
+    client = FireworksClient(cache_dir=tmp_path, transport=transport, api_key="k")
+    msgs = [{"role": "user", "content": "q"}]
+    assert client.cached("m", msgs, max_tokens=5) is None
+    client.chat("m", msgs, max_tokens=5)
+    hit = client.cached("m", msgs, max_tokens=5)
+    assert hit is not None and hit["text"] == "hi" and hit["cached"]
+    assert client.cached("m", msgs, max_tokens=6) is None
+    assert calls == [1]

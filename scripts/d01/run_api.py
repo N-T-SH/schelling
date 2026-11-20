@@ -63,6 +63,10 @@ def main(
     limit: Annotated[int, typer.Option(help="first N prompts only (smoke test)")] = 0,
     env: Annotated[Path, typer.Option()] = Path(".env"),
     workers: Annotated[int, typer.Option(help="parallel requests")] = 1,
+    reuse_max_tokens: Annotated[
+        int,
+        typer.Option(help="reuse cached non-empty answers made with this max_tokens (0: off)"),
+    ] = 0,
 ) -> None:
     recs = [json.loads(x) for x in prompts.read_text().splitlines() if x.strip()]
     recs = [r for r in recs if arm == "all" or r["arm"] == arm][: limit or None]
@@ -90,6 +94,13 @@ def main(
     lines = []
 
     def ask(r: dict[str, object]) -> dict[str, object] | None:
+        if reuse_max_tokens:
+            # An earlier pass with a lower limit: keep its answer unless the reply was empty.
+            old = client.cached(
+                model, r["chat"], max_tokens=reuse_max_tokens, temperature=0.0, **params
+            )  # type: ignore[arg-type]
+            if old is not None and str(old["text"] or "").strip():
+                return old
         try:
             return client.chat(model, r["chat"], max_tokens=max_tokens, temperature=0.0, **params)  # type: ignore[arg-type]
         except RuntimeError:
@@ -120,7 +131,13 @@ def main(
                 typer.echo(f"{done}/{len(recs)} done, ${spent:.3f} spent", err=True)
     # Rewritten in full each run: the cache makes earlier prompts free to replay.
     (tag_dir / "part-api.jsonl").write_text("\n".join(lines) + "\n")
-    meta = {**summary, "endpoint": endpoint, "params": params, "max_tokens": max_tokens}
+    meta = {
+        **summary,
+        "endpoint": endpoint,
+        "params": params,
+        "max_tokens": max_tokens,
+        "reuse_max_tokens": reuse_max_tokens,
+    }
     (tag_dir / "run.json").write_text(json.dumps(meta, indent=2) + "\n")
     summary |= {
         "done": done,
