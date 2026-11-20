@@ -19,6 +19,7 @@ from pathlib import Path
 from typing import Any
 
 BASE_URL = "https://api.fireworks.ai/inference/v1"
+OPENROUTER_URL = "https://openrouter.ai/api/v1"
 DEFAULT_CACHE = Path("cache/llm")
 
 # transport(url, headers, body) -> parsed JSON; injectable so tests need no network.
@@ -61,7 +62,12 @@ class FireworksClient:
         transport: Transport | None = None,
         api_key: str | None = None,
         retries: int = 3,
+        base_url: str = BASE_URL,
+        key_env: str = "FIREWORKS_API_KEY",
     ) -> None:
+        # Any OpenAI-compatible endpoint works (e.g. OPENROUTER_URL with OPENROUTER_API_KEY).
+        self.base_url = base_url
+        self.key_env = key_env
         self.cache_dir = cache_dir
         self._transport = transport or _urllib_transport
         self._api_key = api_key
@@ -69,9 +75,9 @@ class FireworksClient:
         self.network_calls = 0
 
     def _key(self) -> str:
-        key = self._api_key or os.environ.get("FIREWORKS_API_KEY")
+        key = self._api_key or os.environ.get(self.key_env)
         if not key:
-            raise RuntimeError("FIREWORKS_API_KEY is not set (put it in the git-ignored .env)")
+            raise RuntimeError(f"{self.key_env} is not set (put it in the git-ignored .env)")
         return key
 
     def chat(
@@ -96,13 +102,13 @@ class FireworksClient:
         for attempt in range(self._retries):
             try:
                 self.network_calls += 1
-                raw = self._transport(f"{BASE_URL}/chat/completions", headers, body)
+                raw = self._transport(f"{self.base_url}/chat/completions", headers, body)
                 break
             except RuntimeError as err:
                 last = err
                 time.sleep(2**attempt)
         else:
-            raise RuntimeError(f"Fireworks request failed after retries: {last}")
+            raise RuntimeError(f"request to {self.base_url} failed after retries: {last}")
         out = {
             "text": raw["choices"][0]["message"]["content"],
             "usage": raw.get("usage", {}),

@@ -57,7 +57,7 @@ markers = [
 line-length = 100
 target-version = "py311"
 src = ["src", "tests", "scripts"]
-extend-exclude = ["docs", "research"]
+extend-exclude = ["docs", "research", "notebooks"]  # notebooks are generated (scripts/d01/make_notebook.py)
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]

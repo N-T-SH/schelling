@@ -62,3 +62,25 @@ def test_dotenv_does_not_override_existing(tmp_path: Path, monkeypatch: pytest.M
     import os
 
     assert os.environ["FW_TEST_A"] == "one" and os.environ["FW_TEST_B"] == "kept"
+
+
+def test_other_openai_compatible_endpoint_and_key_env(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from schelling.llm.fireworks import OPENROUTER_URL
+
+    calls: list[dict[str, Any]] = []
+    monkeypatch.setenv("OPENROUTER_API_KEY", "or-key")
+    monkeypatch.delenv("FIREWORKS_API_KEY", raising=False)
+    client = FireworksClient(
+        tmp_path, fake(calls), base_url=OPENROUTER_URL, key_env="OPENROUTER_API_KEY"
+    )
+    client.chat("vendor/model", MSG)
+    assert calls[0]["url"] == f"{OPENROUTER_URL}/chat/completions"
+    assert calls[0]["auth"] == "Bearer or-key"
+    monkeypatch.delenv("OPENROUTER_API_KEY")
+    fresh = FireworksClient(
+        tmp_path / "x", fake(calls), base_url=OPENROUTER_URL, key_env="OPENROUTER_API_KEY"
+    )
+    with pytest.raises(RuntimeError, match="OPENROUTER_API_KEY"):
+        fresh.chat("vendor/model", MSG)

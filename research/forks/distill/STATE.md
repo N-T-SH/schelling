@@ -52,7 +52,16 @@ estimates, not measurements. Command: `scripts/fd_llm_calls.py` at the SHA of th
 The last row is over the proposed $5 cap for E3. Options: fewer persons on `heldout_person`, or a seeded
 item subsample there. The LOEO folds are not sized yet.
 
+## D01-lite (2026-11-20)
+
+Draft amendment `campaigns/D01-external-benchmark/D01-lite.md`: decision items only, persona against
+population prompts, Qwentaur-4B against its own base (Colab free tier), DeepSeek V4.1 Flash and
+Qwen3.8-27B (OpenRouter). Tooling built and tested (`src/schelling/bench/`, `scripts/d01/`,
+`notebooks/d01_colab_logprobs.ipynb`); smoke run only, no results, no spend.
+
 ## Blocked: needs the human
+
+0. Approve the D01-lite amendment; OpenRouter key and cap for the two API models.
 
 1. Spend approval for the E3 smoke test and runs (cap), and how to shrink the `heldout_person` persona run.
 2. Which frontier model is E1/E2 and its cap (FA1 to FA3 are checked after you name it).
