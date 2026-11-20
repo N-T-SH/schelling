@@ -38,6 +38,11 @@ class DataCfg(_Strict):
     max_train_rows: int | None = None
     study_temperature: float = 0.5
     augment_option_permutation: bool = True
+    # M5 paraphrase augmentation (off when paraphrases_per_question is 0)
+    paraphrase_path: str | None = None
+    paraphrase_generator: str = "accounts/fireworks/models/gpt-oss-120b@v1"
+    paraphrases_per_question: int = 0
+    paraphrase_prob: float = 0.5
 
 
 class OptimCfg(_Strict):
