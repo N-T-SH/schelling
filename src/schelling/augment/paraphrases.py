@@ -98,6 +98,11 @@ def parse_json_list(text: str) -> list[str]:
 
 
 def spend_usd(usage: dict[str, Any], in_per_m: float, out_per_m: float) -> float:
+    # A provider that reports the billed charge (OpenRouter's `cost`, after discounts) wins
+    # over list price from token counts.
+    cost = usage.get("cost")
+    if isinstance(cost, int | float) and not isinstance(cost, bool):
+        return float(cost)
     tokens_in = float(usage.get("prompt_tokens", 0))
     tokens_out = float(usage.get("completion_tokens", 0))
     return (tokens_in * in_per_m + tokens_out * out_per_m) / 1_000_000

@@ -1,0 +1,1 @@
+{"name": "gate-deepseek-v4.1-flash-high", "model": "deepseek/deepseek-v4.1-flash-1017", "form": "population", "wording": 0, "max_tokens": 8000, "extra": {"reasoning": {"effort": "high"}}}

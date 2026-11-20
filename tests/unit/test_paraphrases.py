@@ -53,6 +53,11 @@ def test_spend_uses_the_price_table() -> None:
     assert abs(spend_usd(usage, in_per_m=0.15, out_per_m=0.60) - 0.75) < 1e-9
 
 
+def test_spend_prefers_the_billed_cost_when_reported() -> None:
+    usage = {"prompt_tokens": 1_000_000, "completion_tokens": 1_000_000, "cost": 0.0123}
+    assert spend_usd(usage, in_per_m=0.15, out_per_m=0.60) == 0.0123
+
+
 def test_spelled_out_numbers_count_as_the_same_number() -> None:
     src = "Cars are 8 times more likely to cause harm."
     assert filter_candidates(src, ["Cars are eight times as likely to cause harm."]) != []

@@ -29,7 +29,7 @@ from schelling.baselines.llm_prompt import (
     parse_probs,
 )
 from schelling.data.loader import load_partition
-from schelling.llm.fireworks import FireworksClient, load_dotenv
+from schelling.llm.fireworks import OPENROUTER_URL, FireworksClient, load_dotenv
 
 app = typer.Typer(add_completion=False)
 
@@ -48,6 +48,7 @@ def main(
     cap_usd: Annotated[float, typer.Option()] = 0.0,
     limit: Annotated[int, typer.Option(help="at most this many requests (smoke test)")] = 0,
     env: Annotated[Path, typer.Option(help=".env holding the API key")] = Path(".env"),
+    provider: Annotated[str, typer.Option(help="fireworks or openrouter")] = "fireworks",
 ) -> None:
     cfg = LLMSpec.model_validate_json(spec.read_text())
     frame = load_partition(processed, split, "val", splits_dir=splits_dir)
@@ -58,7 +59,17 @@ def main(
         if cap_usd <= 0:
             raise typer.BadParameter("--go needs --cap-usd")
         load_dotenv(env)
-        client = FireworksClient(cache_dir=Path(cfg.cache_dir))
+        if provider == "openrouter":
+            client = FireworksClient(
+                cache_dir=Path(cfg.cache_dir),
+                base_url=OPENROUTER_URL,
+                key_env="OPENROUTER_API_KEY",
+                retries=5,
+            )
+        elif provider == "fireworks":
+            client = FireworksClient(cache_dir=Path(cfg.cache_dir))
+        else:
+            raise typer.BadParameter("--provider must be fireworks or openrouter")
     base = LLMPromptBaseline(cfg, client=client)
     base.fit(frame.iloc[:0], persons)
     unique = {json.dumps(r, sort_keys=True, default=str): r for r in base.requests(frame)}
@@ -85,7 +96,13 @@ def main(
         for q, labels, attrs in reqs:
             if spent >= cap_usd:
                 break
-            resp = base.fetch(q, labels, attrs)
+            try:
+                resp = base.fetch(q, labels, attrs)
+            except RuntimeError as err:
+                typer.echo(f"request failed: {err}", err=True)
+                bad += 1
+                done += 1
+                continue
             if not resp["cached"]:
                 fresh += 1
                 spent += spend_usd(resp["usage"], in_per_m, out_per_m)
