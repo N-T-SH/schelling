@@ -148,6 +148,8 @@ def score_model(
     persona = p[p["arm"] == "persona"].set_index(["person_id", "item_id"])["p"]
     population = p[p["arm"] == "population"].set_index("item_id")["p"]
     rows = human[human.set_index(["person_id", "item_id"]).index.isin(persona.index)]
+    # Persona against population needs both prompts for the item.
+    rows = rows[rows["item_id"].isin(population.index)]
     if len(rows):
         keys = list(zip(rows["person_id"], rows["item_id"], strict=True))
         y = rows["response"].to_numpy(dtype=int)

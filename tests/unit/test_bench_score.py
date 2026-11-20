@@ -119,3 +119,14 @@ def test_split_half_ceiling_is_below_one_and_compare_items_is_paired() -> None:
     b = [{"item_id": "x", "m": 0.7}, {"item_id": "y", "m": 0.6}, {"item_id": "z", "m": 0.1}]
     cmp = score.compare_items(a, b, "m", 100, 0)
     assert cmp["n_items"] == 2 and cmp["mean"] == pytest.approx(0.2)
+
+
+def test_item_without_population_prompt_is_left_out_of_person_comparison() -> None:
+    persons = [f"p{j}" for j in range(10)]
+    prompts = _prompts(persons)
+    prompts = prompts[prompts["prompt_id"] != "i1-pop"]  # e.g. the reply did not parse
+    probs = {
+        pid: TRUE[item] for pid, item in zip(prompts["prompt_id"], prompts["item_id"], strict=True)
+    }
+    out = score.score_model(prompts, probs, _human(), _human(), PAIRS, n_splits=5, n_boot=50)
+    assert out["individual"]["n_rows"] == 10 * (len(TRUE) - 1)
