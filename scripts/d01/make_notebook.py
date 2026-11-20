@@ -54,6 +54,8 @@ run all cells again: finished prompts are skipped. Nothing else needs changing.
 """),
         code("""
 # transformers, peft and accelerate; bitsandbytes only matters for the optional 4-bit cell.
+# Colab ships an old torchao that recent peft/transformers reject; the scorer does not use it.
+!pip -q uninstall -y torchao
 !pip -q install "transformers>=4.51" "peft>=0.15" accelerate bitsandbytes
 """),
         code("""

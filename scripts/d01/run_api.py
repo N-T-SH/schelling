@@ -17,6 +17,7 @@ Prices are per million tokens and must be read from the provider on the day of t
 from __future__ import annotations
 
 import json
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Annotated
 
@@ -52,6 +53,7 @@ def main(
     cap_usd: Annotated[float, typer.Option()] = 0.0,
     limit: Annotated[int, typer.Option(help="first N prompts only (smoke test)")] = 0,
     env: Annotated[Path, typer.Option()] = Path(".env"),
+    workers: Annotated[int, typer.Option(help="parallel requests")] = 1,
 ) -> None:
     recs = [json.loads(x) for x in prompts.read_text().splitlines() if x.strip()]
     recs = [r for r in recs if arm == "all" or r["arm"] == arm][: limit or None]
@@ -71,27 +73,42 @@ def main(
         raise typer.BadParameter("--go needs --cap-usd")
     load_dotenv(env)
     url, key_env = ENDPOINTS[endpoint]
-    client = FireworksClient(base_url=url, key_env=key_env)
+    client = FireworksClient(base_url=url, key_env=key_env, retries=5)
     params = json.loads(extra)
     tag_dir = out / (model.split("/")[-1].lower() + "-api")
     tag_dir.mkdir(parents=True, exist_ok=True)
-    spent, bad, fresh, done = 0.0, 0, 0, 0
+    spent, bad, fresh, done, failed = 0.0, 0, 0, 0, 0
     lines = []
-    for r in recs:
-        if spent >= cap_usd:
-            break
-        resp = client.chat(model, r["chat"], max_tokens=max_tokens, temperature=0.0, **params)
-        if not resp["cached"]:
-            fresh += 1
-            spent += spend_usd(resp["usage"], in_per_m, out_per_m)
+
+    def ask(r: dict[str, object]) -> dict[str, object] | None:
         try:
-            probs: list[float] | None = parse_probs(
-                resp["text"] or "", len(r["labels"]), EPS
-            ).tolist()
-        except ParseError:
-            probs, bad = None, bad + 1
-        lines.append(json.dumps({"prompt_id": r["prompt_id"], "probs": probs}))
-        done += 1
+            return client.chat(model, r["chat"], max_tokens=max_tokens, temperature=0.0, **params)  # type: ignore[arg-type]
+        except RuntimeError:
+            return None  # retries exhausted: recorded as unparsed, retried on the next run
+
+    chunk = max(1, workers) * 20
+    with ThreadPoolExecutor(max_workers=max(1, workers)) as pool:
+        # The cap is checked between chunks, so it can be overshot by at most one chunk.
+        for start in range(0, len(recs), chunk):
+            if spent >= cap_usd:
+                break
+            batch = recs[start : start + chunk]
+            for r, resp in zip(batch, pool.map(ask, batch), strict=True):
+                probs: list[float] | None = None
+                if resp is None:
+                    failed += 1
+                else:
+                    if not resp["cached"]:
+                        fresh += 1
+                        spent += spend_usd(resp["usage"], in_per_m, out_per_m)
+                    try:
+                        probs = parse_probs(str(resp["text"] or ""), len(r["labels"]), EPS).tolist()
+                    except ParseError:
+                        bad += 1
+                lines.append(json.dumps({"prompt_id": r["prompt_id"], "probs": probs}))
+                done += 1
+            if start // chunk % 25 == 0:
+                typer.echo(f"{done}/{len(recs)} done, ${spent:.3f} spent", err=True)
     # Rewritten in full each run: the cache makes earlier prompts free to replay.
     (tag_dir / "part-api.jsonl").write_text("\n".join(lines) + "\n")
     meta = {**summary, "endpoint": endpoint, "params": params, "max_tokens": max_tokens}
@@ -100,6 +117,7 @@ def main(
         "done": done,
         "network_calls": fresh,
         "parse_failures": bad,
+        "request_failures": failed,
         "spent_usd": round(spent, 4),
         "cap_reached": done < len(recs),
     }

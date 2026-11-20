@@ -84,3 +84,17 @@ def test_other_openai_compatible_endpoint_and_key_env(
     )
     with pytest.raises(RuntimeError, match="OPENROUTER_API_KEY"):
         fresh.chat("vendor/model", MSG)
+
+
+def test_dropped_connection_becomes_retryable_error(monkeypatch: pytest.MonkeyPatch) -> None:
+    import http.client
+    import urllib.request
+
+    from schelling.llm import fireworks
+
+    def boom(*_a: object, **_k: object) -> None:
+        raise http.client.RemoteDisconnected("closed")
+
+    monkeypatch.setattr(urllib.request, "urlopen", boom)
+    with pytest.raises(RuntimeError, match="RemoteDisconnected"):
+        fireworks._urllib_transport("https://example.invalid", {}, {})

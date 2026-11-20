@@ -9,6 +9,7 @@ and is never logged, cached or put in an exception message.
 from __future__ import annotations
 
 import hashlib
+import http.client
 import json
 import os
 import time
@@ -48,6 +49,9 @@ def _urllib_transport(url: str, headers: dict[str, str], body: dict[str, Any]) -
     except urllib.error.HTTPError as err:
         # Status only: the response body can echo request details.
         raise RuntimeError(f"Fireworks HTTP {err.code}") from None
+    except (OSError, http.client.HTTPException, json.JSONDecodeError) as err:
+        # Dropped connections and timeouts are retried like HTTP errors (type name only).
+        raise RuntimeError(f"network error: {type(err).__name__}") from None
 
 
 def request_key(model: str, messages: list[dict[str, str]], params: dict[str, Any]) -> str:
