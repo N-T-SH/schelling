@@ -1,0 +1,30 @@
+{
+  "a": "reports/FD-gate-deepseek-off-item-val",
+  "b": "reports/FD-gate-b1-item-val",
+  "split": "heldout_item",
+  "partition": "val",
+  "source": "twin2k",
+  "unit": "item_id",
+  "n_rows": 65804,
+  "n_persons": 2058,
+  "n_items": 28,
+  "row_nll_a": 1.2691583661233121,
+  "row_nll_b": 1.3533652808783667,
+  "paired": {
+    "n_units": 28,
+    "mean_a": 1.3127271489857688,
+    "mean_b": 1.415353091051531,
+    "mean_diff": -0.102625942065762,
+    "ci_low": -0.22028899372893476,
+    "ci_high": 0.013263672985093573,
+    "units_a_better": 18,
+    "n_boot": 10000,
+    "seed": 0,
+    "level": 0.95
+  },
+  "a_metrics_sha": "8f90f6c264898a04baed4cd2bf2b141ee8f60d26",
+  "b_metrics_sha": "8f90f6c264898a04baed4cd2bf2b141ee8f60d26",
+  "git_sha": "270cb0e458c85a1634036bce8783fca6ef8f432d",
+  "dirty": false,
+  "created_at": "2026-11-20T15:13:47.300326+00:00"
+}
