@@ -68,9 +68,16 @@ longer clearly the right primary approach.
 
 ## Blocked: needs the human
 
-0. Nothing blocked. Step 1 of `D02-OPTIONS.md` is done (D01b passed, M4b re-run done, item folds
-   merged as decision 0007). Step 2 in progress: A1 teacher answers for every non-test Twin-2K-500
-   question (cap one dollar), then A1 training on the item folds.
+0. A1 teacher answers are partly fetched: 302 of 528 non-test Twin-2K-500 questions cached, about
+   0.57 dollars billed of an approved 1.50 total (the human raised the cap from 1 to 1.50). The run
+   stopped when the Mac crashed (2026-11-20 23:13): four parallel batches of `scripts/fd_llm_calls.py`
+   used about 4 GB each. Fixed in 865bdf0 (one process, `--workers`, about 1 GB peak). The human
+   chose not to resume yet. To resume (cached answers are free; cap is new spend only):
+   `uv run python scripts/fd_llm_calls.py --spec configs/fork-distill/gate-deepseek-high16k.json
+   --split heldout_item_f0,heldout_item_f1 --partitions train,val --in-per-m 0.30 --out-per-m 1.20
+   --provider openrouter --go --cap-usd 0.90 --workers 4`. The dry run (same command without
+   `--provider`, `--go`, `--cap-usd`) reports how many are cached. Then build A1 (cached LLM prior
+   into M4b) and train it on the item folds (`D02-OPTIONS.md` step 2).
 
 1. Spend approval for the E3 smoke test and runs (cap), and how to shrink the `heldout_person` persona run.
 2. Which frontier model is E1/E2 and its cap (FA1 to FA3 are checked after you name it).
