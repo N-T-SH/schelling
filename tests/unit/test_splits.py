@@ -42,6 +42,7 @@ def test_all_five_splits_plus_retest_exist() -> None:
         "temporal",
         "retest",
         *(f"heldout_experiment_f{k}" for k in range(8)),
+        *(f"heldout_item_f{k}" for k in range(5)),
     }
 
 
