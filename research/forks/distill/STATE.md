@@ -57,13 +57,14 @@ item subsample there. The LOEO folds are not sized yet.
 Amendment `campaigns/D01-external-benchmark/D01-lite.md` (approved by the human 2026-11-20): decision items only, persona against
 population prompts, Qwentaur-4B against its own base (Colab free tier), DeepSeek V4.1 Flash and
 Qwen3.8-27B (OpenRouter). Tooling built and tested (`src/schelling/bench/`, `scripts/d01/`,
-`notebooks/d01_colab_logprobs.ipynb`); smoke run only, no results, no spend.
+`notebooks/d01_colab_logprobs.ipynb`); DeepSeek and Qwentaur-4B scored.
 
 ## Blocked: needs the human
 
-0. D01-lite: DeepSeek V4.1 Flash done (results in `D01-lite.md`; $3.96 billed of the $7
-   OpenRouter credit). Qwen3.8-27B dropped for budget. Qwentaur-4B/14B pending: Colab free GPU
-   quota ran out; the human chooses when and where to run (not on this Mac, by request).
+0. D01-lite: all planned runs scored (results in `D01-lite.md`; $3.96 billed of the $7
+   OpenRouter credit). Qwentaur-4B beats its base by about 0.055 but only ties a uniform guess and
+   trails DeepSeek reasoning-off. 14B skipped and Qwen3.8-27B dropped by the human. Next step for
+   the human: decide whether D01 closes here or adds contamination probes.
 
 1. Spend approval for the E3 smoke test and runs (cap), and how to shrink the `heldout_person` persona run.
 2. Which frontier model is E1/E2 and its cap (FA1 to FA3 are checked after you name it).

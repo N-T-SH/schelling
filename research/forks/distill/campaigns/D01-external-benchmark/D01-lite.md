@@ -1,8 +1,8 @@
 # D01-lite: do decision-tuned models predict people better than general LLMs?
 
 **Status:** approved by the human on 2026-11-20 as an amendment to the D01 contract. DeepSeek V4.1
-Flash scored (results below); Qwentaur runs pending (Colab GPU quota). Still needed for the API
-models: an OpenRouter key in `.env` and a spend cap. The Colab runs are free and can start now.
+Flash and Qwentaur-4B (with its base) scored; results below. Qwentaur-14B skipped by the human;
+Qwen3.8-27B dropped for budget.
 
 **Dry-run cost estimate (2026-11-20, all 10,807 prompts, no network):** about 3.1 M input tokens
 per model. Assuming 300 output tokens per call: DeepSeek V4.1 Flash about $4.82, Qwen3.8-27B
@@ -87,7 +87,7 @@ Any other model works if it writes `results/<name>/part-*.jsonl` lines of
 
 ## Results so far (2026-11-20)
 
-DeepSeek V4.1 Flash only; Qwentaur not run yet (Colab GPU quota). Validation people only, each
+DeepSeek V4.1 Flash and Qwentaur-4B with its base model. Validation people only, each
 person's first answer (wave 1). Accuracy = 1 - TVD between predicted and human answer
 distributions, averaged over items, 95 % bootstrap intervals over items. References: uniform
 guess, and the training crowd (each item's answer distribution among `heldout_person` train
@@ -137,9 +137,38 @@ response in `cache/llm/usage.jsonl`), plus about $0.03 for the first smoke test 
 were lost with the deleted worktree. Reasoning off costs about $0.0001 per prompt; reasoning
 high about $0.0017.
 
-**Reading so far:** a general model with no reasoning beats a uniform guess but sits far from
-the simple training crowd; reasoning helps a lot; demographic personas do not help it predict a
-given person. The decision-tuned comparison (Qwentaur against its base) is the open part.
+**Qwentaur-4B against its base** (all 10,807 prompts, fp16 on a Colab T4, log-probabilities over
+the answer keys, renormalised). Scored together with DeepSeek reasoning-off and the references;
+the DeepSeek and reference numbers reproduce the table above.
+Source: `reports/FD-d01lite/qwentaur4b-vs-all/metrics.json`, git 25a7010f, clean.
+
+| Predictor | Accuracy, no persona | Accuracy, persona | Spread | Persona minus population NLL |
+|---|---|---|---|---|
+| Qwen3-4B base | 0.663 [0.623, 0.704] | 0.668 [0.631, 0.706] | 1.19 / 1.25 | -0.021 [-0.027, -0.015] |
+| Uniform | 0.713 | 0.713 | 1.24 | 0 |
+| Qwentaur-4B | 0.719 [0.689, 0.750] | 0.723 [0.696, 0.750] | 1.10 / 1.11 | -0.018 [-0.023, -0.012] |
+| DeepSeek, reasoning off | 0.779 | 0.776 | 1.08 / 1.09 | +0.018 |
+| Training crowd | 0.942 | 0.942 | 1.00 | 0 |
+
+- Fine-tuning on Psych-101 helps: Qwentaur minus its base +0.056 [0.024, 0.089] without persona,
+  +0.054 [0.020, 0.089] with persona (paired over items). But that only lifts the base from below
+  a uniform guess to level with it: Qwentaur minus uniform +0.005 [-0.027, 0.039] and +0.009
+  [-0.019, 0.039].
+- DeepSeek (reasoning off) beats Qwentaur by 0.060 [0.027, 0.091] without persona and 0.053
+  [0.027, 0.079] with persona.
+- Persona prompts lower Qwentaur's NLL on a person's real answers (the opposite of DeepSeek), but
+  the base model shows the same drop, and Psych-101 has no demographics, so this is probably the
+  prompt format rather than learned use of demographics. Qwentaur's NLL with persona (0.975) is
+  barely below uniform's (0.999) and far above the training crowd's (0.737).
+- Bias test: correlation with the human effects 0.24 without persona and 0.23 with (signs right 8
+  and 6 of 10); the base 0.37 and 0.19. DeepSeek: 0.70 and 0.88.
+- The base model puts a median 25 % of its next-token probability on the answer keys (Qwentaur
+  over 99.9 %), so the base readout is a renormalised minority of its mass.
+
+**Reading so far:** on these decision items no model comes near the simple training crowd.
+Reasoning helps DeepSeek a lot. Decision tuning helps Qwen3-4B but only up to a uniform guess,
+and it stays behind a general model without reasoning. Demographic personas do not help any
+model predict a given person in a way that can be credited to the demographics.
 
 ## Known limits
 
@@ -149,4 +178,4 @@ given person. The decision-tuned comparison (Qwentaur against its base) is the o
 - Psych-101 transcripts carry no demographics, so the persona arm is new ground for Qwentaur.
 - Stated probabilities (API models) and log-probabilities (Qwentaur) are different readouts; the
   API models' log-probability readout is not built.
-- 4-bit 14B numbers are comparable with their own base only, not with fp16 4B.
+- Only the 4B Qwentaur was run; whether scale changes the picture is untested.
