@@ -14,24 +14,73 @@ approves the cap first (AGENTS.md rule 7).
 from __future__ import annotations
 
 import json
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Any
 
 import pandas as pd
+import pyarrow as pa  # type: ignore[import-untyped]
+import pyarrow.compute as pc  # type: ignore[import-untyped]
+import pyarrow.parquet as pq  # type: ignore[import-untyped]
 import typer
 
 from schelling.augment.paraphrases import spend_usd
 from schelling.baselines.llm_prompt import (
+    CacheMissError,
     LLMPromptBaseline,
     LLMSpec,
     ParseError,
     build_messages,
     parse_probs,
 )
-from schelling.data.loader import load_partition
+from schelling.data.loader import load_records, partition_frame, select_partition
 from schelling.llm.fireworks import OPENROUTER_URL, FireworksClient, load_dotenv
 
 app = typer.Typer(add_completion=False)
+
+
+def _request_rows(
+    processed: Path, splits_dir: Path, source: str, split: str, partitions: str, form: str
+) -> tuple[pd.DataFrame, int]:
+    """The rows that need a request, loaded once and kept small.
+
+    Loads only the source's records, once, and reduces each partition to one row per item for
+    the population form (its request does not depend on the person). Loading every split and
+    partition in full, in four parallel processes, used about 4 GB each and crashed a 16 GB
+    machine on 2026-11-20.
+    """
+    path = processed / f"records_{source}.parquet"
+    light = ["record_id", "source", "study_id", "item_id", "person_id", "trial_idx", "wave"]
+    text = ["qtype", "question", "options", "levels"]
+    # Split assignment needs only the small columns; the question text (a copy per row) is
+    # read afterwards for the rows that need a request.
+    records = (
+        pd.read_parquet(path, columns=light, dtype_backend="pyarrow")
+        if path.exists()
+        else load_records(processed)
+    )
+    records = records[records["source"] == source]
+    parts, n_rows = [], 0
+    for s in split.split(","):
+        parted = partition_frame(records, s, splits_dir)
+        for part in partitions.split(","):
+            rows = select_partition(parted, part)
+            n_rows += len(rows)
+            parts.append(rows.drop_duplicates("item_id") if form == "population" else rows)
+        del parted
+    frame = pd.concat(parts).drop_duplicates("record_id").reset_index(drop=True)
+    if path.exists():
+        # Dictionary-encoded: each distinct question is held once, not once per row.
+        table = pq.read_table(
+            path, columns=["record_id", *text], read_dictionary=["question", "qtype"]
+        )
+        keep = pc.is_in(table["record_id"], value_set=pa.array(frame["record_id"].tolist()))
+        texts = table.filter(keep).to_pandas()
+        del table
+        texts["question"] = texts["question"].astype(str)
+        texts["qtype"] = texts["qtype"].astype(str)
+        frame = frame[light].merge(texts, on="record_id", validate="1:1")
+    return frame, n_rows
 
 
 @app.command()
@@ -55,16 +104,10 @@ def main(
     shard: Annotated[
         str, typer.Option(help="i/n: only every n-th request from i (parallel runs)")
     ] = "0/1",
+    workers: Annotated[int, typer.Option(help="parallel requests in this one process")] = 1,
 ) -> None:
     cfg = LLMSpec.model_validate_json(spec.read_text())
-    frame = pd.concat(
-        [
-            load_partition(processed, s, part, splits_dir=splits_dir)
-            for s in split.split(",")
-            for part in partitions.split(",")
-        ]
-    )
-    frame = frame[frame["source"] == source].drop_duplicates("record_id").reset_index(drop=True)
+    frame, n_rows = _request_rows(processed, splits_dir, source, split, partitions, cfg.form)
     persons = pd.read_parquet(processed / "persons_twin2k.parquet")
     client = None
     if go:
@@ -99,32 +142,51 @@ def main(
         "form": cfg.form,
         "split": split,
         "partitions": partitions,
-        "rows": len(frame),
+        "rows": n_rows,
         "requests": len(reqs),
         "est_input_tokens": round(est_in),
         "assumed_output_tokens_per_call": out_tokens,
         "est_usd": round(est, 4),
     }
+    if not go:
+        # Progress from the cache, no network: how many requests already have a response.
+        cached, cached_usd = 0, 0.0
+        for q, labels, attrs in reqs:
+            try:
+                hit = base.fetch(q, labels, attrs)
+            except CacheMissError:
+                continue
+            cached += 1
+            cached_usd += spend_usd(hit["usage"], in_per_m, out_per_m)
+        summary |= {"cached": cached, "cached_billed_usd": round(cached_usd, 4)}
     if go:
         spent, done, bad, fresh = 0.0, 0, 0, 0
-        for q, labels, attrs in reqs:
-            if spent >= cap_usd:
-                break
+
+        def one(req: tuple[str, list[str], dict[str, Any] | None]) -> tuple[Any, int]:
+            q, labels, attrs = req
             try:
-                resp = base.fetch(q, labels, attrs)
+                return base.fetch(q, labels, attrs), len(labels)
             except RuntimeError as err:
                 typer.echo(f"request failed: {err}", err=True)
-                bad += 1
-                done += 1
-                continue
-            if not resp["cached"]:
-                fresh += 1
-                spent += spend_usd(resp["usage"], in_per_m, out_per_m)
-            try:
-                parse_probs(resp["text"], len(labels), cfg.eps)
-            except ParseError:
-                bad += 1
-            done += 1
+                return None, len(labels)
+
+        # The cap is checked between chunks, so it can be passed by at most one chunk.
+        with ThreadPoolExecutor(max_workers=workers) as pool:
+            for lo in range(0, len(reqs), workers):
+                if spent >= cap_usd:
+                    break
+                for resp, n_labels in pool.map(one, reqs[lo : lo + workers]):
+                    done += 1
+                    if resp is None:
+                        bad += 1
+                        continue
+                    if not resp["cached"]:
+                        fresh += 1
+                        spent += spend_usd(resp["usage"], in_per_m, out_per_m)
+                    try:
+                        parse_probs(resp["text"], n_labels, cfg.eps)
+                    except ParseError:
+                        bad += 1
         summary |= {
             "done": done,
             "network_calls": fresh,
