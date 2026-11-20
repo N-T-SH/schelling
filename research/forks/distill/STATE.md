@@ -54,14 +54,16 @@ item subsample there. The LOEO folds are not sized yet.
 
 ## D01-lite (2026-11-20)
 
-Draft amendment `campaigns/D01-external-benchmark/D01-lite.md`: decision items only, persona against
+Amendment `campaigns/D01-external-benchmark/D01-lite.md` (approved by the human 2026-11-20): decision items only, persona against
 population prompts, Qwentaur-4B against its own base (Colab free tier), DeepSeek V4.1 Flash and
 Qwen3.8-27B (OpenRouter). Tooling built and tested (`src/schelling/bench/`, `scripts/d01/`,
 `notebooks/d01_colab_logprobs.ipynb`); smoke run only, no results, no spend.
 
 ## Blocked: needs the human
 
-0. Approve the D01-lite amendment; OpenRouter key and cap for the two API models.
+0. D01-lite: OpenRouter key in `.env` and a spend cap for the two API models (dry-run estimate
+   about $4.82 and $7.32 at 300 output tokens per call; a 50-prompt smoke run measures the real
+   output length first). The Colab run needs nothing from me: upload the prompts and run.
 
 1. Spend approval for the E3 smoke test and runs (cap), and how to shrink the `heldout_person` persona run.
 2. Which frontier model is E1/E2 and its cap (FA1 to FA3 are checked after you name it).

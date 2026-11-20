@@ -1,9 +1,13 @@
 # D01-lite: do decision-tuned models predict people better than general LLMs?
 
-**Status:** draft amendment to the approved D01 contract, written 2026-11-20 at the human's
-request. Tooling is built and tested; no model has been scored and nothing has been spent.
-Running it needs: approval of this amendment, an OpenRouter key and spend cap for the API models.
-The Colab runs are free.
+**Status:** approved by the human on 2026-11-20 as an amendment to the D01 contract. Tooling is
+built and tested; no model has been scored and nothing has been spent. Still needed for the API
+models: an OpenRouter key in `.env` and a spend cap. The Colab runs are free and can start now.
+
+**Dry-run cost estimate (2026-11-20, all 10,807 prompts, no network):** about 3.1 M input tokens
+per model. Assuming 300 output tokens per call: DeepSeek V4.1 Flash about $4.82, Qwen3.8-27B
+about $7.32 (list prices above, not batch). The output length is a guess; reasoning output can
+make it several times larger, so a 50-prompt paid smoke run measures it before the full run.
 
 ## Question
 
