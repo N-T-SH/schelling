@@ -68,8 +68,9 @@ longer clearly the right primary approach.
 
 ## Blocked: needs the human
 
-0. Review `D02-OPTIONS.md` (status, four arms with pros and cons, decision steps). Decisions needed:
-   is network-free running a requirement; approve an `eval-change/item-folds` proposal; caps of one
+0. Review `D02-OPTIONS.md` (status, four arms with pros and cons, decision steps). Decided 2026-11-20:
+   network-free running is not required, so A1 (direct LLM prior) leads and A2 is a fallback. Still
+   needed: approve an `eval-change/item-folds` proposal; caps of one
    dollar each for D01b (contamination probe) and the A1 teacher labels. Then step 1: D01b, the
    three-seed M4b re-run and item folds.
 

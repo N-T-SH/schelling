@@ -129,8 +129,9 @@ human's approval.
 
 **Step 0. Human decisions (no work).**
 
-1. Is running without the network a requirement for the simulator? If **no**, A2's main advantage is
-   gone and it runs only if A1 disappoints.
+1. ~~Is running without the network a requirement for the simulator?~~ **Decided 2026-11-20: not
+   required** (the human, in chat). A2's main advantage is gone: it runs only if A1 disappoints or the
+   A2 capacity check comes close to the teacher.
 2. Approve an `eval-change/item-folds` proposal: 28 items cannot separate arms that differ by a few
    hundredths of NLL (DESIGN §9, attack 4).
 3. Approve the spend caps below.
@@ -149,7 +150,7 @@ human's approval.
    dollar), then train M4b with the prior input. A day of CPU.
 2. **A2 capacity check** (no spend): fit M4b's prior path to teacher labels on the training questions
    only and measure how close it gets to the teacher on the val questions. If it gets less than half
-   of the teacher's gain over M4b, drop A2 unless network-free running is required (step 0).
+   of the teacher's gain over M4b, drop A2 (network-free running is not required, step 0).
 3. **A3 feasibility** (no spend, needs a GPU): population-form LoRA on the 435 training questions on a
    free T4; record training time and the val score.
 
@@ -157,8 +158,8 @@ human's approval.
 
 1. If **A1 beats A0** with the interval excluding 0 and passes the guards (ECE, SD ratio,
    permutation), A1 is the default design.
-2. **A2** runs in full (bank, five seeds) only if network-free running is required (step 0), or if its
-   capacity check came close to the teacher. It then has to match A1 to be worth its cost.
+2. **A2** runs in full (bank, five seeds) only if its capacity check came close to the teacher or A1
+   fails (network-free running is not required, step 0). It then has to match A1 to be worth its cost.
 3. **A3** is kept only if it beats A1, or if A1 is ruled out by the contamination probe.
 4. If no arm beats A0, that is the finding; write it up.
 
