@@ -151,6 +151,12 @@ def test_parse_rejects_malformed(text: str) -> None:
         parse_probs(text, 3, eps=1e-4)
 
 
+def test_parse_rejects_an_empty_reply() -> None:
+    # A reasoning model that runs out of tokens returns content None.
+    with pytest.raises(ParseError):
+        parse_probs(None, 2, 1e-4)
+
+
 def test_temperature_one_is_identity_and_high_flattens() -> None:
     p = np.array([0.7, 0.2, 0.1])
     assert apply_temperature(p, 1.0) == pytest.approx(p)

@@ -88,7 +88,10 @@ def build_messages(
     ]
 
 
-def parse_probs(text: str, n: int, eps: float) -> np.ndarray:
+def parse_probs(text: str | None, n: int, eps: float) -> np.ndarray:
+    if not isinstance(text, str):
+        # A reasoning model can spend the whole token limit thinking and return no content.
+        raise ParseError("empty reply")
     start, end = text.find("{"), text.rfind("}")
     if start < 0 or end < start:
         raise ParseError("no JSON object")
