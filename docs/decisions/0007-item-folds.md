@@ -1,7 +1,6 @@
 # 0007: Five item folds for comparing models on unseen questions
 
-**Date:** 2026-11-20 · **Status:** proposed (the human approved writing it, 2026-11-20; approval of
-this branch is the decision)
+**Date:** 2026-11-20 · **Status:** approved (Nitesh, 2026-11-20, "Approve PR10"; proposed the same day)
 
 ## Context
 
