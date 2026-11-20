@@ -61,9 +61,9 @@ Qwen3.8-27B (OpenRouter). Tooling built and tested (`src/schelling/bench/`, `scr
 
 ## Blocked: needs the human
 
-0. D01-lite: OpenRouter key in `.env` and a spend cap for the two API models (dry-run estimate
-   about $4.82 and $7.32 at 300 output tokens per call; a 50-prompt smoke run measures the real
-   output length first). The Colab run needs nothing from me: upload the prompts and run.
+0. D01-lite: DeepSeek V4.1 Flash done (results in `D01-lite.md`; $3.96 billed of the $7
+   OpenRouter credit). Qwen3.8-27B dropped for budget. Qwentaur-4B/14B pending: Colab free GPU
+   quota ran out; the human chooses when and where to run (not on this Mac, by request).
 
 1. Spend approval for the E3 smoke test and runs (cap), and how to shrink the `heldout_person` persona run.
 2. Which frontier model is E1/E2 and its cap (FA1 to FA3 are checked after you name it).

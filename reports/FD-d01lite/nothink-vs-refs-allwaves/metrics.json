@@ -1,0 +1,3619 @@
+{
+  "prompts": "data/d01/d01_prompts.jsonl",
+  "prompts_sha256": "f2dc73c88d7d4c16a6aac37240a4aed69c629926f9ebaa032c2212cfda180472",
+  "n_prompts": 10807,
+  "waves": "all",
+  "human_retest": {
+    "n_pairs": 7215.0,
+    "n_items": 54.0,
+    "exact_agreement": 0.6837144837144837
+  },
+  "models": {
+    "deepseek-v4.1-flash-nothink": {
+      "coverage": {
+        "population": 1.0,
+        "persona": 1.0
+      },
+      "n_items": 107,
+      "ceiling": 0.9369169526244696,
+      "population": {
+        "accuracy": {
+          "mean": 0.7819706034217891,
+          "ci_low": 0.7536862574482793,
+          "ci_high": 0.8076539706299438
+        },
+        "accuracy_over_ceiling": 0.8346210421653185,
+        "sd_ratio_median": 1.0756546466375716
+      },
+      "persona": {
+        "accuracy": {
+          "mean": 0.7784942120184543,
+          "ci_low": 0.7496052949994938,
+          "ci_high": 0.8048249665284629
+        },
+        "accuracy_over_ceiling": 0.8309105837371762,
+        "sd_ratio_median": 1.0914624934760813
+      },
+      "individual": {
+        "n_rows": 12284,
+        "n_persons": 100,
+        "nll_population": 0.9843793051627155,
+        "nll_persona": 0.9962373615390868,
+        "persona_minus_population": {
+          "mean": 0.011855745202281663,
+          "ci_low": 0.00540370173918016,
+          "ci_high": 0.018660358089356954
+        }
+      },
+      "effects": {
+        "pairs": [
+          {
+            "id": "E02",
+            "experiment": "outcome_bias",
+            "human": {
+              "d": -0.5164352300036393,
+              "sd": 1.251187685767813,
+              "ci_low": -0.5764874733067605,
+              "ci_high": -0.45026486216093314
+            },
+            "population": -0.039934076279051864,
+            "persona": -0.3173960382659028
+          },
+          {
+            "id": "E03",
+            "experiment": "absolute_relative",
+            "human": {
+              "d": -0.9126394738140774,
+              "sd": 0.45457296717495865,
+              "ci_low": -0.9782727910657422,
+              "ci_high": -0.8470618965185245
+            },
+            "population": 0.43988539230807056,
+            "persona": -0.13152573230011305
+          },
+          {
+            "id": "E04",
+            "experiment": "myside",
+            "human": {
+              "d": 0.3001477234514857,
+              "sd": 1.3026178905128887,
+              "ci_low": 0.23359826541039985,
+              "ci_high": 0.36294470822407765
+            },
+            "population": 0.05370571500238184,
+            "persona": 0.059432820240871376
+          },
+          {
+            "id": "E05",
+            "experiment": "less_is_more",
+            "human": {
+              "d": 0.6987329113091205,
+              "sd": 1.3475514352866746,
+              "ci_low": 0.6196743888537968,
+              "ci_high": 0.7765823202803113
+            },
+            "population": 0.007417158437907364,
+            "persona": 0.023512392248166186
+          },
+          {
+            "id": "E06",
+            "experiment": "less_is_more",
+            "human": {
+              "d": -0.05289305766053015,
+              "sd": 1.4244879239065038,
+              "ci_low": -0.13121118896130005,
+              "ci_high": 0.025138903660411323
+            },
+            "population": 0.0,
+            "persona": 0.04308166767327167
+          },
+          {
+            "id": "E07",
+            "experiment": "less_is_more",
+            "human": {
+              "d": 0.6601752753801985,
+              "sd": 1.3121258064714076,
+              "ci_low": 0.5823387572285745,
+              "ci_high": 0.7398723520250889
+            },
+            "population": 0.0076174117218450865,
+            "persona": 0.07091810313037696
+          },
+          {
+            "id": "E08",
+            "experiment": "proportion_dominance_1",
+            "human": {
+              "d": 0.20281375140891522,
+              "sd": 1.1099341055900067,
+              "ci_low": 0.12697945394904486,
+              "ci_high": 0.27945168030978196
+            },
+            "population": 0.0,
+            "persona": 0.058262617430376085
+          },
+          {
+            "id": "E09",
+            "experiment": "proportion_dominance_1",
+            "human": {
+              "d": 0.0176704182698492,
+              "sd": 1.0676910744172383,
+              "ci_low": -0.06310859913012953,
+              "ci_high": 0.09377760364332123
+            },
+            "population": 0.0,
+            "persona": -0.01001661710012968
+          },
+          {
+            "id": "E10",
+            "experiment": "proportion_dominance_1",
+            "human": {
+              "d": 0.22106555930194866,
+              "sd": 1.103638433819098,
+              "ci_low": 0.1405881896818995,
+              "ci_high": 0.3011655281445715
+            },
+            "population": 0.0,
+            "persona": 0.048904615714117666
+          },
+          {
+            "id": "E12",
+            "experiment": "proportion_dominance_2",
+            "human": {
+              "d": 0.011394509566796735,
+              "sd": 1.3605881090692504,
+              "ci_low": -0.07333089826969073,
+              "ci_high": 0.08800340476915253
+            },
+            "population": -0.11018033523030697,
+            "persona": 0.006317005886538477
+          },
+          {
+            "id": "E14",
+            "experiment": "wta_wtp",
+            "human": {
+              "d": 1.5478382092913792,
+              "sd": 2.459926616483833,
+              "ci_low": 1.4718904444754117,
+              "ci_high": 1.6251737543199924
+            },
+            "population": 1.254880152207734,
+            "persona": 0.5074127736131262
+          },
+          {
+            "id": "E15",
+            "experiment": "wta_wtp",
+            "human": {
+              "d": 0.5984945557232084,
+              "sd": 1.7648572278498988,
+              "ci_low": 0.5214346769555686,
+              "ci_high": 0.6758033885997153
+            },
+            "population": 0.0,
+            "persona": 0.6076530666830603
+          },
+          {
+            "id": "E16",
+            "experiment": "wta_wtp",
+            "human": {
+              "d": 2.1922083558476397,
+              "sd": 2.218687762305699,
+              "ci_low": 2.1154436490898703,
+              "ci_high": 2.270240907367334
+            },
+            "population": 1.3913237993006795,
+            "persona": 1.0459421706567409
+          }
+        ],
+        "population": {
+          "correlation": 0.7148760035234866,
+          "sign_agreement": 0.6,
+          "n_pairs": 13,
+          "n_real": 10
+        },
+        "persona": {
+          "correlation": 0.8773814210748989,
+          "sign_agreement": 1.0,
+          "n_pairs": 13,
+          "n_real": 10
+        }
+      },
+      "per_item": [
+        {
+          "item_id": "QID117",
+          "n_human": 206,
+          "population_acc": 0.6461626131117447,
+          "ceiling": 0.883883495145631,
+          "population_sd_ratio": 0.9640315043877352,
+          "persona_acc": 0.7686761729370144,
+          "persona_sd_ratio": 0.9001279872023039
+        },
+        {
+          "item_id": "QID118",
+          "n_human": 206,
+          "population_acc": 0.5600892032327245,
+          "ceiling": 0.8512135922330097,
+          "population_sd_ratio": 1.261756083781096,
+          "persona_acc": 0.4722992396426373,
+          "persona_sd_ratio": 1.2721309169444277
+        },
+        {
+          "item_id": "QID119",
+          "n_human": 206,
+          "population_acc": 0.578720100762213,
+          "ceiling": 0.8662621359223301,
+          "population_sd_ratio": 1.4382748906900118,
+          "persona_acc": 0.4277466665027314,
+          "persona_sd_ratio": 1.419051503205446
+        },
+        {
+          "item_id": "QID120",
+          "n_human": 206,
+          "population_acc": 0.5832896763430744,
+          "ceiling": 0.8766990291262137,
+          "population_sd_ratio": 1.666102237684041,
+          "persona_acc": 0.4591299719697777,
+          "persona_sd_ratio": 1.485381902938056
+        },
+        {
+          "item_id": "QID121",
+          "n_human": 206,
+          "population_acc": 0.5762035992281132,
+          "ceiling": 0.8902912621359224,
+          "population_sd_ratio": 1.60471357948465,
+          "persona_acc": 0.5584590446881359,
+          "persona_sd_ratio": 1.4604377557741228
+        },
+        {
+          "item_id": "QID122",
+          "n_human": 206,
+          "population_acc": 0.7871635569073342,
+          "ceiling": 0.9129126213592232,
+          "population_sd_ratio": 1.3341502163164067,
+          "persona_acc": 0.6642076276285601,
+          "persona_sd_ratio": 1.304137212052066
+        },
+        {
+          "item_id": "QID149",
+          "n_human": 206,
+          "population_acc": 0.9724263982155026,
+          "ceiling": 0.9440776699029126,
+          "population_sd_ratio": 0.9937168515437329,
+          "persona_acc": 0.972300530185225,
+          "persona_sd_ratio": 1.0011563406040598
+        },
+        {
+          "item_id": "QID150",
+          "n_human": 206,
+          "population_acc": 0.8875142738442602,
+          "ceiling": 0.9463106796116506,
+          "population_sd_ratio": 1.0540734395478746,
+          "persona_acc": 0.9491430354705761,
+          "persona_sd_ratio": 1.0298793799441226
+        },
+        {
+          "item_id": "QID151",
+          "n_human": 206,
+          "population_acc": 0.5164317621912511,
+          "ceiling": 0.9604854368932039,
+          "population_sd_ratio": 1.4163518488713855,
+          "persona_acc": 0.3751709561000418,
+          "persona_sd_ratio": 1.2416524033885437
+        },
+        {
+          "item_id": "QID157",
+          "n_human": 200,
+          "population_acc": 0.7548006596042375,
+          "ceiling": 0.87655,
+          "population_sd_ratio": 1.3085976517986648,
+          "persona_acc": 0.7611693983609836,
+          "persona_sd_ratio": 1.2999091669349385
+        },
+        {
+          "item_id": "QID159_2",
+          "n_human": 220,
+          "population_acc": 0.8455090127741536,
+          "ceiling": 0.8932727272727273,
+          "population_sd_ratio": 0.9958722825157339,
+          "persona_acc": 0.8539546635654972,
+          "persona_sd_ratio": 0.9874827000898372
+        },
+        {
+          "item_id": "QID160_1",
+          "n_human": 192,
+          "population_acc": 0.8946552172862948,
+          "ceiling": 0.8831770833333333,
+          "population_sd_ratio": 0.9695473044707897,
+          "persona_acc": 0.8984118070824175,
+          "persona_sd_ratio": 0.9892321866077858
+        },
+        {
+          "item_id": "QID160_2",
+          "n_human": 192,
+          "population_acc": 0.887172102988207,
+          "ceiling": 0.8766145833333333,
+          "population_sd_ratio": 1.06573416335084,
+          "persona_acc": 0.8865195049636887,
+          "persona_sd_ratio": 1.0567560395848694
+        },
+        {
+          "item_id": "QID160_3",
+          "n_human": 192,
+          "population_acc": 0.8663776733959625,
+          "ceiling": 0.8785416666666666,
+          "population_sd_ratio": 0.9739174355641408,
+          "persona_acc": 0.7676785491205277,
+          "persona_sd_ratio": 1.0180596245507205
+        },
+        {
+          "item_id": "QID161",
+          "n_human": 220,
+          "population_acc": 0.7190917721231501,
+          "ceiling": 0.8968636363636364,
+          "population_sd_ratio": 1.8745109699825593,
+          "persona_acc": 0.8760374192610627,
+          "persona_sd_ratio": 1.3054698007883878
+        },
+        {
+          "item_id": "QID162",
+          "n_human": 192,
+          "population_acc": 0.6913480563605475,
+          "ceiling": 0.8943229166666665,
+          "population_sd_ratio": 1.3908320851058193,
+          "persona_acc": 0.7368172019169915,
+          "persona_sd_ratio": 1.2016436485316957
+        },
+        {
+          "item_id": "QID163",
+          "n_human": 202,
+          "population_acc": 0.8260791109104911,
+          "ceiling": 0.9488118811881188,
+          "population_sd_ratio": 1.1113974775929,
+          "persona_acc": 0.6958527601410409,
+          "persona_sd_ratio": 1.100509908997038
+        },
+        {
+          "item_id": "QID165",
+          "n_human": 210,
+          "population_acc": 0.7941604821892766,
+          "ceiling": 0.9627619047619048,
+          "population_sd_ratio": 1.363081121805502,
+          "persona_acc": 0.8472113291627391,
+          "persona_sd_ratio": 1.3029178437133142
+        },
+        {
+          "item_id": "QID167",
+          "n_human": 222,
+          "population_acc": 0.9666379697033567,
+          "ceiling": 0.9767567567567568,
+          "population_sd_ratio": 0.702848850696813,
+          "persona_acc": 0.9621679988326665,
+          "persona_sd_ratio": 0.6472097594320182
+        },
+        {
+          "item_id": "QID169",
+          "n_human": 190,
+          "population_acc": 0.7408208253086225,
+          "ceiling": 0.9468421052631578,
+          "population_sd_ratio": 0.5721222518135224,
+          "persona_acc": 0.7250177017228134,
+          "persona_sd_ratio": 0.5356276506418127
+        },
+        {
+          "item_id": "QID171",
+          "n_human": 162,
+          "population_acc": 0.807326521924223,
+          "ceiling": 0.8885802469135803,
+          "population_sd_ratio": 1.0422776805984684,
+          "persona_acc": 0.8434144039091563,
+          "persona_sd_ratio": 0.994041614144872
+        },
+        {
+          "item_id": "QID172",
+          "n_human": 114,
+          "population_acc": 0.6048997606459927,
+          "ceiling": 0.8522807017543859,
+          "population_sd_ratio": 0.9421777568657421,
+          "persona_acc": 0.6067978116205056,
+          "persona_sd_ratio": 0.9094935406089795
+        },
+        {
+          "item_id": "QID173",
+          "n_human": 136,
+          "population_acc": 0.7067759943557632,
+          "ceiling": 0.8624264705882354,
+          "population_sd_ratio": 0.8348743960557803,
+          "persona_acc": 0.7273147323397126,
+          "persona_sd_ratio": 0.8097936169368523
+        },
+        {
+          "item_id": "QID174",
+          "n_human": 162,
+          "population_acc": 0.9060022396209303,
+          "ceiling": 0.8896296296296297,
+          "population_sd_ratio": 1.0565968233705316,
+          "persona_acc": 0.9049436948192571,
+          "persona_sd_ratio": 1.0255457817148566
+        },
+        {
+          "item_id": "QID175",
+          "n_human": 114,
+          "population_acc": 0.8772064231042372,
+          "ceiling": 0.8745614035087721,
+          "population_sd_ratio": 1.1312301535860152,
+          "persona_acc": 0.8859849811936136,
+          "persona_sd_ratio": 1.092047709473846
+        },
+        {
+          "item_id": "QID176",
+          "n_human": 136,
+          "population_acc": 0.8027260560896022,
+          "ceiling": 0.8972058823529412,
+          "population_sd_ratio": 1.1665146191584592,
+          "persona_acc": 0.7944479083987417,
+          "persona_sd_ratio": 1.1243117485300698
+        },
+        {
+          "item_id": "QID178",
+          "n_human": 114,
+          "population_acc": 0.8892426473940196,
+          "ceiling": 0.8537719298245614,
+          "population_sd_ratio": 1.1563337712472908,
+          "persona_acc": 0.9009807098197224,
+          "persona_sd_ratio": 0.9522724394080239
+        },
+        {
+          "item_id": "QID179",
+          "n_human": 136,
+          "population_acc": 0.8570704342100623,
+          "ceiling": 0.8668382352941176,
+          "population_sd_ratio": 1.1255965665179508,
+          "persona_acc": 0.8877349913581266,
+          "persona_sd_ratio": 0.9456357455383805
+        },
+        {
+          "item_id": "QID183",
+          "n_human": 212,
+          "population_acc": 0.7188307527173811,
+          "ceiling": 0.9476415094339621,
+          "population_sd_ratio": 1.122072872114912,
+          "persona_acc": 0.8740920117863227,
+          "persona_sd_ratio": 1.1021002305307452
+        },
+        {
+          "item_id": "QID184",
+          "n_human": 200,
+          "population_acc": 0.6681799940011998,
+          "ceiling": 0.9508000000000001,
+          "population_sd_ratio": 1.022515364881501,
+          "persona_acc": 0.7716092381523691,
+          "persona_sd_ratio": 1.0672825183131045
+        },
+        {
+          "item_id": "QID189",
+          "n_human": 132,
+          "population_acc": 0.8461636696636696,
+          "ceiling": 0.8128787878787879,
+          "population_sd_ratio": 0.9612453728886008,
+          "persona_acc": 0.5961728382059707,
+          "persona_sd_ratio": 0.9288111390435858
+        },
+        {
+          "item_id": "QID190",
+          "n_human": 148,
+          "population_acc": 0.7952082377082377,
+          "ceiling": 0.8216891891891891,
+          "population_sd_ratio": 1.077083643994445,
+          "persona_acc": 0.65703051003051,
+          "persona_sd_ratio": 0.9104771705021627
+        },
+        {
+          "item_id": "QID191",
+          "n_human": 132,
+          "population_acc": 0.6817664002664003,
+          "ceiling": 0.864621212121212,
+          "population_sd_ratio": 1.8523911256530257,
+          "persona_acc": 0.5927494503280386,
+          "persona_sd_ratio": 1.7569626696984362
+        },
+        {
+          "item_id": "QID192",
+          "n_human": 232,
+          "population_acc": 0.9031965417261375,
+          "ceiling": 0.9512068965517241,
+          "population_sd_ratio": 0.9084197761905833,
+          "persona_acc": 0.9183498127960621,
+          "persona_sd_ratio": 1.038938920068877
+        },
+        {
+          "item_id": "QID193",
+          "n_human": 180,
+          "population_acc": 0.8671766646670668,
+          "ceiling": 0.9507777777777778,
+          "population_sd_ratio": 1.0072505612321863,
+          "persona_acc": 0.8629894354462435,
+          "persona_sd_ratio": 1.0054205316160603
+        },
+        {
+          "item_id": "QID194",
+          "n_human": 210,
+          "population_acc": 0.8516406727392135,
+          "ceiling": 0.8850476190476192,
+          "population_sd_ratio": 0.989128026506816,
+          "persona_acc": 0.8504189525500386,
+          "persona_sd_ratio": 0.9516911893280412
+        },
+        {
+          "item_id": "QID195",
+          "n_human": 202,
+          "population_acc": 0.8364740957405753,
+          "ceiling": 0.8842574257425743,
+          "population_sd_ratio": 1.2551157197744836,
+          "persona_acc": 0.8631919660085137,
+          "persona_sd_ratio": 1.1699622922539996
+        },
+        {
+          "item_id": "QID196",
+          "n_human": 412,
+          "population_acc": 0.9266260243097011,
+          "ceiling": 0.9641747572815536,
+          "population_sd_ratio": 1.0269594225950915,
+          "persona_acc": 0.7694759446169016,
+          "persona_sd_ratio": 1.0078213152531916
+        },
+        {
+          "item_id": "QID198_1",
+          "n_human": 212,
+          "population_acc": 0.9380372227441305,
+          "ceiling": 0.9774528301886792,
+          "population_sd_ratio": 1.4066333309919459,
+          "persona_acc": 0.8228920536647385,
+          "persona_sd_ratio": 1.8317150491595582
+        },
+        {
+          "item_id": "QID198_10",
+          "n_human": 212,
+          "population_acc": 0.9738976732955297,
+          "ceiling": 0.9551886792452831,
+          "population_sd_ratio": 1.0072275898214793,
+          "persona_acc": 0.9505922117463301,
+          "persona_sd_ratio": 0.9407465752053846
+        },
+        {
+          "item_id": "QID198_6",
+          "n_human": 212,
+          "population_acc": 0.8519156074445488,
+          "ceiling": 0.9502830188679244,
+          "population_sd_ratio": 0.7331338093691132,
+          "persona_acc": 0.9675129030797615,
+          "persona_sd_ratio": 0.9746107681645078
+        },
+        {
+          "item_id": "QID203_1",
+          "n_human": 200,
+          "population_acc": 0.9838406718656271,
+          "ceiling": 0.9760000000000002,
+          "population_sd_ratio": 1.074972684940084,
+          "persona_acc": 0.9730193761247751,
+          "persona_sd_ratio": 1.1829218284376168
+        },
+        {
+          "item_id": "QID203_3",
+          "n_human": 200,
+          "population_acc": 0.6773899820035993,
+          "ceiling": 0.9471,
+          "population_sd_ratio": 0.45179928054765894,
+          "persona_acc": 0.7038344631073784,
+          "persona_sd_ratio": 0.5544159421320443
+        },
+        {
+          "item_id": "QID203_5",
+          "n_human": 200,
+          "population_acc": 0.7286359828034392,
+          "ceiling": 0.9465,
+          "population_sd_ratio": 0.5389215555522328,
+          "persona_acc": 0.7327348430313934,
+          "persona_sd_ratio": 0.5586840782396825
+        },
+        {
+          "item_id": "QID225",
+          "n_human": 206,
+          "population_acc": 0.9124726219804584,
+          "ceiling": 0.9674757281553396,
+          "population_sd_ratio": 0.532513418025241,
+          "persona_acc": 0.9303256533159393,
+          "persona_sd_ratio": 0.6562531833175261
+        },
+        {
+          "item_id": "QID226",
+          "n_human": 206,
+          "population_acc": 0.9420659363272977,
+          "ceiling": 0.9689320388349515,
+          "population_sd_ratio": 1.2342641665174334,
+          "persona_acc": 0.9428577294249891,
+          "persona_sd_ratio": 1.2267698605426578
+        },
+        {
+          "item_id": "QID227",
+          "n_human": 206,
+          "population_acc": 0.8881824411816666,
+          "ceiling": 0.9779611650485437,
+          "population_sd_ratio": 1.848536948842394,
+          "persona_acc": 0.8461307253112486,
+          "persona_sd_ratio": 2.040530966540396
+        },
+        {
+          "item_id": "QID228",
+          "n_human": 206,
+          "population_acc": 0.609116215591833,
+          "ceiling": 0.9758252427184467,
+          "population_sd_ratio": 2.1240474338878954,
+          "persona_acc": 0.7579755019869816,
+          "persona_sd_ratio": 1.9562266821886876
+        },
+        {
+          "item_id": "QID231",
+          "n_human": 206,
+          "population_acc": 0.6226737161586543,
+          "ceiling": 0.9058737864077671,
+          "population_sd_ratio": 1.212702842601759,
+          "persona_acc": 0.724854960809922,
+          "persona_sd_ratio": 1.2057093589273062
+        },
+        {
+          "item_id": "QID244_10",
+          "n_human": 206,
+          "population_acc": 0.7204183435157628,
+          "ceiling": 0.946601941747573,
+          "population_sd_ratio": 0.9885258628501423,
+          "persona_acc": 0.899336268668597,
+          "persona_sd_ratio": 1.0346797059861572
+        },
+        {
+          "item_id": "QID244_13",
+          "n_human": 206,
+          "population_acc": 0.6645816564842373,
+          "ceiling": 0.9857281553398061,
+          "population_sd_ratio": 3.981602149957648,
+          "persona_acc": 0.6666095518760328,
+          "persona_sd_ratio": 3.978174590122243
+        },
+        {
+          "item_id": "QID244_4",
+          "n_human": 206,
+          "population_acc": 0.5829997107374641,
+          "ceiling": 0.9795145631067962,
+          "population_sd_ratio": 2.745871066407307,
+          "persona_acc": 0.5546221144120692,
+          "persona_sd_ratio": 2.75737911006194
+        },
+        {
+          "item_id": "QID245_10",
+          "n_human": 206,
+          "population_acc": 0.9713076802115305,
+          "ceiling": 0.9471844660194175,
+          "population_sd_ratio": 1.0007125809384114,
+          "persona_acc": 0.8651140839793203,
+          "persona_sd_ratio": 0.991118189408033
+        },
+        {
+          "item_id": "QID245_14",
+          "n_human": 206,
+          "population_acc": 0.6587564137657906,
+          "ceiling": 0.9907766990291265,
+          "population_sd_ratio": 4.864480054398472,
+          "persona_acc": 0.6574161769587833,
+          "persona_sd_ratio": 4.873050638304375
+        },
+        {
+          "item_id": "QID245_4",
+          "n_human": 206,
+          "population_acc": 0.39881640176819005,
+          "ceiling": 0.977766990291262,
+          "population_sd_ratio": 2.2194147750248594,
+          "persona_acc": 0.5425963253951154,
+          "persona_sd_ratio": 2.3263709358996905
+        },
+        {
+          "item_id": "QID246_12",
+          "n_human": 206,
+          "population_acc": 0.6499700059988003,
+          "ceiling": 1.0,
+          "population_sd_ratio": NaN,
+          "persona_acc": 0.6624675064987006,
+          "persona_sd_ratio": NaN
+        },
+        {
+          "item_id": "QID246_5",
+          "n_human": 206,
+          "population_acc": 0.7367235776145742,
+          "ceiling": 0.9656310679611647,
+          "population_sd_ratio": 1.5129300737240012,
+          "persona_acc": 0.6302281485450488,
+          "persona_sd_ratio": 1.5577966176829825
+        },
+        {
+          "item_id": "QID246_9",
+          "n_human": 206,
+          "population_acc": 0.8917230243271734,
+          "ceiling": 0.943495145631068,
+          "population_sd_ratio": 0.9709678144776712,
+          "persona_acc": 0.9657345132915163,
+          "persona_sd_ratio": 0.9976938079737895
+        },
+        {
+          "item_id": "QID247_10",
+          "n_human": 206,
+          "population_acc": 0.9351453204504729,
+          "ceiling": 0.9454368932038836,
+          "population_sd_ratio": 0.9951770742325398,
+          "persona_acc": 0.9727184466019417,
+          "persona_sd_ratio": 1.0001365621516614
+        },
+        {
+          "item_id": "QID247_13",
+          "n_human": 206,
+          "population_acc": 0.6589991322123925,
+          "ceiling": 0.9899029126213594,
+          "population_sd_ratio": 4.864480054398472,
+          "persona_acc": 0.6664455652558812,
+          "persona_sd_ratio": 4.845823214798498
+        },
+        {
+          "item_id": "QID247_7",
+          "n_human": 206,
+          "population_acc": 0.7103298078248429,
+          "ceiling": 0.9601941747572816,
+          "population_sd_ratio": 1.356362198531531,
+          "persona_acc": 0.642574553050555,
+          "persona_sd_ratio": 1.3622695593183636
+        },
+        {
+          "item_id": "QID248_10",
+          "n_human": 206,
+          "population_acc": 0.9005098980203959,
+          "ceiling": 0.9439805825242719,
+          "population_sd_ratio": 1.0007125809384114,
+          "persona_acc": 0.9313717936024442,
+          "persona_sd_ratio": 1.0053054603224763
+        },
+        {
+          "item_id": "QID248_14",
+          "n_human": 206,
+          "population_acc": 0.6499700059988003,
+          "ceiling": 1.0,
+          "population_sd_ratio": NaN,
+          "persona_acc": 0.660767846430714,
+          "persona_sd_ratio": NaN
+        },
+        {
+          "item_id": "QID248_4",
+          "n_human": 206,
+          "population_acc": 0.6450870893782408,
+          "ceiling": 0.9678640776699029,
+          "population_sd_ratio": 1.7193254641232099,
+          "persona_acc": 0.6090688852520764,
+          "persona_sd_ratio": 1.7272267602479066
+        },
+        {
+          "item_id": "QID250_1",
+          "n_human": 206,
+          "population_acc": 0.9603562103113359,
+          "ceiling": 0.9748543689320389,
+          "population_sd_ratio": 0.6788240774401739,
+          "persona_acc": 0.9322600043098171,
+          "persona_sd_ratio": 1.357659546054616
+        },
+        {
+          "item_id": "QID250_14",
+          "n_human": 206,
+          "population_acc": 0.7227369962900625,
+          "ceiling": 0.970485436893204,
+          "population_sd_ratio": 1.8357105142981651,
+          "persona_acc": 0.6891228356270497,
+          "persona_sd_ratio": 1.8736458544326224
+        },
+        {
+          "item_id": "QID250_8",
+          "n_human": 206,
+          "population_acc": 0.9213143487807293,
+          "ceiling": 0.9514563106796118,
+          "population_sd_ratio": 1.053469283435021,
+          "persona_acc": 0.7960410345115446,
+          "persona_sd_ratio": 1.0849103405485805
+        },
+        {
+          "item_id": "QID251_1",
+          "n_human": 206,
+          "population_acc": 0.6613006816112507,
+          "ceiling": 0.9648543689320388,
+          "population_sd_ratio": 1.5796695119526665,
+          "persona_acc": 0.6535224896768227,
+          "persona_sd_ratio": 1.5817721799315865
+        },
+        {
+          "item_id": "QID251_13",
+          "n_human": 206,
+          "population_acc": 0.6683880602520272,
+          "ceiling": 0.9644660194174756,
+          "population_sd_ratio": 1.5235138523104372,
+          "persona_acc": 0.6414175999751507,
+          "persona_sd_ratio": 1.530103626851606
+        },
+        {
+          "item_id": "QID251_8",
+          "n_human": 206,
+          "population_acc": 0.8975491115369159,
+          "ceiling": 0.9428155339805826,
+          "population_sd_ratio": 0.9584860855123494,
+          "persona_acc": 0.9700172683909818,
+          "persona_sd_ratio": 0.9974160443392072
+        },
+        {
+          "item_id": "QID252_1",
+          "n_human": 206,
+          "population_acc": 0.7102812641355224,
+          "ceiling": 0.961747572815534,
+          "population_sd_ratio": 1.356362198531531,
+          "persona_acc": 0.6825514605816707,
+          "persona_sd_ratio": 1.3621664694744064
+        },
+        {
+          "item_id": "QID252_14",
+          "n_human": 206,
+          "population_acc": 0.7441447632803536,
+          "ceiling": 0.965631067961165,
+          "population_sd_ratio": 1.6484239083976262,
+          "persona_acc": 0.7107173613820931,
+          "persona_sd_ratio": 1.6799451878935665
+        },
+        {
+          "item_id": "QID252_7",
+          "n_human": 206,
+          "population_acc": 0.9616290237098211,
+          "ceiling": 0.9453398058252427,
+          "population_sd_ratio": 1.0088250333886102,
+          "persona_acc": 0.926013738999773,
+          "persona_sd_ratio": 1.0138565904291874
+        },
+        {
+          "item_id": "QID276_1",
+          "n_human": 206,
+          "population_acc": 0.5224571784672192,
+          "ceiling": 0.9597087378640776,
+          "population_sd_ratio": 1.2560033492428955,
+          "persona_acc": 0.5600229954009198,
+          "persona_sd_ratio": 1.2813396991787576
+        },
+        {
+          "item_id": "QID276_14",
+          "n_human": 206,
+          "population_acc": 0.9616544166894778,
+          "ceiling": 0.9462135922330098,
+          "population_sd_ratio": 1.0263613135926573,
+          "persona_acc": 0.952756730207357,
+          "persona_sd_ratio": 1.0325651049989055
+        },
+        {
+          "item_id": "QID276_8",
+          "n_human": 206,
+          "population_acc": 0.8417861185044545,
+          "ceiling": 0.9517475728155341,
+          "population_sd_ratio": 1.0949735940224588,
+          "persona_acc": 0.7444708631089314,
+          "persona_sd_ratio": 1.0953002463127353
+        },
+        {
+          "item_id": "QID277_14",
+          "n_human": 206,
+          "population_acc": 0.8265919437471729,
+          "ceiling": 0.9516504854368932,
+          "population_sd_ratio": 1.1120521064010738,
+          "persona_acc": 0.8454476677480042,
+          "persona_sd_ratio": 1.1074248358391452
+        },
+        {
+          "item_id": "QID277_2",
+          "n_human": 206,
+          "population_acc": 0.45473873186527736,
+          "ceiling": 0.9654368932038835,
+          "population_sd_ratio": 1.5443518641167644,
+          "persona_acc": 0.5541008691465589,
+          "persona_sd_ratio": 1.6098061467517106
+        },
+        {
+          "item_id": "QID277_7",
+          "n_human": 206,
+          "population_acc": 0.7713492253005712,
+          "ceiling": 0.9545631067961164,
+          "population_sd_ratio": 1.2040277713398924,
+          "persona_acc": 0.6833166473501413,
+          "persona_sd_ratio": 1.2071745307677526
+        },
+        {
+          "item_id": "QID278_1",
+          "n_human": 206,
+          "population_acc": 0.5310979551662484,
+          "ceiling": 0.9533980582524272,
+          "population_sd_ratio": 1.229759169212713,
+          "persona_acc": 0.5968529789187793,
+          "persona_sd_ratio": 1.2702220980645955
+        },
+        {
+          "item_id": "QID278_14",
+          "n_human": 206,
+          "population_acc": 0.9240042865213367,
+          "ceiling": 0.9533009708737865,
+          "population_sd_ratio": 1.0720791886981502,
+          "persona_acc": 0.8717079593789983,
+          "persona_sd_ratio": 1.1006644891199597
+        },
+        {
+          "item_id": "QID278_7",
+          "n_human": 206,
+          "population_acc": 0.8382424291840661,
+          "ceiling": 0.9480582524271844,
+          "population_sd_ratio": 1.1004518019819187,
+          "persona_acc": 0.7041676130793255,
+          "persona_sd_ratio": 1.0914624934760813
+        },
+        {
+          "item_id": "QID279_1",
+          "n_human": 206,
+          "population_acc": 0.9731802668592496,
+          "ceiling": 0.945242718446602,
+          "population_sd_ratio": 1.0003405208708895,
+          "persona_acc": 0.9725570614032533,
+          "persona_sd_ratio": 1.0021029913246118
+        },
+        {
+          "item_id": "QID279_14",
+          "n_human": 206,
+          "population_acc": 0.542699896913821,
+          "ceiling": 0.9556310679611651,
+          "population_sd_ratio": 1.205819961077163,
+          "persona_acc": 0.6888231188713715,
+          "persona_sd_ratio": 1.2638220782695562
+        },
+        {
+          "item_id": "QID279_7",
+          "n_human": 206,
+          "population_acc": 0.7387193143895493,
+          "ceiling": 0.9471844660194175,
+          "population_sd_ratio": 0.9786699251363575,
+          "persona_acc": 0.8242652246249778,
+          "persona_sd_ratio": 1.0174690261992176
+        },
+        {
+          "item_id": "QID288_1",
+          "n_human": 412,
+          "population_acc": 0.6683691682812324,
+          "ceiling": 0.9324514563106796,
+          "population_sd_ratio": 1.6250977885292248,
+          "persona_acc": 0.6615155628923833,
+          "persona_sd_ratio": 1.6556548263536002
+        },
+        {
+          "item_id": "QID288_2",
+          "n_human": 412,
+          "population_acc": 0.5888115485866027,
+          "ceiling": 0.9135436893203884,
+          "population_sd_ratio": 1.1154023003561404,
+          "persona_acc": 0.7555611314798086,
+          "persona_sd_ratio": 1.1861755636359346
+        },
+        {
+          "item_id": "QID288_3",
+          "n_human": 412,
+          "population_acc": 0.8847919805650609,
+          "ceiling": 0.9058252427184467,
+          "population_sd_ratio": 1.0619743298991946,
+          "persona_acc": 0.8650061400480544,
+          "persona_sd_ratio": 1.1094360979762092
+        },
+        {
+          "item_id": "QID289_2",
+          "n_human": 412,
+          "population_acc": 0.7678168607217667,
+          "ceiling": 0.9224757281553398,
+          "population_sd_ratio": 1.399008637106314,
+          "persona_acc": 0.7313401128918495,
+          "persona_sd_ratio": 1.3284030785102483
+        },
+        {
+          "item_id": "QID289_3",
+          "n_human": 412,
+          "population_acc": 0.8298051000222175,
+          "ceiling": 0.9230339805825242,
+          "population_sd_ratio": 1.3348329281901716,
+          "persona_acc": 0.8670167800015718,
+          "persona_sd_ratio": 1.2278582688667652
+        },
+        {
+          "item_id": "QID289_4",
+          "n_human": 412,
+          "population_acc": 0.8036847895793333,
+          "ceiling": 0.9262135922330097,
+          "population_sd_ratio": 1.4364605578327312,
+          "persona_acc": 0.8574759682785157,
+          "persona_sd_ratio": 1.3083136183784316
+        },
+        {
+          "item_id": "QID291",
+          "n_human": 412,
+          "population_acc": 0.8025235391280381,
+          "ceiling": 0.9339077669902913,
+          "population_sd_ratio": 1.0756546466375716,
+          "persona_acc": 0.8029022856876665,
+          "persona_sd_ratio": 0.981618732454228
+        },
+        {
+          "item_id": "QID84_12",
+          "n_human": 206,
+          "population_acc": 0.6694845691055964,
+          "ceiling": 0.9844660194174757,
+          "population_sd_ratio": 3.456693143301443,
+          "persona_acc": 0.6677762311615351,
+          "persona_sd_ratio": 3.461216082818558
+        },
+        {
+          "item_id": "QID84_4",
+          "n_human": 206,
+          "population_acc": 0.5733395165627069,
+          "ceiling": 0.9832038834951459,
+          "population_sd_ratio": 3.232754077969657,
+          "persona_acc": 0.5247572815533982,
+          "persona_sd_ratio": 3.249033534064036
+        },
+        {
+          "item_id": "QID84_9",
+          "n_human": 206,
+          "population_acc": 0.8832909728733864,
+          "ceiling": 0.9465048543689321,
+          "population_sd_ratio": 1.0579416119583047,
+          "persona_acc": 0.803343574003646,
+          "persona_sd_ratio": 1.0620745301597958
+        },
+        {
+          "item_id": "QID9_1",
+          "n_human": 412,
+          "population_acc": 0.979020603646261,
+          "ceiling": 0.9620388349514561,
+          "population_sd_ratio": 1.002549894550143,
+          "persona_acc": 0.905235040370566,
+          "persona_sd_ratio": 1.015571924785264
+        },
+        {
+          "item_id": "QID9_10",
+          "n_human": 412,
+          "population_acc": 0.8308492379194066,
+          "ceiling": 0.9596116504854371,
+          "population_sd_ratio": 0.9753926408822027,
+          "persona_acc": 0.9584367010093123,
+          "persona_sd_ratio": 1.0046243455944313
+        },
+        {
+          "item_id": "QID9_11",
+          "n_human": 412,
+          "population_acc": 0.9697969435239164,
+          "ceiling": 0.9635922330097086,
+          "population_sd_ratio": 0.9922916721279014,
+          "persona_acc": 0.9732259567503979,
+          "persona_sd_ratio": 0.9947642309680873
+        },
+        {
+          "item_id": "QID9_14",
+          "n_human": 412,
+          "population_acc": 0.812912344715523,
+          "ceiling": 0.9604854368932039,
+          "population_sd_ratio": 0.9798785174524285,
+          "persona_acc": 0.7459419669464162,
+          "persona_sd_ratio": 0.9372810479714843
+        },
+        {
+          "item_id": "QID9_17",
+          "n_human": 412,
+          "population_acc": 0.46814423523062376,
+          "ceiling": 0.9612621359223301,
+          "population_sd_ratio": 0.5215385708132184,
+          "persona_acc": 0.47140534029116465,
+          "persona_sd_ratio": 0.5225690710830222
+        },
+        {
+          "item_id": "QID9_18",
+          "n_human": 412,
+          "population_acc": 0.965111167086971,
+          "ceiling": 0.9621844660194177,
+          "population_sd_ratio": 0.9851074189776787,
+          "persona_acc": 0.9071754386986679,
+          "persona_sd_ratio": 0.948145932342999
+        },
+        {
+          "item_id": "QID9_22",
+          "n_human": 412,
+          "population_acc": 0.8118929272397949,
+          "ceiling": 0.9580097087378641,
+          "population_sd_ratio": 0.9805496792979723,
+          "persona_acc": 0.8798065144252696,
+          "persona_sd_ratio": 1.0045837459174438
+        },
+        {
+          "item_id": "QID9_25",
+          "n_human": 412,
+          "population_acc": 0.9794207857457635,
+          "ceiling": 0.9582524271844661,
+          "population_sd_ratio": 1.0034405567310507,
+          "persona_acc": 0.9786286043762118,
+          "persona_sd_ratio": 1.0031090413137267
+        },
+        {
+          "item_id": "QID9_3",
+          "n_human": 412,
+          "population_acc": 0.9789466572704876,
+          "ceiling": 0.9611650485436894,
+          "population_sd_ratio": 1.0034405567310507,
+          "persona_acc": 0.9591975973737283,
+          "persona_sd_ratio": 1.0119935887206513
+        },
+        {
+          "item_id": "QID9_32",
+          "n_human": 412,
+          "population_acc": 0.7667387444841128,
+          "ceiling": 0.9614077669902913,
+          "population_sd_ratio": 0.7804920513504541,
+          "persona_acc": 0.8611002508236214,
+          "persona_sd_ratio": 0.9074404916935035
+        },
+        {
+          "item_id": "QID9_37",
+          "n_human": 412,
+          "population_acc": 0.9747063936727217,
+          "ceiling": 0.9591747572815534,
+          "population_sd_ratio": 1.0062746723382365,
+          "persona_acc": 0.9326479898195111,
+          "persona_sd_ratio": 1.0174545786908078
+        },
+        {
+          "item_id": "QID9_6",
+          "n_human": 412,
+          "population_acc": 0.9424409195830736,
+          "ceiling": 0.9598058252427185,
+          "population_sd_ratio": 0.9880656384682381,
+          "persona_acc": 0.943757520340593,
+          "persona_sd_ratio": 0.9893605667980454
+        }
+      ],
+      "run": {
+        "model": "deepseek/deepseek-v4.1-flash-1017",
+        "requests": 10807,
+        "est_input_tokens": 3101360,
+        "assumed_output_tokens_per_call": 300,
+        "est_usd": 4.82,
+        "endpoint": "openrouter",
+        "params": {
+          "reasoning": {
+            "effort": "none"
+          }
+        },
+        "max_tokens": 2000
+      }
+    },
+    "ref-train-crowd": {
+      "coverage": {
+        "population": 1.0,
+        "persona": 1.0
+      },
+      "n_items": 107,
+      "ceiling": 0.9369169526244696,
+      "population": {
+        "accuracy": {
+          "mean": 0.9501701657695113,
+          "ci_low": 0.9431330136451771,
+          "ci_high": 0.9572680881300017
+        },
+        "accuracy_over_ceiling": 1.0141455580539098,
+        "sd_ratio_median": 1.0032398977299544
+      },
+      "persona": {
+        "accuracy": {
+          "mean": 0.9497898261325751,
+          "ci_low": 0.9422559103396687,
+          "ci_high": 0.9563662384586117
+        },
+        "accuracy_over_ceiling": 1.013739609975085,
+        "sd_ratio_median": 1.0032398977299544
+      },
+      "individual": {
+        "n_rows": 12284,
+        "n_persons": 100,
+        "nll_population": 0.8119495299066054,
+        "nll_persona": 0.8119495299066054,
+        "persona_minus_population": {
+          "mean": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0
+        }
+      },
+      "effects": {
+        "pairs": [
+          {
+            "id": "E02",
+            "experiment": "outcome_bias",
+            "human": {
+              "d": -0.5164352300036393,
+              "sd": 1.251187685767813,
+              "ci_low": -0.5764874733067605,
+              "ci_high": -0.45026486216093314
+            },
+            "population": -0.6081621751659494,
+            "persona": -0.6081621751659476
+          },
+          {
+            "id": "E03",
+            "experiment": "absolute_relative",
+            "human": {
+              "d": -0.9126394738140774,
+              "sd": 0.45457296717495865,
+              "ci_low": -0.9782727910657422,
+              "ci_high": -0.8470618965185245
+            },
+            "population": -0.8773242045608644,
+            "persona": -0.8773242045608635
+          },
+          {
+            "id": "E04",
+            "experiment": "myside",
+            "human": {
+              "d": 0.3001477234514857,
+              "sd": 1.3026178905128887,
+              "ci_low": 0.23359826541039985,
+              "ci_high": 0.36294470822407765
+            },
+            "population": 0.2654553899869277,
+            "persona": 0.2654553899869267
+          },
+          {
+            "id": "E05",
+            "experiment": "less_is_more",
+            "human": {
+              "d": 0.6987329113091205,
+              "sd": 1.3475514352866746,
+              "ci_low": 0.6196743888537968,
+              "ci_high": 0.7765823202803113
+            },
+            "population": 0.6170933267517483,
+            "persona": 0.6170933267517483
+          },
+          {
+            "id": "E06",
+            "experiment": "less_is_more",
+            "human": {
+              "d": -0.05289305766053015,
+              "sd": 1.4244879239065038,
+              "ci_low": -0.13121118896130005,
+              "ci_high": 0.025138903660411323
+            },
+            "population": -0.007903418829424263,
+            "persona": -0.007903418829424417
+          },
+          {
+            "id": "E07",
+            "experiment": "less_is_more",
+            "human": {
+              "d": 0.6601752753801985,
+              "sd": 1.3121258064714076,
+              "ci_low": 0.5823387572285745,
+              "ci_high": 0.7398723520250889
+            },
+            "population": 0.6251737976985917,
+            "persona": 0.6251737976985915
+          },
+          {
+            "id": "E08",
+            "experiment": "proportion_dominance_1",
+            "human": {
+              "d": 0.20281375140891522,
+              "sd": 1.1099341055900067,
+              "ci_low": 0.12697945394904486,
+              "ci_high": 0.27945168030978196
+            },
+            "population": 0.21574882931098402,
+            "persona": 0.2157488293109848
+          },
+          {
+            "id": "E09",
+            "experiment": "proportion_dominance_1",
+            "human": {
+              "d": 0.0176704182698492,
+              "sd": 1.0676910744172383,
+              "ci_low": -0.06310859913012953,
+              "ci_high": 0.09377760364332123
+            },
+            "population": -0.022961092316856346,
+            "persona": -0.022961092316855933
+          },
+          {
+            "id": "E10",
+            "experiment": "proportion_dominance_1",
+            "human": {
+              "d": 0.22106555930194866,
+              "sd": 1.103638433819098,
+              "ci_low": 0.1405881896818995,
+              "ci_high": 0.3011655281445715
+            },
+            "population": 0.19476635099048564,
+            "persona": 0.19476635099048684
+          },
+          {
+            "id": "E12",
+            "experiment": "proportion_dominance_2",
+            "human": {
+              "d": 0.011394509566796735,
+              "sd": 1.3605881090692504,
+              "ci_low": -0.07333089826969073,
+              "ci_high": 0.08800340476915253
+            },
+            "population": -0.03491674497276337,
+            "persona": -0.0349167449727637
+          },
+          {
+            "id": "E14",
+            "experiment": "wta_wtp",
+            "human": {
+              "d": 1.5478382092913792,
+              "sd": 2.459926616483833,
+              "ci_low": 1.4718904444754117,
+              "ci_high": 1.6251737543199924
+            },
+            "population": 1.434705293210786,
+            "persona": 1.4347052932107867
+          },
+          {
+            "id": "E15",
+            "experiment": "wta_wtp",
+            "human": {
+              "d": 0.5984945557232084,
+              "sd": 1.7648572278498988,
+              "ci_low": 0.5214346769555686,
+              "ci_high": 0.6758033885997153
+            },
+            "population": 0.5760259218544802,
+            "persona": 0.5760259218544798
+          },
+          {
+            "id": "E16",
+            "experiment": "wta_wtp",
+            "human": {
+              "d": 2.1922083558476397,
+              "sd": 2.218687762305699,
+              "ci_low": 2.1154436490898703,
+              "ci_high": 2.270240907367334
+            },
+            "population": 2.0489017546430617,
+            "persona": 2.0489017546430617
+          }
+        ],
+        "population": {
+          "correlation": 0.9987026998296348,
+          "sign_agreement": 1.0,
+          "n_pairs": 13,
+          "n_real": 10
+        },
+        "persona": {
+          "correlation": 0.9987026998296347,
+          "sign_agreement": 1.0,
+          "n_pairs": 13,
+          "n_real": 10
+        }
+      },
+      "per_item": [
+        {
+          "item_id": "QID117",
+          "n_human": 206,
+          "population_acc": 0.9355042626599233,
+          "ceiling": 0.883883495145631,
+          "population_sd_ratio": 1.0077193572188994,
+          "persona_acc": 0.9365689708973369,
+          "persona_sd_ratio": 1.0077193572188992
+        },
+        {
+          "item_id": "QID118",
+          "n_human": 206,
+          "population_acc": 0.892714675221,
+          "ceiling": 0.8512135922330097,
+          "population_sd_ratio": 1.0633793483752172,
+          "persona_acc": 0.8887944788156981,
+          "persona_sd_ratio": 1.0633793483752179
+        },
+        {
+          "item_id": "QID119",
+          "n_human": 206,
+          "population_acc": 0.9071466592247698,
+          "ceiling": 0.8662621359223301,
+          "population_sd_ratio": 0.9911220502696256,
+          "persona_acc": 0.9049776155574816,
+          "persona_sd_ratio": 0.9911220502696252
+        },
+        {
+          "item_id": "QID120",
+          "n_human": 206,
+          "population_acc": 0.9071845101233145,
+          "ceiling": 0.8766990291262137,
+          "population_sd_ratio": 1.0007500350795817,
+          "persona_acc": 0.9069710325604372,
+          "persona_sd_ratio": 1.0007500350795817
+        },
+        {
+          "item_id": "QID121",
+          "n_human": 206,
+          "population_acc": 0.9361166814303834,
+          "ceiling": 0.8902912621359224,
+          "population_sd_ratio": 0.9814182873642551,
+          "persona_acc": 0.9385520766810771,
+          "persona_sd_ratio": 0.9814182873642551
+        },
+        {
+          "item_id": "QID122",
+          "n_human": 206,
+          "population_acc": 0.9540973907766991,
+          "ceiling": 0.9129126213592232,
+          "population_sd_ratio": 1.0165122022843582,
+          "persona_acc": 0.9516793082524271,
+          "persona_sd_ratio": 1.0165122022843582
+        },
+        {
+          "item_id": "QID149",
+          "n_human": 206,
+          "population_acc": 0.968032727937232,
+          "ceiling": 0.9440776699029126,
+          "population_sd_ratio": 1.0082893369915928,
+          "persona_acc": 0.9687450852093541,
+          "persona_sd_ratio": 1.0082893369915928
+        },
+        {
+          "item_id": "QID150",
+          "n_human": 206,
+          "population_acc": 0.9349949304708178,
+          "ceiling": 0.9463106796116506,
+          "population_sd_ratio": 0.9444795117865296,
+          "persona_acc": 0.9381017265873232,
+          "persona_sd_ratio": 0.9444795117865288
+        },
+        {
+          "item_id": "QID151",
+          "n_human": 206,
+          "population_acc": 0.9801962674117695,
+          "ceiling": 0.9604854368932039,
+          "population_sd_ratio": 1.0304146222507033,
+          "persona_acc": 0.9795151525869338,
+          "persona_sd_ratio": 1.0304146222507033
+        },
+        {
+          "item_id": "QID157",
+          "n_human": 200,
+          "population_acc": 0.8919336683417086,
+          "ceiling": 0.87655,
+          "population_sd_ratio": 0.9999918101650864,
+          "persona_acc": 0.888023743718593,
+          "persona_sd_ratio": 0.9999918101650863
+        },
+        {
+          "item_id": "QID159_2",
+          "n_human": 220,
+          "population_acc": 0.8905551233607468,
+          "ceiling": 0.8932727272727273,
+          "population_sd_ratio": 0.9601768633419014,
+          "persona_acc": 0.8943424094243165,
+          "persona_sd_ratio": 0.9601768633419009
+        },
+        {
+          "item_id": "QID160_1",
+          "n_human": 192,
+          "population_acc": 0.92642573441247,
+          "ceiling": 0.8831770833333333,
+          "population_sd_ratio": 0.9663941645212978,
+          "persona_acc": 0.9264208633093526,
+          "persona_sd_ratio": 0.9663941645212983
+        },
+        {
+          "item_id": "QID160_2",
+          "n_human": 192,
+          "population_acc": 0.8944683003597124,
+          "ceiling": 0.8766145833333333,
+          "population_sd_ratio": 1.065223812921934,
+          "persona_acc": 0.8972819244604312,
+          "persona_sd_ratio": 1.0652238129219338
+        },
+        {
+          "item_id": "QID160_3",
+          "n_human": 192,
+          "population_acc": 0.8906501049160671,
+          "ceiling": 0.8785416666666666,
+          "population_sd_ratio": 1.0728789641242673,
+          "persona_acc": 0.8851948441247001,
+          "persona_sd_ratio": 1.0728789641242673
+        },
+        {
+          "item_id": "QID161",
+          "n_human": 220,
+          "population_acc": 0.9116448643673184,
+          "ceiling": 0.8968636363636364,
+          "population_sd_ratio": 1.0197089946008797,
+          "persona_acc": 0.9148503438193734,
+          "persona_sd_ratio": 1.0197089946008793
+        },
+        {
+          "item_id": "QID162",
+          "n_human": 192,
+          "population_acc": 0.866804925988527,
+          "ceiling": 0.8943229166666665,
+          "population_sd_ratio": 1.141122862509107,
+          "persona_acc": 0.8649406179573856,
+          "persona_sd_ratio": 1.1411228625091074
+        },
+        {
+          "item_id": "QID163",
+          "n_human": 202,
+          "population_acc": 0.9725806510540351,
+          "ceiling": 0.9488118811881188,
+          "population_sd_ratio": 1.0068709529957303,
+          "persona_acc": 0.9738398304775129,
+          "persona_sd_ratio": 1.0068709529957298
+        },
+        {
+          "item_id": "QID165",
+          "n_human": 210,
+          "population_acc": 0.9660364984317081,
+          "ceiling": 0.9627619047619048,
+          "population_sd_ratio": 1.0869428848293436,
+          "persona_acc": 0.9648502994011977,
+          "persona_sd_ratio": 1.0869428848293425
+        },
+        {
+          "item_id": "QID167",
+          "n_human": 222,
+          "population_acc": 0.9879474112666883,
+          "ceiling": 0.9767567567567568,
+          "population_sd_ratio": 0.9742451443030752,
+          "persona_acc": 0.9873510257245194,
+          "persona_sd_ratio": 0.9742451443030757
+        },
+        {
+          "item_id": "QID169",
+          "n_human": 190,
+          "population_acc": 0.9715419508428773,
+          "ceiling": 0.9468421052631578,
+          "population_sd_ratio": 1.0039150379298025,
+          "persona_acc": 0.973435786900013,
+          "persona_sd_ratio": 1.0039150379298032
+        },
+        {
+          "item_id": "QID171",
+          "n_human": 162,
+          "population_acc": 0.8984737800786118,
+          "ceiling": 0.8885802469135803,
+          "population_sd_ratio": 1.0456424474858776,
+          "persona_acc": 0.8970977534911961,
+          "persona_sd_ratio": 1.0456424474858772
+        },
+        {
+          "item_id": "QID172",
+          "n_human": 114,
+          "population_acc": 0.8302765428557771,
+          "ceiling": 0.8522807017543859,
+          "population_sd_ratio": 1.1207409684124352,
+          "persona_acc": 0.8338500884363497,
+          "persona_sd_ratio": 1.1207409684124356
+        },
+        {
+          "item_id": "QID173",
+          "n_human": 136,
+          "population_acc": 0.8823064498005506,
+          "ceiling": 0.8624264705882354,
+          "population_sd_ratio": 0.9280458161845354,
+          "persona_acc": 0.8765969998314513,
+          "persona_sd_ratio": 0.9280458161845357
+        },
+        {
+          "item_id": "QID174",
+          "n_human": 162,
+          "population_acc": 0.9302018023200077,
+          "ceiling": 0.8896296296296297,
+          "population_sd_ratio": 0.9431593508079699,
+          "persona_acc": 0.9278033426005814,
+          "persona_sd_ratio": 0.9431593508079698
+        },
+        {
+          "item_id": "QID175",
+          "n_human": 114,
+          "population_acc": 0.9098443998279077,
+          "ceiling": 0.8745614035087721,
+          "population_sd_ratio": 0.9637585991681429,
+          "persona_acc": 0.9044877862230504,
+          "persona_sd_ratio": 0.9637585991681431
+        },
+        {
+          "item_id": "QID176",
+          "n_human": 136,
+          "population_acc": 0.8984407129614024,
+          "ceiling": 0.8972058823529412,
+          "population_sd_ratio": 0.9735658600020066,
+          "persona_acc": 0.8938871565818306,
+          "persona_sd_ratio": 0.9735658600020062
+        },
+        {
+          "item_id": "QID178",
+          "n_human": 114,
+          "population_acc": 0.9111146400483969,
+          "ceiling": 0.8537719298245614,
+          "population_sd_ratio": 0.9893428295514246,
+          "persona_acc": 0.9147988505747128,
+          "persona_sd_ratio": 0.9893428295514242
+        },
+        {
+          "item_id": "QID179",
+          "n_human": 136,
+          "population_acc": 0.8897185114503816,
+          "ceiling": 0.8668382352941176,
+          "population_sd_ratio": 0.996851751167553,
+          "persona_acc": 0.885288224068253,
+          "persona_sd_ratio": 0.9968517511675532
+        },
+        {
+          "item_id": "QID183",
+          "n_human": 212,
+          "population_acc": 0.9754088239979971,
+          "ceiling": 0.9476415094339621,
+          "population_sd_ratio": 0.9922152890297821,
+          "persona_acc": 0.9740080114709697,
+          "persona_sd_ratio": 0.9922152890297815
+        },
+        {
+          "item_id": "QID184",
+          "n_human": 200,
+          "population_acc": 0.9671368131868132,
+          "ceiling": 0.9508000000000001,
+          "population_sd_ratio": 1.0146526102108075,
+          "persona_acc": 0.9692274725274725,
+          "persona_sd_ratio": 1.0146526102108078
+        },
+        {
+          "item_id": "QID189",
+          "n_human": 132,
+          "population_acc": 0.8433638743455498,
+          "ceiling": 0.8128787878787879,
+          "population_sd_ratio": 0.8762295153809949,
+          "persona_acc": 0.8414865936855469,
+          "persona_sd_ratio": 0.8762295153809945
+        },
+        {
+          "item_id": "QID190",
+          "n_human": 148,
+          "population_acc": 0.8135096702206792,
+          "ceiling": 0.8216891891891891,
+          "population_sd_ratio": 1.103500643754652,
+          "persona_acc": 0.8135779816513761,
+          "persona_sd_ratio": 1.1035006437546528
+        },
+        {
+          "item_id": "QID191",
+          "n_human": 132,
+          "population_acc": 0.9091017913946092,
+          "ceiling": 0.864621212121212,
+          "population_sd_ratio": 1.1963160814711908,
+          "persona_acc": 0.910284614096769,
+          "persona_sd_ratio": 1.1963160814711904
+        },
+        {
+          "item_id": "QID192",
+          "n_human": 232,
+          "population_acc": 0.9594728840125392,
+          "ceiling": 0.9512068965517241,
+          "population_sd_ratio": 0.9709837739288384,
+          "persona_acc": 0.9577677115987467,
+          "persona_sd_ratio": 0.9709837739288388
+        },
+        {
+          "item_id": "QID193",
+          "n_human": 180,
+          "population_acc": 0.967208788983394,
+          "ceiling": 0.9507777777777778,
+          "population_sd_ratio": 1.0032398977299544,
+          "persona_acc": 0.9739655056028081,
+          "persona_sd_ratio": 1.0032398977299544
+        },
+        {
+          "item_id": "QID194",
+          "n_human": 210,
+          "population_acc": 0.8758673303062057,
+          "ceiling": 0.8850476190476192,
+          "population_sd_ratio": 0.891484620989477,
+          "persona_acc": 0.8705904063336828,
+          "persona_sd_ratio": 0.8914846209894768
+        },
+        {
+          "item_id": "QID195",
+          "n_human": 202,
+          "population_acc": 0.9212321331053969,
+          "ceiling": 0.8842574257425743,
+          "population_sd_ratio": 1.0937696744211947,
+          "persona_acc": 0.9189921231331765,
+          "persona_sd_ratio": 1.0937696744211953
+        },
+        {
+          "item_id": "QID196",
+          "n_human": 412,
+          "population_acc": 0.9783959950719461,
+          "ceiling": 0.9641747572815536,
+          "population_sd_ratio": 0.992143424673708,
+          "persona_acc": 0.977995723321603,
+          "persona_sd_ratio": 0.9921434246737083
+        },
+        {
+          "item_id": "QID198_1",
+          "n_human": 212,
+          "population_acc": 0.9736440560250028,
+          "ceiling": 0.9774528301886792,
+          "population_sd_ratio": 1.200695334487867,
+          "persona_acc": 0.9723617895589761,
+          "persona_sd_ratio": 1.2006953344878677
+        },
+        {
+          "item_id": "QID198_10",
+          "n_human": 212,
+          "population_acc": 0.9525498321564996,
+          "ceiling": 0.9551886792452831,
+          "population_sd_ratio": 1.047125062079984,
+          "persona_acc": 0.95354143998148,
+          "persona_sd_ratio": 1.0471250620799832
+        },
+        {
+          "item_id": "QID198_6",
+          "n_human": 212,
+          "population_acc": 0.9700923139252227,
+          "ceiling": 0.9502830188679244,
+          "population_sd_ratio": 0.9713888347936358,
+          "persona_acc": 0.966123220280125,
+          "persona_sd_ratio": 0.9713888347936351
+        },
+        {
+          "item_id": "QID203_1",
+          "n_human": 200,
+          "population_acc": 0.9812440576230492,
+          "ceiling": 0.9760000000000002,
+          "population_sd_ratio": 0.8505404429072639,
+          "persona_acc": 0.9804795918367352,
+          "persona_sd_ratio": 0.8505404429072636
+        },
+        {
+          "item_id": "QID203_3",
+          "n_human": 200,
+          "population_acc": 0.9487294117647059,
+          "ceiling": 0.9471,
+          "population_sd_ratio": 0.9689697224296371,
+          "persona_acc": 0.9470852941176469,
+          "persona_sd_ratio": 0.9689697224296377
+        },
+        {
+          "item_id": "QID203_5",
+          "n_human": 200,
+          "population_acc": 0.9719480792316928,
+          "ceiling": 0.9465,
+          "population_sd_ratio": 1.009977152109913,
+          "persona_acc": 0.9721645258103241,
+          "persona_sd_ratio": 1.009977152109913
+        },
+        {
+          "item_id": "QID225",
+          "n_human": 206,
+          "population_acc": 0.9712036005446797,
+          "ceiling": 0.9674757281553396,
+          "population_sd_ratio": 0.8981294078190456,
+          "persona_acc": 0.972425740239683,
+          "persona_sd_ratio": 0.8981294078190456
+        },
+        {
+          "item_id": "QID226",
+          "n_human": 206,
+          "population_acc": 0.9701566543465318,
+          "ceiling": 0.9689320388349515,
+          "population_sd_ratio": 0.846201930538757,
+          "persona_acc": 0.9710789844436185,
+          "persona_sd_ratio": 0.8462019305387574
+        },
+        {
+          "item_id": "QID227",
+          "n_human": 206,
+          "population_acc": 0.9837610601210792,
+          "ceiling": 0.9779611650485437,
+          "population_sd_ratio": 0.7918995044290961,
+          "persona_acc": 0.9830560124026629,
+          "persona_sd_ratio": 0.7918995044290961
+        },
+        {
+          "item_id": "QID228",
+          "n_human": 206,
+          "population_acc": 0.9792257473134444,
+          "ceiling": 0.9758252427184467,
+          "population_sd_ratio": 0.8343290808291055,
+          "persona_acc": 0.9801610754475624,
+          "persona_sd_ratio": 0.8343290808291048
+        },
+        {
+          "item_id": "QID231",
+          "n_human": 206,
+          "population_acc": 0.9237715561652545,
+          "ceiling": 0.9058737864077671,
+          "population_sd_ratio": 1.0746513016568338,
+          "persona_acc": 0.9179172431659076,
+          "persona_sd_ratio": 1.0746513016568329
+        },
+        {
+          "item_id": "QID244_10",
+          "n_human": 206,
+          "population_acc": 0.9721876197381529,
+          "ceiling": 0.946601941747573,
+          "population_sd_ratio": 1.0006358458183764,
+          "persona_acc": 0.9732215384252626,
+          "persona_sd_ratio": 1.0006358458183762
+        },
+        {
+          "item_id": "QID244_13",
+          "n_human": 206,
+          "population_acc": 0.9891596371160276,
+          "ceiling": 0.9857281553398061,
+          "population_sd_ratio": 1.292804489005639,
+          "persona_acc": 0.9895702689797874,
+          "persona_sd_ratio": 1.292804489005639
+        },
+        {
+          "item_id": "QID244_4",
+          "n_human": 206,
+          "population_acc": 0.9899588837604116,
+          "ceiling": 0.9795145631067962,
+          "population_sd_ratio": 0.951542550305402,
+          "persona_acc": 0.9898236570168768,
+          "persona_sd_ratio": 0.9515425503054028
+        },
+        {
+          "item_id": "QID245_10",
+          "n_human": 206,
+          "population_acc": 0.9732440860405208,
+          "ceiling": 0.9471844660194175,
+          "population_sd_ratio": 0.9978539625109413,
+          "persona_acc": 0.9713072606268531,
+          "persona_sd_ratio": 0.9978539625109413
+        },
+        {
+          "item_id": "QID245_14",
+          "n_human": 206,
+          "population_acc": 0.9898813376483279,
+          "ceiling": 0.9907766990291265,
+          "population_sd_ratio": 1.374932297602858,
+          "persona_acc": 0.9911596548004313,
+          "persona_sd_ratio": 1.3749322976028588
+        },
+        {
+          "item_id": "QID245_4",
+          "n_human": 206,
+          "population_acc": 0.9842148124568942,
+          "ceiling": 0.977766990291262,
+          "population_sd_ratio": 0.8682822747693336,
+          "persona_acc": 0.9842802447521524,
+          "persona_sd_ratio": 0.8682822747693334
+        },
+        {
+          "item_id": "QID246_12",
+          "n_human": 206,
+          "population_acc": 0.9881602914389801,
+          "ceiling": 1.0,
+          "population_sd_ratio": NaN,
+          "persona_acc": 0.9881602914389785,
+          "persona_sd_ratio": NaN
+        },
+        {
+          "item_id": "QID246_5",
+          "n_human": 206,
+          "population_acc": 0.9818629046044292,
+          "ceiling": 0.9656310679611647,
+          "population_sd_ratio": 1.0278668824130919,
+          "persona_acc": 0.9813600780471704,
+          "persona_sd_ratio": 1.0278668824130928
+        },
+        {
+          "item_id": "QID246_9",
+          "n_human": 206,
+          "population_acc": 0.9713842467328064,
+          "ceiling": 0.943495145631068,
+          "population_sd_ratio": 0.9999754306213483,
+          "persona_acc": 0.9717904869695415,
+          "persona_sd_ratio": 0.9999754306213484
+        },
+        {
+          "item_id": "QID247_10",
+          "n_human": 206,
+          "population_acc": 0.9718451317782848,
+          "ceiling": 0.9454368932038836,
+          "population_sd_ratio": 1.0001413754521422,
+          "persona_acc": 0.9727184466019417,
+          "persona_sd_ratio": 1.0001413754521422
+        },
+        {
+          "item_id": "QID247_13",
+          "n_human": 206,
+          "population_acc": 0.9944992660972289,
+          "ceiling": 0.9899029126213594,
+          "population_sd_ratio": 1.0156543041918193,
+          "persona_acc": 0.9948369497939765,
+          "persona_sd_ratio": 1.0156543041918205
+        },
+        {
+          "item_id": "QID247_7",
+          "n_human": 206,
+          "population_acc": 0.9752057875159897,
+          "ceiling": 0.9601941747572816,
+          "population_sd_ratio": 1.0447319731928426,
+          "persona_acc": 0.9749875619690994,
+          "persona_sd_ratio": 1.0447319731928426
+        },
+        {
+          "item_id": "QID248_10",
+          "n_human": 206,
+          "population_acc": 0.9647162832098373,
+          "ceiling": 0.9439805825242719,
+          "population_sd_ratio": 1.0049923325885688,
+          "persona_acc": 0.9614160197122166,
+          "persona_sd_ratio": 1.0049923325885688
+        },
+        {
+          "item_id": "QID248_14",
+          "n_human": 206,
+          "population_acc": 0.9899817850637525,
+          "ceiling": 1.0,
+          "population_sd_ratio": NaN,
+          "persona_acc": 0.9899817850637517,
+          "persona_sd_ratio": NaN
+        },
+        {
+          "item_id": "QID248_4",
+          "n_human": 206,
+          "population_acc": 0.9778032727937231,
+          "ceiling": 0.9678640776699029,
+          "population_sd_ratio": 1.0951313616575011,
+          "persona_acc": 0.9769790027175037,
+          "persona_sd_ratio": 1.0951313616575018
+        },
+        {
+          "item_id": "QID250_1",
+          "n_human": 206,
+          "population_acc": 0.97685158658579,
+          "ceiling": 0.9748543689320389,
+          "population_sd_ratio": 1.1448948440502114,
+          "persona_acc": 0.9745871281117178,
+          "persona_sd_ratio": 1.1448948440502114
+        },
+        {
+          "item_id": "QID250_14",
+          "n_human": 206,
+          "population_acc": 0.9826733218974187,
+          "ceiling": 0.970485436893204,
+          "population_sd_ratio": 1.0785242338361491,
+          "persona_acc": 0.9834638147617618,
+          "persona_sd_ratio": 1.0785242338361496
+        },
+        {
+          "item_id": "QID250_8",
+          "n_human": 206,
+          "population_acc": 0.9509126036748191,
+          "ceiling": 0.9514563106796118,
+          "population_sd_ratio": 1.0343773322580276,
+          "persona_acc": 0.9560163227050069,
+          "persona_sd_ratio": 1.0343773322580274
+        },
+        {
+          "item_id": "QID251_1",
+          "n_human": 206,
+          "population_acc": 0.9830503828673491,
+          "ceiling": 0.9648543689320388,
+          "population_sd_ratio": 1.0085254081330726,
+          "persona_acc": 0.9823613984826781,
+          "persona_sd_ratio": 1.008525408133072
+        },
+        {
+          "item_id": "QID251_13",
+          "n_human": 206,
+          "population_acc": 0.9770972524330793,
+          "ceiling": 0.9644660194174756,
+          "population_sd_ratio": 0.92069154814964,
+          "persona_acc": 0.9742186440777875,
+          "persona_sd_ratio": 0.92069154814964
+        },
+        {
+          "item_id": "QID251_8",
+          "n_human": 206,
+          "population_acc": 0.9683677294993543,
+          "ceiling": 0.9428155339805826,
+          "population_sd_ratio": 1.0028928587363044,
+          "persona_acc": 0.9668650856809381,
+          "persona_sd_ratio": 1.0028928587363042
+        },
+        {
+          "item_id": "QID252_1",
+          "n_human": 206,
+          "population_acc": 0.9776423152421878,
+          "ceiling": 0.961747572815534,
+          "population_sd_ratio": 0.9693585971864273,
+          "persona_acc": 0.9773779334005339,
+          "persona_sd_ratio": 0.9693585971864267
+        },
+        {
+          "item_id": "QID252_14",
+          "n_human": 206,
+          "population_acc": 0.9826235697738164,
+          "ceiling": 0.965631067961165,
+          "population_sd_ratio": 1.0445780794390382,
+          "persona_acc": 0.9817254083623652,
+          "persona_sd_ratio": 1.0445780794390378
+        },
+        {
+          "item_id": "QID252_7",
+          "n_human": 206,
+          "population_acc": 0.9651243213609917,
+          "ceiling": 0.9453398058252427,
+          "population_sd_ratio": 0.9899365802989404,
+          "persona_acc": 0.9628119381517442,
+          "persona_sd_ratio": 0.9899365802989405
+        },
+        {
+          "item_id": "QID276_1",
+          "n_human": 206,
+          "population_acc": 0.9522497214706349,
+          "ceiling": 0.9597087378640776,
+          "population_sd_ratio": 0.8756002419348047,
+          "persona_acc": 0.950988469768511,
+          "persona_sd_ratio": 0.8756002419348048
+        },
+        {
+          "item_id": "QID276_14",
+          "n_human": 206,
+          "population_acc": 0.975762315713772,
+          "ceiling": 0.9462135922330098,
+          "population_sd_ratio": 0.9993843600227295,
+          "persona_acc": 0.9731499460625673,
+          "persona_sd_ratio": 0.9993843600227285
+        },
+        {
+          "item_id": "QID276_8",
+          "n_human": 206,
+          "population_acc": 0.9730703367700024,
+          "ceiling": 0.9517475728155341,
+          "population_sd_ratio": 1.0094280498372525,
+          "persona_acc": 0.9750108759085363,
+          "persona_sd_ratio": 1.009428049837252
+        },
+        {
+          "item_id": "QID277_14",
+          "n_human": 206,
+          "population_acc": 0.9641157797938,
+          "ceiling": 0.9516504854368932,
+          "population_sd_ratio": 1.0315265933404856,
+          "persona_acc": 0.9656427986159005,
+          "persona_sd_ratio": 1.0315265933404858
+        },
+        {
+          "item_id": "QID277_2",
+          "n_human": 206,
+          "population_acc": 0.9777452384741896,
+          "ceiling": 0.9654368932038835,
+          "population_sd_ratio": 1.049526752395202,
+          "persona_acc": 0.9795003271614761,
+          "persona_sd_ratio": 1.049526752395203
+        },
+        {
+          "item_id": "QID277_7",
+          "n_human": 206,
+          "population_acc": 0.9727184466019417,
+          "ceiling": 0.9545631067961164,
+          "population_sd_ratio": 0.9747311292305937,
+          "persona_acc": 0.9741262135922331,
+          "persona_sd_ratio": 0.9747311292305934
+        },
+        {
+          "item_id": "QID278_1",
+          "n_human": 206,
+          "population_acc": 0.9743942502107391,
+          "ceiling": 0.9533980582524272,
+          "population_sd_ratio": 0.953789134232267,
+          "persona_acc": 0.9720521277285562,
+          "persona_sd_ratio": 0.9537891342322662
+        },
+        {
+          "item_id": "QID278_14",
+          "n_human": 206,
+          "population_acc": 0.9712058995172157,
+          "ceiling": 0.9533009708737865,
+          "population_sd_ratio": 1.0241824971308646,
+          "persona_acc": 0.9695168620793325,
+          "persona_sd_ratio": 1.0241824971308644
+        },
+        {
+          "item_id": "QID278_7",
+          "n_human": 206,
+          "population_acc": 0.9753642103029339,
+          "ceiling": 0.9480582524271844,
+          "population_sd_ratio": 0.99142122205004,
+          "persona_acc": 0.9736381535124176,
+          "persona_sd_ratio": 0.9914212220500406
+        },
+        {
+          "item_id": "QID279_1",
+          "n_human": 206,
+          "population_acc": 0.9092608803296371,
+          "ceiling": 0.945242718446602,
+          "population_sd_ratio": 1.0405461652940746,
+          "persona_acc": 0.9129134171574093,
+          "persona_sd_ratio": 1.0405461652940748
+        },
+        {
+          "item_id": "QID279_14",
+          "n_human": 206,
+          "population_acc": 0.977537800413815,
+          "ceiling": 0.9556310679611651,
+          "population_sd_ratio": 0.9960562803461657,
+          "persona_acc": 0.9774943852016906,
+          "persona_sd_ratio": 0.9960562803461647
+        },
+        {
+          "item_id": "QID279_7",
+          "n_human": 206,
+          "population_acc": 0.9347560731191163,
+          "ceiling": 0.9471844660194175,
+          "population_sd_ratio": 0.9601866815462549,
+          "persona_acc": 0.9343809279596317,
+          "persona_sd_ratio": 0.9601866815462542
+        },
+        {
+          "item_id": "QID288_1",
+          "n_human": 412,
+          "population_acc": 0.9230075898256901,
+          "ceiling": 0.9324514563106796,
+          "population_sd_ratio": 1.0999983033315146,
+          "persona_acc": 0.9219009879428015,
+          "persona_sd_ratio": 1.0999983033315148
+        },
+        {
+          "item_id": "QID288_2",
+          "n_human": 412,
+          "population_acc": 0.9413124895157992,
+          "ceiling": 0.9135436893203884,
+          "population_sd_ratio": 1.0162719489612215,
+          "persona_acc": 0.9381605120115835,
+          "persona_sd_ratio": 1.0162719489612215
+        },
+        {
+          "item_id": "QID288_3",
+          "n_human": 412,
+          "population_acc": 0.9328666895234509,
+          "ceiling": 0.9058252427184467,
+          "population_sd_ratio": 1.0009094984226974,
+          "persona_acc": 0.9309558648251749,
+          "persona_sd_ratio": 1.0009094984226974
+        },
+        {
+          "item_id": "QID289_2",
+          "n_human": 412,
+          "population_acc": 0.922217404803456,
+          "ceiling": 0.9224757281553398,
+          "population_sd_ratio": 0.9555681392944764,
+          "persona_acc": 0.920355977245238,
+          "persona_sd_ratio": 0.9555681392944761
+        },
+        {
+          "item_id": "QID289_3",
+          "n_human": 412,
+          "population_acc": 0.9156523674429144,
+          "ceiling": 0.9230339805825242,
+          "population_sd_ratio": 0.953314834496624,
+          "persona_acc": 0.9167588516084604,
+          "persona_sd_ratio": 0.953314834496624
+        },
+        {
+          "item_id": "QID289_4",
+          "n_human": 412,
+          "population_acc": 0.9392454391886921,
+          "ceiling": 0.9262135922330097,
+          "population_sd_ratio": 1.0293449338627316,
+          "persona_acc": 0.9400079753499884,
+          "persona_sd_ratio": 1.0293449338627316
+        },
+        {
+          "item_id": "QID291",
+          "n_human": 412,
+          "population_acc": 0.941295509708738,
+          "ceiling": 0.9339077669902913,
+          "population_sd_ratio": 0.9885463981783302,
+          "persona_acc": 0.9417202669902914,
+          "persona_sd_ratio": 0.9885463981783298
+        },
+        {
+          "item_id": "QID84_12",
+          "n_human": 206,
+          "population_acc": 0.9863960952835694,
+          "ceiling": 0.9844660194174757,
+          "population_sd_ratio": 1.2847566246260083,
+          "persona_acc": 0.986433291480243,
+          "persona_sd_ratio": 1.2847566246260087
+        },
+        {
+          "item_id": "QID84_4",
+          "n_human": 206,
+          "population_acc": 0.9856523187201208,
+          "ceiling": 0.9832038834951459,
+          "population_sd_ratio": 1.222329563631728,
+          "persona_acc": 0.9868238810193296,
+          "persona_sd_ratio": 1.2223295636317268
+        },
+        {
+          "item_id": "QID84_9",
+          "n_human": 206,
+          "population_acc": 0.9725511521389287,
+          "ceiling": 0.9465048543689321,
+          "population_sd_ratio": 0.9931992198993151,
+          "persona_acc": 0.9727362194280864,
+          "persona_sd_ratio": 0.9931992198993147
+        },
+        {
+          "item_id": "QID9_1",
+          "n_human": 412,
+          "population_acc": 0.9668715404884431,
+          "ceiling": 0.9620388349514561,
+          "population_sd_ratio": 1.0087042224621112,
+          "persona_acc": 0.9660959025235641,
+          "persona_sd_ratio": 1.008704222462111
+        },
+        {
+          "item_id": "QID9_10",
+          "n_human": 412,
+          "population_acc": 0.9799378098454973,
+          "ceiling": 0.9596116504854371,
+          "population_sd_ratio": 0.9997530326313324,
+          "persona_acc": 0.9796441308410114,
+          "persona_sd_ratio": 0.9997530326313326
+        },
+        {
+          "item_id": "QID9_11",
+          "n_human": 412,
+          "population_acc": 0.973126101591007,
+          "ceiling": 0.9635922330097086,
+          "population_sd_ratio": 0.9937755162865294,
+          "persona_acc": 0.9707905223383488,
+          "persona_sd_ratio": 0.9937755162865294
+        },
+        {
+          "item_id": "QID9_14",
+          "n_human": 412,
+          "population_acc": 0.9665305114919153,
+          "ceiling": 0.9604854368932039,
+          "population_sd_ratio": 0.990132538192284,
+          "persona_acc": 0.9680110940161866,
+          "persona_sd_ratio": 0.9901325381922838
+        },
+        {
+          "item_id": "QID9_17",
+          "n_human": 412,
+          "population_acc": 0.9535769065261346,
+          "ceiling": 0.9612621359223301,
+          "population_sd_ratio": 1.01506111699045,
+          "persona_acc": 0.9559295807027784,
+          "persona_sd_ratio": 1.0150611169904502
+        },
+        {
+          "item_id": "QID9_18",
+          "n_human": 412,
+          "population_acc": 0.9652443837279904,
+          "ceiling": 0.9621844660194177,
+          "population_sd_ratio": 1.0089431947819016,
+          "persona_acc": 0.9664822478056597,
+          "persona_sd_ratio": 1.0089431947819016
+        },
+        {
+          "item_id": "QID9_22",
+          "n_human": 412,
+          "population_acc": 0.9782478734504041,
+          "ceiling": 0.9580097087378641,
+          "population_sd_ratio": 1.003315244264721,
+          "persona_acc": 0.9774383845886311,
+          "persona_sd_ratio": 1.003315244264721
+        },
+        {
+          "item_id": "QID9_25",
+          "n_human": 412,
+          "population_acc": 0.9665297893787468,
+          "ceiling": 0.9582524271844661,
+          "population_sd_ratio": 1.0091587963082316,
+          "persona_acc": 0.9676547827470953,
+          "persona_sd_ratio": 1.0091587963082316
+        },
+        {
+          "item_id": "QID9_3",
+          "n_human": 412,
+          "population_acc": 0.9516745362265019,
+          "ceiling": 0.9611650485436894,
+          "population_sd_ratio": 1.0130596920558217,
+          "persona_acc": 0.9539065438190056,
+          "persona_sd_ratio": 1.013059692055822
+        },
+        {
+          "item_id": "QID9_32",
+          "n_human": 412,
+          "population_acc": 0.9753172434729811,
+          "ceiling": 0.9614077669902913,
+          "population_sd_ratio": 1.0056770488591213,
+          "persona_acc": 0.9766352621123429,
+          "persona_sd_ratio": 1.0056770488591211
+        },
+        {
+          "item_id": "QID9_37",
+          "n_human": 412,
+          "population_acc": 0.9710194616867385,
+          "ceiling": 0.9591747572815534,
+          "population_sd_ratio": 1.008521178013212,
+          "persona_acc": 0.9703429448069749,
+          "persona_sd_ratio": 1.0085211780132117
+        },
+        {
+          "item_id": "QID9_6",
+          "n_human": 412,
+          "population_acc": 0.9493264894689372,
+          "ceiling": 0.9598058252427185,
+          "population_sd_ratio": 0.9902714925208989,
+          "persona_acc": 0.9467523476046469,
+          "persona_sd_ratio": 0.9902714925208987
+        }
+      ],
+      "run": {
+        "reference": "ref-train-crowd",
+        "data": "heldout_person train, wave 1, add-0.5 smoothing"
+      }
+    },
+    "ref-uniform": {
+      "coverage": {
+        "population": 1.0,
+        "persona": 1.0
+      },
+      "n_items": 107,
+      "ceiling": 0.9369169526244696,
+      "population": {
+        "accuracy": {
+          "mean": 0.7131660134785682,
+          "ci_low": 0.6836374395070988,
+          "ci_high": 0.7410096666286666
+        },
+        "accuracy_over_ceiling": 0.7611838076799278,
+        "sd_ratio_median": 1.2365701159660745
+      },
+      "persona": {
+        "accuracy": {
+          "mean": 0.7138893566888195,
+          "ci_low": 0.6849856024125679,
+          "ci_high": 0.7430602403788898
+        },
+        "accuracy_over_ceiling": 0.7619558539196986,
+        "sd_ratio_median": 1.2365701159660738
+      },
+      "individual": {
+        "n_rows": 12284,
+        "n_persons": 100,
+        "nll_population": 1.0523620240391451,
+        "nll_persona": 1.0523620240391451,
+        "persona_minus_population": {
+          "mean": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0
+        }
+      },
+      "effects": {
+        "pairs": [
+          {
+            "id": "E02",
+            "experiment": "outcome_bias",
+            "human": {
+              "d": -0.5164352300036393,
+              "sd": 1.251187685767813,
+              "ci_low": -0.5764874733067605,
+              "ci_high": -0.45026486216093314
+            },
+            "population": 0.0,
+            "persona": 0.0
+          },
+          {
+            "id": "E03",
+            "experiment": "absolute_relative",
+            "human": {
+              "d": -0.9126394738140774,
+              "sd": 0.45457296717495865,
+              "ci_low": -0.9782727910657422,
+              "ci_high": -0.8470618965185245
+            },
+            "population": 0.0,
+            "persona": 0.0
+          },
+          {
+            "id": "E04",
+            "experiment": "myside",
+            "human": {
+              "d": 0.3001477234514857,
+              "sd": 1.3026178905128887,
+              "ci_low": 0.23359826541039985,
+              "ci_high": 0.36294470822407765
+            },
+            "population": 0.0,
+            "persona": 0.0
+          },
+          {
+            "id": "E05",
+            "experiment": "less_is_more",
+            "human": {
+              "d": 0.6987329113091205,
+              "sd": 1.3475514352866746,
+              "ci_low": 0.6196743888537968,
+              "ci_high": 0.7765823202803113
+            },
+            "population": 0.0,
+            "persona": 0.0
+          },
+          {
+            "id": "E06",
+            "experiment": "less_is_more",
+            "human": {
+              "d": -0.05289305766053015,
+              "sd": 1.4244879239065038,
+              "ci_low": -0.13121118896130005,
+              "ci_high": 0.025138903660411323
+            },
+            "population": 0.0,
+            "persona": 0.0
+          },
+          {
+            "id": "E07",
+            "experiment": "less_is_more",
+            "human": {
+              "d": 0.6601752753801985,
+              "sd": 1.3121258064714076,
+              "ci_low": 0.5823387572285745,
+              "ci_high": 0.7398723520250889
+            },
+            "population": 0.0,
+            "persona": 0.0
+          },
+          {
+            "id": "E08",
+            "experiment": "proportion_dominance_1",
+            "human": {
+              "d": 0.20281375140891522,
+              "sd": 1.1099341055900067,
+              "ci_low": 0.12697945394904486,
+              "ci_high": 0.27945168030978196
+            },
+            "population": 0.0,
+            "persona": 0.0
+          },
+          {
+            "id": "E09",
+            "experiment": "proportion_dominance_1",
+            "human": {
+              "d": 0.0176704182698492,
+              "sd": 1.0676910744172383,
+              "ci_low": -0.06310859913012953,
+              "ci_high": 0.09377760364332123
+            },
+            "population": 0.0,
+            "persona": 0.0
+          },
+          {
+            "id": "E10",
+            "experiment": "proportion_dominance_1",
+            "human": {
+              "d": 0.22106555930194866,
+              "sd": 1.103638433819098,
+              "ci_low": 0.1405881896818995,
+              "ci_high": 0.3011655281445715
+            },
+            "population": 0.0,
+            "persona": 0.0
+          },
+          {
+            "id": "E12",
+            "experiment": "proportion_dominance_2",
+            "human": {
+              "d": 0.011394509566796735,
+              "sd": 1.3605881090692504,
+              "ci_low": -0.07333089826969073,
+              "ci_high": 0.08800340476915253
+            },
+            "population": 0.0,
+            "persona": 0.0
+          },
+          {
+            "id": "E14",
+            "experiment": "wta_wtp",
+            "human": {
+              "d": 1.5478382092913792,
+              "sd": 2.459926616483833,
+              "ci_low": 1.4718904444754117,
+              "ci_high": 1.6251737543199924
+            },
+            "population": 0.0,
+            "persona": 0.0
+          },
+          {
+            "id": "E15",
+            "experiment": "wta_wtp",
+            "human": {
+              "d": 0.5984945557232084,
+              "sd": 1.7648572278498988,
+              "ci_low": 0.5214346769555686,
+              "ci_high": 0.6758033885997153
+            },
+            "population": 0.0,
+            "persona": 0.0
+          },
+          {
+            "id": "E16",
+            "experiment": "wta_wtp",
+            "human": {
+              "d": 2.1922083558476397,
+              "sd": 2.218687762305699,
+              "ci_low": 2.1154436490898703,
+              "ci_high": 2.270240907367334
+            },
+            "population": 0.0,
+            "persona": 0.0
+          }
+        ],
+        "population": {
+          "correlation": null,
+          "sign_agreement": 0.0,
+          "n_pairs": 13,
+          "n_real": 10
+        },
+        "persona": {
+          "correlation": null,
+          "sign_agreement": 0.0,
+          "n_pairs": 13,
+          "n_real": 10
+        }
+      },
+      "per_item": [
+        {
+          "item_id": "QID117",
+          "n_human": 206,
+          "population_acc": 0.7784385113268608,
+          "ceiling": 0.883883495145631,
+          "population_sd_ratio": 1.0925416292361048,
+          "persona_acc": 0.7799919093851134,
+          "persona_sd_ratio": 1.092541629236104
+        },
+        {
+          "item_id": "QID118",
+          "n_human": 206,
+          "population_acc": 0.39828883495145617,
+          "ceiling": 0.8512135922330097,
+          "population_sd_ratio": 1.6829785184685686,
+          "persona_acc": 0.39704793689320383,
+          "persona_sd_ratio": 1.6829785184685686
+        },
+        {
+          "item_id": "QID119",
+          "n_human": 206,
+          "population_acc": 0.5004667662434653,
+          "ceiling": 0.8662621359223301,
+          "population_sd_ratio": 1.6383555358225315,
+          "persona_acc": 0.5028864824495894,
+          "persona_sd_ratio": 1.6383555358225306
+        },
+        {
+          "item_id": "QID120",
+          "n_human": 206,
+          "population_acc": 0.5344757281553398,
+          "ceiling": 0.8766990291262137,
+          "population_sd_ratio": 1.693170904087576,
+          "persona_acc": 0.5335873786407771,
+          "persona_sd_ratio": 1.6931709040875744
+        },
+        {
+          "item_id": "QID121",
+          "n_human": 206,
+          "population_acc": 0.5617961165048544,
+          "ceiling": 0.8902912621359224,
+          "population_sd_ratio": 1.6431565403186583,
+          "persona_acc": 0.5604923717059641,
+          "persona_sd_ratio": 1.6431565403186577
+        },
+        {
+          "item_id": "QID122",
+          "n_human": 206,
+          "population_acc": 0.7284951456310681,
+          "ceiling": 0.9129126213592232,
+          "population_sd_ratio": 1.436665508078052,
+          "persona_acc": 0.7276092233009709,
+          "persona_sd_ratio": 1.436665508078052
+        },
+        {
+          "item_id": "QID149",
+          "n_human": 206,
+          "population_acc": 0.8915533980582525,
+          "ceiling": 0.9440776699029126,
+          "population_sd_ratio": 1.0236222296999038,
+          "persona_acc": 0.8959223300970873,
+          "persona_sd_ratio": 1.0236222296999038
+        },
+        {
+          "item_id": "QID150",
+          "n_human": 206,
+          "population_acc": 0.8375242718446603,
+          "ceiling": 0.9463106796116506,
+          "population_sd_ratio": 1.0593815272852962,
+          "persona_acc": 0.8347087378640776,
+          "persona_sd_ratio": 1.0593815272852962
+        },
+        {
+          "item_id": "QID151",
+          "n_human": 206,
+          "population_acc": 0.6364077669902913,
+          "ceiling": 0.9604854368932039,
+          "population_sd_ratio": 1.4589762016504393,
+          "persona_acc": 0.6377184466019419,
+          "persona_sd_ratio": 1.4589762016504393
+        },
+        {
+          "item_id": "QID157",
+          "n_human": 200,
+          "population_acc": 0.7513,
+          "ceiling": 0.87655,
+          "population_sd_ratio": 1.2967967002123661,
+          "persona_acc": 0.7483166666666667,
+          "persona_sd_ratio": 1.2967967002123655
+        },
+        {
+          "item_id": "QID159_2",
+          "n_human": 220,
+          "population_acc": 0.7166818181818183,
+          "ceiling": 0.8932727272727273,
+          "population_sd_ratio": 1.3825724219115114,
+          "persona_acc": 0.7158181818181819,
+          "persona_sd_ratio": 1.3825724219115105
+        },
+        {
+          "item_id": "QID160_1",
+          "n_human": 192,
+          "population_acc": 0.7319791666666667,
+          "ceiling": 0.8831770833333333,
+          "population_sd_ratio": 1.4023813224127397,
+          "persona_acc": 0.7346354166666668,
+          "persona_sd_ratio": 1.4023813224127388
+        },
+        {
+          "item_id": "QID160_2",
+          "n_human": 192,
+          "population_acc": 0.68390625,
+          "ceiling": 0.8766145833333333,
+          "population_sd_ratio": 1.479561876765588,
+          "persona_acc": 0.6905729166666669,
+          "persona_sd_ratio": 1.479561876765587
+        },
+        {
+          "item_id": "QID160_3",
+          "n_human": 192,
+          "population_acc": 0.69640625,
+          "ceiling": 0.8785416666666666,
+          "population_sd_ratio": 1.468437361517364,
+          "persona_acc": 0.6972395833333335,
+          "persona_sd_ratio": 1.468437361517363
+        },
+        {
+          "item_id": "QID161",
+          "n_human": 220,
+          "population_acc": 0.565935064935065,
+          "ceiling": 0.8968636363636364,
+          "population_sd_ratio": 1.8527999296364788,
+          "persona_acc": 0.5647662337662339,
+          "persona_sd_ratio": 1.8527999296364779
+        },
+        {
+          "item_id": "QID162",
+          "n_human": 192,
+          "population_acc": 0.5323809523809524,
+          "ceiling": 0.8943229166666665,
+          "population_sd_ratio": 1.5445745652529042,
+          "persona_acc": 0.5300818452380954,
+          "persona_sd_ratio": 1.5445745652529035
+        },
+        {
+          "item_id": "QID163",
+          "n_human": 202,
+          "population_acc": 0.7760891089108912,
+          "ceiling": 0.9488118811881188,
+          "population_sd_ratio": 1.1169942368896173,
+          "persona_acc": 0.7814356435643566,
+          "persona_sd_ratio": 1.1169942368896173
+        },
+        {
+          "item_id": "QID165",
+          "n_human": 210,
+          "population_acc": 0.6441904761904763,
+          "ceiling": 0.9627619047619048,
+          "population_sd_ratio": 1.4288690166235205,
+          "persona_acc": 0.6419523809523809,
+          "persona_sd_ratio": 1.4288690166235205
+        },
+        {
+          "item_id": "QID167",
+          "n_human": 222,
+          "population_acc": 0.5633333333333334,
+          "ceiling": 0.9767567567567568,
+          "population_sd_ratio": 2.056966853734556,
+          "persona_acc": 0.562972972972973,
+          "persona_sd_ratio": 2.056966853734556
+        },
+        {
+          "item_id": "QID169",
+          "n_human": 190,
+          "population_acc": 0.8392631578947367,
+          "ceiling": 0.9468421052631578,
+          "population_sd_ratio": 1.0539303728279352,
+          "persona_acc": 0.8443684210526315,
+          "persona_sd_ratio": 1.0539303728279352
+        },
+        {
+          "item_id": "QID171",
+          "n_human": 162,
+          "population_acc": 0.6287654320987655,
+          "ceiling": 0.8885802469135803,
+          "population_sd_ratio": 1.2164815884182834,
+          "persona_acc": 0.628950617283951,
+          "persona_sd_ratio": 1.216481588418282
+        },
+        {
+          "item_id": "QID172",
+          "n_human": 114,
+          "population_acc": 0.8401754385964912,
+          "ceiling": 0.8522807017543859,
+          "population_sd_ratio": 1.0827231289601267,
+          "persona_acc": 0.8412631578947369,
+          "persona_sd_ratio": 1.0827231289601253
+        },
+        {
+          "item_id": "QID173",
+          "n_human": 136,
+          "population_acc": 0.8406911764705883,
+          "ceiling": 0.8624264705882354,
+          "population_sd_ratio": 0.9594132442621645,
+          "persona_acc": 0.8402058823529411,
+          "persona_sd_ratio": 0.9594132442621635
+        },
+        {
+          "item_id": "QID174",
+          "n_human": 162,
+          "population_acc": 0.6307901234567901,
+          "ceiling": 0.8896296296296297,
+          "population_sd_ratio": 1.1898744711016676,
+          "persona_acc": 0.6354814814814818,
+          "persona_sd_ratio": 1.1898744711016662
+        },
+        {
+          "item_id": "QID175",
+          "n_human": 114,
+          "population_acc": 0.5872280701754385,
+          "ceiling": 0.8745614035087721,
+          "population_sd_ratio": 1.2739219453628714,
+          "persona_acc": 0.593122807017544,
+          "persona_sd_ratio": 1.27392194536287
+        },
+        {
+          "item_id": "QID176",
+          "n_human": 136,
+          "population_acc": 0.5346323529411764,
+          "ceiling": 0.8972058823529412,
+          "population_sd_ratio": 1.31365714414682,
+          "persona_acc": 0.5296764705882356,
+          "persona_sd_ratio": 1.3136571441468188
+        },
+        {
+          "item_id": "QID178",
+          "n_human": 114,
+          "population_acc": 0.6749122807017546,
+          "ceiling": 0.8537719298245614,
+          "population_sd_ratio": 1.2365701159660745,
+          "persona_acc": 0.6764473684210528,
+          "persona_sd_ratio": 1.2365701159660738
+        },
+        {
+          "item_id": "QID179",
+          "n_human": 136,
+          "population_acc": 0.6392647058823531,
+          "ceiling": 0.8668382352941176,
+          "population_sd_ratio": 1.2372871988954255,
+          "persona_acc": 0.6367647058823532,
+          "persona_sd_ratio": 1.2372871988954246
+        },
+        {
+          "item_id": "QID183",
+          "n_human": 212,
+          "population_acc": 0.7688207547169812,
+          "ceiling": 0.9476415094339621,
+          "population_sd_ratio": 1.1277233904085153,
+          "persona_acc": 0.7681132075471698,
+          "persona_sd_ratio": 1.1277233904085153
+        },
+        {
+          "item_id": "QID184",
+          "n_human": 200,
+          "population_acc": 0.8181499999999999,
+          "ceiling": 0.9508000000000001,
+          "population_sd_ratio": 1.0718661571406802,
+          "persona_acc": 0.8178,
+          "persona_sd_ratio": 1.0718661571406802
+        },
+        {
+          "item_id": "QID189",
+          "n_human": 132,
+          "population_acc": 0.6261969696969697,
+          "ceiling": 0.8128787878787879,
+          "population_sd_ratio": 1.2206502967936728,
+          "persona_acc": 0.6258333333333336,
+          "persona_sd_ratio": 1.2206502967936717
+        },
+        {
+          "item_id": "QID190",
+          "n_human": 148,
+          "population_acc": 0.6474459459459458,
+          "ceiling": 0.8216891891891891,
+          "population_sd_ratio": 1.1008792183300353,
+          "persona_acc": 0.6483108108108112,
+          "persona_sd_ratio": 1.1008792183300342
+        },
+        {
+          "item_id": "QID191",
+          "n_human": 132,
+          "population_acc": 0.3944545454545454,
+          "ceiling": 0.864621212121212,
+          "population_sd_ratio": 2.352283653144174,
+          "persona_acc": 0.391727272727273,
+          "persona_sd_ratio": 2.352283653144172
+        },
+        {
+          "item_id": "QID192",
+          "n_human": 232,
+          "population_acc": 0.8468534482758622,
+          "ceiling": 0.9512068965517241,
+          "population_sd_ratio": 1.048882902416161,
+          "persona_acc": 0.8499137931034483,
+          "persona_sd_ratio": 1.048882902416161
+        },
+        {
+          "item_id": "QID193",
+          "n_human": 180,
+          "population_acc": 0.9168333333333334,
+          "ceiling": 0.9507777777777778,
+          "population_sd_ratio": 1.012322858998157,
+          "persona_acc": 0.921277777777778,
+          "persona_sd_ratio": 1.012322858998157
+        },
+        {
+          "item_id": "QID194",
+          "n_human": 210,
+          "population_acc": 0.7789285714285714,
+          "ceiling": 0.8850476190476192,
+          "population_sd_ratio": 1.1322008626188185,
+          "persona_acc": 0.7750952380952382,
+          "persona_sd_ratio": 1.1322008626188178
+        },
+        {
+          "item_id": "QID195",
+          "n_human": 202,
+          "population_acc": 0.6903052805280526,
+          "ceiling": 0.8842574257425743,
+          "population_sd_ratio": 1.4170960525321605,
+          "persona_acc": 0.6928135313531354,
+          "persona_sd_ratio": 1.4170960525321596
+        },
+        {
+          "item_id": "QID196",
+          "n_human": 412,
+          "population_acc": 0.8766990291262136,
+          "ceiling": 0.9641747572815536,
+          "population_sd_ratio": 1.032130969959234,
+          "persona_acc": 0.8773543689320388,
+          "persona_sd_ratio": 1.032130969959234
+        },
+        {
+          "item_id": "QID198_1",
+          "n_human": 212,
+          "population_acc": 0.5581132075471698,
+          "ceiling": 0.9774528301886792,
+          "population_sd_ratio": 2.163715939458474,
+          "persona_acc": 0.5567452830188679,
+          "persona_sd_ratio": 2.163715939458474
+        },
+        {
+          "item_id": "QID198_10",
+          "n_human": 212,
+          "population_acc": 0.7756603773584907,
+          "ceiling": 0.9551886792452831,
+          "population_sd_ratio": 1.121583232579785,
+          "persona_acc": 0.7762735849056606,
+          "persona_sd_ratio": 1.121583232579785
+        },
+        {
+          "item_id": "QID198_6",
+          "n_human": 212,
+          "population_acc": 0.7681603773584906,
+          "ceiling": 0.9502830188679244,
+          "population_sd_ratio": 1.1277233904085153,
+          "persona_acc": 0.7731603773584906,
+          "persona_sd_ratio": 1.1277233904085153
+        },
+        {
+          "item_id": "QID203_1",
+          "n_human": 200,
+          "population_acc": 0.5587000000000001,
+          "ceiling": 0.9760000000000002,
+          "population_sd_ratio": 2.1053798026662975,
+          "persona_acc": 0.56,
+          "persona_sd_ratio": 2.1053798026662975
+        },
+        {
+          "item_id": "QID203_3",
+          "n_human": 200,
+          "population_acc": 0.8727000000000001,
+          "ceiling": 0.9471,
+          "population_sd_ratio": 1.0356162766686667,
+          "persona_acc": 0.8738499999999999,
+          "persona_sd_ratio": 1.0356162766686667
+        },
+        {
+          "item_id": "QID203_5",
+          "n_human": 200,
+          "population_acc": 0.8414499999999999,
+          "ceiling": 0.9465,
+          "population_sd_ratio": 1.0555008273018727,
+          "persona_acc": 0.84305,
+          "persona_sd_ratio": 1.0555008273018727
+        },
+        {
+          "item_id": "QID225",
+          "n_human": 206,
+          "population_acc": 0.617621359223301,
+          "ceiling": 0.9674757281553396,
+          "population_sd_ratio": 1.5584608966221662,
+          "persona_acc": 0.6161650485436894,
+          "persona_sd_ratio": 1.5584608966221662
+        },
+        {
+          "item_id": "QID226",
+          "n_human": 206,
+          "population_acc": 0.592135922330097,
+          "ceiling": 0.9689320388349515,
+          "population_sd_ratio": 1.7279836183564328,
+          "persona_acc": 0.5907281553398058,
+          "persona_sd_ratio": 1.7279836183564328
+        },
+        {
+          "item_id": "QID227",
+          "n_human": 206,
+          "population_acc": 0.538252427184466,
+          "ceiling": 0.9779611650485437,
+          "population_sd_ratio": 2.587972374292471,
+          "persona_acc": 0.5385922330097087,
+          "persona_sd_ratio": 2.587972374292471
+        },
+        {
+          "item_id": "QID228",
+          "n_human": 206,
+          "population_acc": 0.5591262135922329,
+          "ceiling": 0.9758252427184467,
+          "population_sd_ratio": 2.1347436811459213,
+          "persona_acc": 0.5578155339805825,
+          "persona_sd_ratio": 2.1347436811459213
+        },
+        {
+          "item_id": "QID231",
+          "n_human": 206,
+          "population_acc": 0.5514563106796116,
+          "ceiling": 0.9058737864077671,
+          "population_sd_ratio": 1.9137181191314077,
+          "persona_acc": 0.5579530744336573,
+          "persona_sd_ratio": 1.9137181191314065
+        },
+        {
+          "item_id": "QID244_10",
+          "n_human": 206,
+          "population_acc": 0.8703883495145631,
+          "ceiling": 0.946601941747573,
+          "population_sd_ratio": 1.0362361821038748,
+          "persona_acc": 0.8719417475728156,
+          "persona_sd_ratio": 1.0362361821038748
+        },
+        {
+          "item_id": "QID244_13",
+          "n_human": 206,
+          "population_acc": 0.5146116504854369,
+          "ceiling": 0.9857281553398061,
+          "population_sd_ratio": 4.173770627136505,
+          "persona_acc": 0.5153398058252427,
+          "persona_sd_ratio": 4.173770627136505
+        },
+        {
+          "item_id": "QID244_4",
+          "n_human": 206,
+          "population_acc": 0.5330097087378641,
+          "ceiling": 0.9795145631067962,
+          "population_sd_ratio": 2.759698684094353,
+          "persona_acc": 0.5341262135922329,
+          "persona_sd_ratio": 2.759698684094353
+        },
+        {
+          "item_id": "QID245_10",
+          "n_human": 206,
+          "population_acc": 0.937135922330097,
+          "ceiling": 0.9471844660194175,
+          "population_sd_ratio": 1.0057519548380527,
+          "persona_acc": 0.9482524271844661,
+          "persona_sd_ratio": 1.0057519548380527
+        },
+        {
+          "item_id": "QID245_14",
+          "n_human": 206,
+          "population_acc": 0.5087864077669902,
+          "ceiling": 0.9907766990291265,
+          "population_sd_ratio": 5.099259846329873,
+          "persona_acc": 0.5101456310679611,
+          "persona_sd_ratio": 5.099259846329873
+        },
+        {
+          "item_id": "QID245_4",
+          "n_human": 206,
+          "population_acc": 0.5487864077669903,
+          "ceiling": 0.977766990291262,
+          "population_sd_ratio": 2.326532849981022,
+          "persona_acc": 0.5484951456310679,
+          "persona_sd_ratio": 2.326532849981022
+        },
+        {
+          "item_id": "QID246_12",
+          "n_human": 206,
+          "population_acc": 0.5,
+          "ceiling": 1.0,
+          "population_sd_ratio": NaN,
+          "persona_acc": 0.5,
+          "persona_sd_ratio": NaN
+        },
+        {
+          "item_id": "QID246_5",
+          "n_human": 206,
+          "population_acc": 0.6167475728155339,
+          "ceiling": 0.9656310679611647,
+          "population_sd_ratio": 1.5584608966221662,
+          "persona_acc": 0.6156310679611651,
+          "persona_sd_ratio": 1.5584608966221662
+        },
+        {
+          "item_id": "QID246_9",
+          "n_human": 206,
+          "population_acc": 0.9691747572815536,
+          "ceiling": 0.943495145631068,
+          "population_sd_ratio": 1.0001885725078048,
+          "persona_acc": 0.9699514563106797,
+          "persona_sd_ratio": 1.0001885725078048
+        },
+        {
+          "item_id": "QID247_10",
+          "n_human": 206,
+          "population_acc": 0.9698058252427185,
+          "ceiling": 0.9454368932038836,
+          "population_sd_ratio": 1.0001885725078048,
+          "persona_acc": 0.9720388349514565,
+          "persona_sd_ratio": 1.0001885725078048
+        },
+        {
+          "item_id": "QID247_13",
+          "n_human": 206,
+          "population_acc": 0.5090291262135922,
+          "ceiling": 0.9899029126213594,
+          "population_sd_ratio": 5.099259846329873,
+          "persona_acc": 0.5107766990291261,
+          "persona_sd_ratio": 5.099259846329873
+        },
+        {
+          "item_id": "QID247_7",
+          "n_human": 206,
+          "population_acc": 0.6603398058252428,
+          "ceiling": 0.9601941747572816,
+          "population_sd_ratio": 1.3631925476167102,
+          "persona_acc": 0.660970873786408,
+          "persona_sd_ratio": 1.3631925476167102
+        },
+        {
+          "item_id": "QID248_10",
+          "n_human": 206,
+          "population_acc": 0.9489320388349515,
+          "ceiling": 0.9439805825242719,
+          "population_sd_ratio": 1.0057519548380527,
+          "persona_acc": 0.9451456310679611,
+          "persona_sd_ratio": 1.0057519548380527
+        },
+        {
+          "item_id": "QID248_14",
+          "n_human": 206,
+          "population_acc": 0.5,
+          "ceiling": 1.0,
+          "population_sd_ratio": NaN,
+          "persona_acc": 0.5,
+          "persona_sd_ratio": NaN
+        },
+        {
+          "item_id": "QID248_4",
+          "n_human": 206,
+          "population_acc": 0.5950970873786408,
+          "ceiling": 0.9678640776699029,
+          "population_sd_ratio": 1.7279836183564328,
+          "persona_acc": 0.5942718446601941,
+          "persona_sd_ratio": 1.7279836183564328
+        },
+        {
+          "item_id": "QID250_1",
+          "n_human": 206,
+          "population_acc": 0.569514563106796,
+          "ceiling": 0.9748543689320389,
+          "population_sd_ratio": 1.9866556307619334,
+          "persona_acc": 0.5672330097087379,
+          "persona_sd_ratio": 1.9866556307619334
+        },
+        {
+          "item_id": "QID250_14",
+          "n_human": 206,
+          "population_acc": 0.5727669902912621,
+          "ceiling": 0.970485436893204,
+          "population_sd_ratio": 1.9243094452781593,
+          "persona_acc": 0.575145631067961,
+          "persona_sd_ratio": 1.9243094452781593
+        },
+        {
+          "item_id": "QID250_8",
+          "n_human": 206,
+          "population_acc": 0.8016019417475729,
+          "ceiling": 0.9514563106796118,
+          "population_sd_ratio": 1.0851728791304074,
+          "persona_acc": 0.8070388349514565,
+          "persona_sd_ratio": 1.0851728791304074
+        },
+        {
+          "item_id": "QID251_1",
+          "n_human": 206,
+          "population_acc": 0.6113106796116504,
+          "ceiling": 0.9648543689320388,
+          "population_sd_ratio": 1.5876243887676742,
+          "persona_acc": 0.610631067961165,
+          "persona_sd_ratio": 1.5876243887676742
+        },
+        {
+          "item_id": "QID251_13",
+          "n_human": 206,
+          "population_acc": 0.6183980582524272,
+          "ceiling": 0.9644660194174756,
+          "population_sd_ratio": 1.5311859412691626,
+          "persona_acc": 0.622621359223301,
+          "persona_sd_ratio": 1.5311859412691626
+        },
+        {
+          "item_id": "QID251_8",
+          "n_human": 206,
+          "population_acc": 0.9497572815533981,
+          "ceiling": 0.9428155339805826,
+          "population_sd_ratio": 1.004746561700808,
+          "persona_acc": 0.9477669902912621,
+          "persona_sd_ratio": 1.004746561700808
+        },
+        {
+          "item_id": "QID252_1",
+          "n_human": 206,
+          "population_acc": 0.6602912621359224,
+          "ceiling": 0.961747572815534,
+          "population_sd_ratio": 1.3631925476167102,
+          "persona_acc": 0.6631553398058253,
+          "persona_sd_ratio": 1.3631925476167102
+        },
+        {
+          "item_id": "QID252_14",
+          "n_human": 206,
+          "population_acc": 0.5941747572815533,
+          "ceiling": 0.965631067961165,
+          "population_sd_ratio": 1.7279836183564328,
+          "persona_acc": 0.5936407766990291,
+          "persona_sd_ratio": 1.7279836183564328
+        },
+        {
+          "item_id": "QID252_7",
+          "n_human": 206,
+          "population_acc": 0.9173786407766991,
+          "ceiling": 0.9453398058252427,
+          "population_sd_ratio": 1.0139052598586282,
+          "persona_acc": 0.9212621359223303,
+          "persona_sd_ratio": 1.0139052598586282
+        },
+        {
+          "item_id": "QID276_1",
+          "n_human": 206,
+          "population_acc": 0.6724271844660195,
+          "ceiling": 0.9597087378640776,
+          "population_sd_ratio": 1.3166232308546528,
+          "persona_acc": 0.675,
+          "persona_sd_ratio": 1.3166232308546528
+        },
+        {
+          "item_id": "QID276_14",
+          "n_human": 206,
+          "population_acc": 0.8150970873786408,
+          "ceiling": 0.9462135922330098,
+          "population_sd_ratio": 1.0758977271367605,
+          "persona_acc": 0.8161165048543689,
+          "persona_sd_ratio": 1.0758977271367605
+        },
+        {
+          "item_id": "QID276_8",
+          "n_human": 206,
+          "population_acc": 0.7917961165048544,
+          "ceiling": 0.9517475728155341,
+          "population_sd_ratio": 1.100487646164522,
+          "persona_acc": 0.7929611650485439,
+          "persona_sd_ratio": 1.100487646164522
+        },
+        {
+          "item_id": "QID277_14",
+          "n_human": 206,
+          "population_acc": 0.7766019417475729,
+          "ceiling": 0.9516504854368932,
+          "population_sd_ratio": 1.1176521622680475,
+          "persona_acc": 0.7779611650485436,
+          "persona_sd_ratio": 1.1176521622680475
+        },
+        {
+          "item_id": "QID277_2",
+          "n_human": 206,
+          "population_acc": 0.6047087378640776,
+          "ceiling": 0.9654368932038835,
+          "population_sd_ratio": 1.6188886296644733,
+          "persona_acc": 0.6069902912621359,
+          "persona_sd_ratio": 1.6188886296644733
+        },
+        {
+          "item_id": "QID277_7",
+          "n_human": 206,
+          "population_acc": 0.7213592233009709,
+          "ceiling": 0.9545631067961164,
+          "population_sd_ratio": 1.2100909969262477,
+          "persona_acc": 0.7180097087378641,
+          "persona_sd_ratio": 1.2100909969262477
+        },
+        {
+          "item_id": "QID278_1",
+          "n_human": 206,
+          "population_acc": 0.6810679611650486,
+          "ceiling": 0.9533980582524272,
+          "population_sd_ratio": 1.2891123988785291,
+          "persona_acc": 0.682135922330097,
+          "persona_sd_ratio": 1.2891123988785291
+        },
+        {
+          "item_id": "QID278_14",
+          "n_human": 206,
+          "population_acc": 0.7742233009708738,
+          "ceiling": 0.9533009708737865,
+          "population_sd_ratio": 1.1238221347153607,
+          "persona_acc": 0.7707281553398059,
+          "persona_sd_ratio": 1.1238221347153607
+        },
+        {
+          "item_id": "QID278_7",
+          "n_human": 206,
+          "population_acc": 0.788252427184466,
+          "ceiling": 0.9480582524271844,
+          "population_sd_ratio": 1.1059934412041623,
+          "persona_acc": 0.7849514563106798,
+          "persona_sd_ratio": 1.1059934412041623
+        },
+        {
+          "item_id": "QID279_1",
+          "n_human": 206,
+          "population_acc": 0.8473300970873788,
+          "ceiling": 0.945242718446602,
+          "population_sd_ratio": 1.0486210640582865,
+          "persona_acc": 0.8510679611650486,
+          "persona_sd_ratio": 1.0486210640582865
+        },
+        {
+          "item_id": "QID279_14",
+          "n_human": 206,
+          "population_acc": 0.6926699029126214,
+          "ceiling": 0.9556310679611651,
+          "population_sd_ratio": 1.264017786210076,
+          "persona_acc": 0.697621359223301,
+          "persona_sd_ratio": 1.264017786210076
+        },
+        {
+          "item_id": "QID279_7",
+          "n_human": 206,
+          "population_acc": 0.8886893203883497,
+          "ceiling": 0.9471844660194175,
+          "population_sd_ratio": 1.0259045563453546,
+          "persona_acc": 0.8882524271844661,
+          "persona_sd_ratio": 1.0259045563453546
+        },
+        {
+          "item_id": "QID288_1",
+          "n_human": 412,
+          "population_acc": 0.4647399445214979,
+          "ceiling": 0.9324514563106796,
+          "population_sd_ratio": 2.1036842771204363,
+          "persona_acc": 0.46463245492371713,
+          "persona_sd_ratio": 2.1036842771204354
+        },
+        {
+          "item_id": "QID288_2",
+          "n_human": 412,
+          "population_acc": 0.6308183079056866,
+          "ceiling": 0.9135436893203884,
+          "population_sd_ratio": 1.3202365117077106,
+          "persona_acc": 0.6330478502080445,
+          "persona_sd_ratio": 1.32023651170771
+        },
+        {
+          "item_id": "QID288_3",
+          "n_human": 412,
+          "population_acc": 0.829115811373093,
+          "ceiling": 0.9058252427184467,
+          "population_sd_ratio": 1.1868665511990388,
+          "persona_acc": 0.8265568654646325,
+          "persona_sd_ratio": 1.1868665511990384
+        },
+        {
+          "item_id": "QID289_2",
+          "n_human": 412,
+          "population_acc": 0.5566054091539528,
+          "ceiling": 0.9224757281553398,
+          "population_sd_ratio": 1.583795584280237,
+          "persona_acc": 0.555634535367545,
+          "persona_sd_ratio": 1.5837955842802363
+        },
+        {
+          "item_id": "QID289_3",
+          "n_human": 412,
+          "population_acc": 0.560246185852982,
+          "ceiling": 0.9230339805825242,
+          "population_sd_ratio": 1.6456221483191178,
+          "persona_acc": 0.5608772538141471,
+          "persona_sd_ratio": 1.6456221483191171
+        },
+        {
+          "item_id": "QID289_4",
+          "n_human": 412,
+          "population_acc": 0.5444937586685161,
+          "ceiling": 0.9262135922330097,
+          "population_sd_ratio": 1.7394227310058619,
+          "persona_acc": 0.5432073509015257,
+          "persona_sd_ratio": 1.739422731005861
+        },
+        {
+          "item_id": "QID291",
+          "n_human": 412,
+          "population_acc": 0.8798179611650485,
+          "ceiling": 0.9339077669902913,
+          "population_sd_ratio": 1.0943491484441115,
+          "persona_acc": 0.8807402912621359,
+          "persona_sd_ratio": 1.0943491484441115
+        },
+        {
+          "item_id": "QID84_12",
+          "n_human": 206,
+          "population_acc": 0.5195145631067962,
+          "ceiling": 0.9844660194174757,
+          "population_sd_ratio": 3.623527355361003,
+          "persona_acc": 0.5198058252427183,
+          "persona_sd_ratio": 3.623527355361003
+        },
+        {
+          "item_id": "QID84_4",
+          "n_human": 206,
+          "population_acc": 0.5233495145631067,
+          "ceiling": 0.9832038834951459,
+          "population_sd_ratio": 3.249033534064036,
+          "persona_acc": 0.5247572815533981,
+          "persona_sd_ratio": 3.249033534064036
+        },
+        {
+          "item_id": "QID84_9",
+          "n_human": 206,
+          "population_acc": 0.8333009708737865,
+          "ceiling": 0.9465048543689321,
+          "population_sd_ratio": 1.0632691789822426,
+          "persona_acc": 0.8270388349514564,
+          "persona_sd_ratio": 1.0632691789822426
+        },
+        {
+          "item_id": "QID9_1",
+          "n_human": 412,
+          "population_acc": 0.9103883495145633,
+          "ceiling": 0.9620388349514561,
+          "population_sd_ratio": 1.0156289616055265,
+          "persona_acc": 0.9105339805825242,
+          "persona_sd_ratio": 1.0156289616055265
+        },
+        {
+          "item_id": "QID9_10",
+          "n_human": 412,
+          "population_acc": 0.9507766990291262,
+          "ceiling": 0.9596116504854371,
+          "population_sd_ratio": 1.004746561700808,
+          "persona_acc": 0.9512621359223301,
+          "persona_sd_ratio": 1.004746561700808
+        },
+        {
+          "item_id": "QID9_11",
+          "n_human": 412,
+          "population_acc": 0.94626213592233,
+          "ceiling": 0.9635922330097086,
+          "population_sd_ratio": 1.0052369124484173,
+          "persona_acc": 0.9499029126213593,
+          "persona_sd_ratio": 1.0052369124484173
+        },
+        {
+          "item_id": "QID9_14",
+          "n_human": 412,
+          "population_acc": 0.9328883495145632,
+          "ceiling": 0.9604854368932039,
+          "population_sd_ratio": 1.0093674383316507,
+          "persona_acc": 0.931504854368932,
+          "persona_sd_ratio": 1.0093674383316507
+        },
+        {
+          "item_id": "QID9_17",
+          "n_human": 412,
+          "population_acc": 0.8980582524271845,
+          "ceiling": 0.9612621359223301,
+          "population_sd_ratio": 1.0214555110884498,
+          "persona_acc": 0.9010194174757282,
+          "persona_sd_ratio": 1.0214555110884498
+        },
+        {
+          "item_id": "QID9_18",
+          "n_human": 412,
+          "population_acc": 0.9137135922330097,
+          "ceiling": 0.9621844660194177,
+          "population_sd_ratio": 1.014753700856879,
+          "persona_acc": 0.9146601941747573,
+          "persona_sd_ratio": 1.014753700856879
+        },
+        {
+          "item_id": "QID9_22",
+          "n_human": 412,
+          "population_acc": 0.9316262135922331,
+          "ceiling": 0.9580097087378641,
+          "population_sd_ratio": 1.0100587984346396,
+          "persona_acc": 0.9317961165048544,
+          "persona_sd_ratio": 1.0100587984346396
+        },
+        {
+          "item_id": "QID9_25",
+          "n_human": 412,
+          "population_acc": 0.9085436893203885,
+          "ceiling": 0.9582524271844661,
+          "population_sd_ratio": 1.0165312431885718,
+          "persona_acc": 0.9102427184466021,
+          "persona_sd_ratio": 1.0165312431885718
+        },
+        {
+          "item_id": "QID9_3",
+          "n_human": 412,
+          "population_acc": 0.9109708737864078,
+          "ceiling": 0.9611650485436894,
+          "population_sd_ratio": 1.0165312431885718,
+          "persona_acc": 0.9136407766990291,
+          "persona_sd_ratio": 1.0165312431885718
+        },
+        {
+          "item_id": "QID9_32",
+          "n_human": 412,
+          "population_acc": 0.9133252427184467,
+          "ceiling": 0.9614077669902913,
+          "population_sd_ratio": 1.0156289616055265,
+          "persona_acc": 0.9143446601941748,
+          "persona_sd_ratio": 1.0156289616055265
+        },
+        {
+          "item_id": "QID9_37",
+          "n_human": 412,
+          "population_acc": 0.9028883495145632,
+          "ceiling": 0.9591747572815534,
+          "population_sd_ratio": 1.019402332105785,
+          "persona_acc": 0.9017718446601941,
+          "persona_sd_ratio": 1.019402332105785
+        },
+        {
+          "item_id": "QID9_6",
+          "n_human": 412,
+          "population_acc": 0.9726213592233011,
+          "ceiling": 0.9598058252427185,
+          "population_sd_ratio": 1.0009557467919195,
+          "persona_acc": 0.9751941747572818,
+          "persona_sd_ratio": 1.0009557467919195
+        }
+      ],
+      "run": {
+        "reference": "ref-uniform",
+        "data": "uniform"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "a": "deepseek-v4.1-flash-nothink",
+      "b": "ref-train-crowd",
+      "metric": "persona_acc",
+      "n_items": 107,
+      "mean": -0.17129561411412098,
+      "ci_low": -0.19922627774341337,
+      "ci_high": -0.14422150046898558
+    },
+    {
+      "a": "deepseek-v4.1-flash-nothink",
+      "b": "ref-train-crowd",
+      "metric": "population_acc",
+      "n_items": 107,
+      "mean": -0.16819956234772226,
+      "ci_low": -0.19620150147193183,
+      "ci_high": -0.14105799704690253
+    },
+    {
+      "a": "deepseek-v4.1-flash-nothink",
+      "b": "ref-uniform",
+      "metric": "persona_acc",
+      "n_items": 107,
+      "mean": 0.0646048553296347,
+      "ci_low": 0.0379799063686446,
+      "ci_high": 0.09400096245989695
+    },
+    {
+      "a": "deepseek-v4.1-flash-nothink",
+      "b": "ref-uniform",
+      "metric": "population_acc",
+      "n_items": 107,
+      "mean": 0.06880458994322101,
+      "ci_low": 0.041341878257729794,
+      "ci_high": 0.09936621883945833
+    },
+    {
+      "a": "ref-train-crowd",
+      "b": "ref-uniform",
+      "metric": "persona_acc",
+      "n_items": 107,
+      "mean": 0.23590046944375567,
+      "ci_low": 0.20653380552850803,
+      "ci_high": 0.2651870939702647
+    },
+    {
+      "a": "ref-train-crowd",
+      "b": "ref-uniform",
+      "metric": "population_acc",
+      "n_items": 107,
+      "mean": 0.2370041522909433,
+      "ci_low": 0.20757369670920844,
+      "ci_high": 0.26621743374024837
+    }
+  ],
+  "git_sha": "d926ef81baa0cf7c837eff69cd77ee388393316e",
+  "dirty": false,
+  "seed": 0,
+  "n_splits": 200,
+  "n_boot": 2000,
+  "created_at": "2026-11-20T11:30:14+00:00"
+}

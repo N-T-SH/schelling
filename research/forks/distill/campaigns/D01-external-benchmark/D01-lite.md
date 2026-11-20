@@ -1,7 +1,7 @@
 # D01-lite: do decision-tuned models predict people better than general LLMs?
 
-**Status:** approved by the human on 2026-11-20 as an amendment to the D01 contract. Tooling is
-built and tested; no model has been scored and nothing has been spent. Still needed for the API
+**Status:** approved by the human on 2026-11-20 as an amendment to the D01 contract. DeepSeek V4.1
+Flash scored (results below); Qwentaur runs pending (Colab GPU quota). Still needed for the API
 models: an OpenRouter key in `.env` and a spend cap. The Colab runs are free and can start now.
 
 **Dry-run cost estimate (2026-11-20, all 10,807 prompts, no network):** about 3.1 M input tokens
@@ -84,6 +84,62 @@ Any other model works if it writes `results/<name>/part-*.jsonl` lines of
   (`key_mass` in each result line) was about 0.16 for the untuned SmolLM2 base and about 1.0 for
   its adapter. A low share means the base model is unsure of the format, not of the decision;
   report it beside the base model's scores.
+
+## Results so far (2026-11-20)
+
+DeepSeek V4.1 Flash only; Qwentaur not run yet (Colab GPU quota). Validation people only, each
+person's first answer (wave 1). Accuracy = 1 - TVD between predicted and human answer
+distributions, averaged over items, 95 % bootstrap intervals over items. References: uniform
+guess, and the training crowd (each item's answer distribution among `heldout_person` train
+people; the best possible prediction that ignores who is asked). Split-half human comparison
+on these items: 0.921.
+
+**Full run, reasoning off** (10,807 prompts, 100 people, every reply parsed).
+Source: `reports/FD-d01lite/nothink-vs-refs/metrics.json`, git d926ef81, clean.
+
+| Predictor | Accuracy, no persona | Accuracy, persona | Spread (SD ratio) |
+|---|---|---|---|
+| Uniform | 0.713 | 0.713 | 1.24 |
+| DeepSeek, reasoning off | 0.779 [0.752, 0.805] | 0.776 [0.748, 0.803] | 1.08 |
+| Training crowd | 0.942 | 0.942 | 1.00 |
+
+- DeepSeek minus uniform: +0.066 [0.038, 0.096]; minus training crowd: -0.163 [-0.192, -0.135]
+  (paired over items).
+- Persona prompts make individual answers slightly less likely: NLL +0.018 [0.010, 0.027].
+- Bias test (13 contrasts, 10 with a clear human effect): correlation 0.70 and 6 of 10 signs
+  right without persona; 0.88 and 10 of 10 with persona.
+- People repeat their own answer on retest 68 % of the time (54 items, 7,215 pairs), which
+  limits individual-level prediction for anyone.
+- Pooling retest answers instead (`nothink-vs-refs-allwaves`) changes accuracy by 0.003 or less.
+
+**Reasoning on against off** (2,247 prompts: all 107 population prompts plus 20 people; reasoning
+"high", 8,000-token limit). 134 reasoning replies (6 %) never answered, mostly by thinking past
+8,000 tokens, concentrated on a few items (QID189 to 191 have 40). Main comparison on the 2,113
+prompts both settings answered. Source: `reports/FD-d01lite/think-vs-nothink-answered/metrics.json`,
+git 9d597f99, clean; the version with unanswered prompts scored as uniform is
+`think-vs-nothink-subset` and agrees.
+
+| Predictor | Accuracy, no persona | Accuracy, persona | Spread | Persona minus population NLL |
+|---|---|---|---|---|
+| DeepSeek, reasoning off | 0.787 [0.759, 0.815] | 0.775 [0.749, 0.803] | 1.07 | +0.021 [0.003, 0.038] |
+| DeepSeek, reasoning high | 0.857 [0.835, 0.877] | 0.852 [0.831, 0.871] | 1.01 | +0.028 [0.007, 0.049] |
+| Training crowd | 0.943 | 0.942 | 1.00 | 0 |
+
+- Reasoning raises accuracy by 0.071 [0.038, 0.104] without persona (93 items) and 0.076
+  [0.048, 0.106] with persona (107 items), paired. It closes about 45 % of the gap from
+  reasoning-off to the training crowd, and its spread matches the human spread.
+- Persona prompts still do not help individual prediction, with or without reasoning.
+- Bias test with persona: correlation 0.93 with reasoning, 0.82 without; signs right 8 of 10
+  with reasoning, 10 of 10 without. With 10 contrasts this is not a clear difference.
+
+**Spend:** $3.96 billed by OpenRouter for all DeepSeek calls (from the `cost` field of each
+response in `cache/llm/usage.jsonl`), plus about $0.03 for the first smoke test whose records
+were lost with the deleted worktree. Reasoning off costs about $0.0001 per prompt; reasoning
+high about $0.0017.
+
+**Reading so far:** a general model with no reasoning beats a uniform guess but sits far from
+the simple training crowd; reasoning helps a lot; demographic personas do not help it predict a
+given person. The decision-tuned comparison (Qwentaur against its base) is the open part.
 
 ## Known limits
 
