@@ -69,6 +69,9 @@ class LLMSpec(BaseModel):
     person_subsample: int = 0
     subsample_seed: int = 0
     extra: dict[str, Any] = {}
+    # Reuse a non-empty cached answer made with this lower token limit, so raising the limit
+    # re-asks only the questions whose reasoning ran out of tokens.
+    reuse_max_tokens: int | None = None
 
 
 def build_messages(
@@ -184,9 +187,21 @@ class LLMPromptBaseline:
         self, question: str, labels: list[str], attrs: dict[str, Any] | None
     ) -> dict[str, Any]:
         """The raw cached-or-fresh response for one request (used by the paid-call script)."""
+        messages = build_messages(question, labels, attrs, self.spec.wording)
+        lookup = getattr(self._client, "cached", None)
+        if self.spec.reuse_max_tokens is not None and lookup is not None:
+            prior = lookup(
+                self.spec.model,
+                messages,
+                max_tokens=self.spec.reuse_max_tokens,
+                temperature=0.0,
+                **self.spec.extra,
+            )
+            if prior is not None and isinstance(prior.get("text"), str) and prior["text"].strip():
+                return dict(prior)
         return self._client.chat(
             self.spec.model,
-            build_messages(question, labels, attrs, self.spec.wording),
+            messages,
             max_tokens=self.spec.max_tokens,
             temperature=0.0,
             **self.spec.extra,

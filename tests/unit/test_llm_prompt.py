@@ -243,3 +243,28 @@ def test_make_baseline_loads_a_spec_file(tmp_path: Path) -> None:
     base = make_baseline(str(path))
     assert isinstance(base, LLMPromptBaseline)
     assert base.name == "e-test"
+
+
+def test_raised_limit_reuses_answered_and_re_asks_only_empty_replies(tmp_path: Path) -> None:
+    class EmptyForYesNo(FakeLLM):
+        def __call__(
+            self, url: str, headers: dict[str, str], body: dict[str, Any]
+        ) -> dict[str, Any]:
+            out = super().__call__(url, headers, body)
+            if "own a car" in body["messages"][-1]["content"]:
+                out["choices"][0]["message"]["content"] = None  # ran out of tokens
+            return out
+
+    rows = _frame().drop_duplicates("item_id")
+    low = _online(_spec(tmp_path, max_tokens=1000), EmptyForYesNo()).fit(pd.DataFrame(), _persons())
+    low.predict_proba(rows)
+    assert low.stats["parse_failures"] == 1
+
+    llm = FakeLLM()
+    high = _online(_spec(tmp_path, max_tokens=2000, reuse_max_tokens=1000), llm).fit(
+        pd.DataFrame(), _persons()
+    )
+    probs = high.predict_proba(rows)
+    assert len(llm.calls) == 1 and "own a car" in llm.calls[0][-1]["content"]
+    assert high.stats["parse_failures"] == 0
+    assert all(np.isclose(p.sum(), 1) for p in probs)

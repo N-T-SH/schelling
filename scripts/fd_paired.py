@@ -40,12 +40,19 @@ def main(
     persons: Annotated[int, typer.Option(help="seeded person subsample; 0 keeps everyone")] = 0,
     seed: Annotated[int, typer.Option()] = 0,
     n_boot: Annotated[int, typer.Option()] = 10_000,
+    exclude_items: Annotated[
+        Path | None, typer.Option(help="JSON with an 'items' list to leave out (e.g. unanswered)")
+    ] = None,
 ) -> None:
     records = load_partition(processed, split, "val", splits_dir=splits_dir)
     records = records[records["source"] == source]
     rows = compare.join_rows(records, compare.load_predictions(a), compare.load_predictions(b))
     if persons:
         rows = compare.subsample_persons(rows, persons, seed)
+    excluded: list[str] = []
+    if exclude_items is not None:
+        excluded = sorted(json.loads(exclude_items.read_text())["items"])
+        rows = rows[~rows["item_id"].isin(excluded)]
     y = rows["response"].to_numpy(dtype=int)
     result = {
         "a": str(a),
@@ -54,6 +61,8 @@ def main(
         "partition": "val",
         "source": source,
         "unit": unit,
+        "excluded_items": excluded,
+        "exclude_items_file": None if exclude_items is None else str(exclude_items),
         "n_rows": len(rows),
         "n_persons": int(rows["person_id"].nunique()),
         "n_items": int(rows["item_id"].nunique()),
