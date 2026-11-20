@@ -37,7 +37,7 @@ app = typer.Typer(add_completion=False)
 @app.command()
 def main(
     spec: Annotated[Path, typer.Option(help="LLMSpec JSON")],
-    split: Annotated[str, typer.Option()],
+    split: Annotated[str, typer.Option(help="one split, or several joined by commas")],
     in_per_m: Annotated[float, typer.Option(help="USD per million input tokens")],
     out_per_m: Annotated[float, typer.Option(help="USD per million output tokens")],
     processed: Annotated[Path, typer.Option()] = Path("data/processed"),
@@ -49,10 +49,22 @@ def main(
     limit: Annotated[int, typer.Option(help="at most this many requests (smoke test)")] = 0,
     env: Annotated[Path, typer.Option(help=".env holding the API key")] = Path(".env"),
     provider: Annotated[str, typer.Option(help="fireworks or openrouter")] = "fireworks",
+    partitions: Annotated[
+        str, typer.Option(help="train and/or val, joined by commas (test is sealed)")
+    ] = "val",
+    shard: Annotated[
+        str, typer.Option(help="i/n: only every n-th request from i (parallel runs)")
+    ] = "0/1",
 ) -> None:
     cfg = LLMSpec.model_validate_json(spec.read_text())
-    frame = load_partition(processed, split, "val", splits_dir=splits_dir)
-    frame = frame[frame["source"] == source].reset_index(drop=True)
+    frame = pd.concat(
+        [
+            load_partition(processed, s, part, splits_dir=splits_dir)
+            for s in split.split(",")
+            for part in partitions.split(",")
+        ]
+    )
+    frame = frame[frame["source"] == source].drop_duplicates("record_id").reset_index(drop=True)
     persons = pd.read_parquet(processed / "persons_twin2k.parquet")
     client = None
     if go:
@@ -73,7 +85,8 @@ def main(
     base = LLMPromptBaseline(cfg, client=client)
     base.fit(frame.iloc[:0], persons)
     unique = {json.dumps(r, sort_keys=True, default=str): r for r in base.requests(frame)}
-    reqs = list(unique.values())[: limit or None]
+    i, n = (int(x) for x in shard.split("/"))
+    reqs = list(unique.values())[i::n][: limit or None]
     chars = sum(
         sum(len(m["content"]) for m in build_messages(q, labels, attrs, cfg.wording))
         for q, labels, attrs in reqs
@@ -85,6 +98,7 @@ def main(
         "model": cfg.model,
         "form": cfg.form,
         "split": split,
+        "partitions": partitions,
         "rows": len(frame),
         "requests": len(reqs),
         "est_input_tokens": round(est_in),
