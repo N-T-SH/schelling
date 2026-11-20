@@ -268,3 +268,13 @@ def test_raised_limit_reuses_answered_and_re_asks_only_empty_replies(tmp_path: P
     assert len(llm.calls) == 1 and "own a car" in llm.calls[0][-1]["content"]
     assert high.stats["parse_failures"] == 0
     assert all(np.isclose(p.sum(), 1) for p in probs)
+
+
+def test_rows_outside_the_chosen_sources_get_uniform_and_no_call(tmp_path: Path) -> None:
+    frame = _frame().drop_duplicates("item_id").reset_index(drop=True)
+    frame["source"] = ["twin2k", "psych101", "twin2k"]
+    llm = FakeLLM()
+    base = _online(_spec(tmp_path, sources=["twin2k"]), llm).fit(pd.DataFrame(), _persons())
+    probs = base.predict_proba(frame)
+    assert len(llm.calls) == 2 and base.skipped_rows == 1
+    assert probs[1] == pytest.approx(np.full(3, 1 / 3))

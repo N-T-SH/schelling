@@ -72,6 +72,9 @@ class LLMSpec(BaseModel):
     # Reuse a non-empty cached answer made with this lower token limit, so raising the limit
     # re-asks only the questions whose reasoning ran out of tokens.
     reuse_max_tokens: int | None = None
+    # Ask the LLM about rows of these sources only; other rows get a uniform guess and are
+    # counted as skipped (e.g. Psych-101, which is outside the fork's claim, decision 0001).
+    sources: list[str] | None = None
 
 
 def build_messages(
@@ -137,6 +140,7 @@ class LLMPromptBaseline:
         )
         self._attrs: dict[str, dict[str, Any]] = {}
         self.stats = {"requests": 0, "parse_failures": 0, "fallback_rows": 0}
+        self.skipped_rows = 0
 
     @classmethod
     def from_spec(cls, path: str | Path, client: ChatClient | None = None) -> LLMPromptBaseline:
@@ -219,12 +223,24 @@ class LLMPromptBaseline:
 
     def predict_proba(self, frame: pd.DataFrame) -> list[np.ndarray]:
         self.stats = {"requests": 0, "parse_failures": 0, "fallback_rows": 0}
+        self.skipped_rows = 0
+        wanted = self.spec.sources
+        sources = frame["source"] if wanted is not None else [None] * len(frame)
         memo: dict[str, np.ndarray] = {}
         out = []
         persona = self.spec.form == "persona"
-        for (question, ordered, attrs), qtype, options, levels in zip(
-            self.requests(frame), frame["qtype"], frame["options"], frame["levels"], strict=True
+        for (question, ordered, attrs), qtype, options, levels, source in zip(
+            self.requests(frame),
+            frame["qtype"],
+            frame["options"],
+            frame["levels"],
+            sources,
+            strict=True,
         ):
+            if wanted is not None and source not in wanted:
+                self.skipped_rows += 1
+                out.append(np.full(len(ordered), 1 / len(ordered)))
+                continue
             self.stats["fallback_rows"] += persona and attrs is None
             key = json.dumps([question, ordered, attrs], sort_keys=True, default=str)
             if key not in memo:
@@ -236,6 +252,8 @@ class LLMPromptBaseline:
                 None if levels is None else list(levels),
             )
             out.append(np.array([by_label[lab] for lab in labels]))
+        if self.skipped_rows:
+            print(f"[{self.name}] rows outside {wanted}: {self.skipped_rows}", file=sys.stderr)
         if self.stats["parse_failures"]:
             print(f"[{self.name}] parse failures: {self.stats['parse_failures']}", file=sys.stderr)
         return out
