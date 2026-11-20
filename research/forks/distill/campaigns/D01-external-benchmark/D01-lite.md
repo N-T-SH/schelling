@@ -1,8 +1,9 @@
 # D01-lite: do decision-tuned models predict people better than general LLMs?
 
-**Status:** approved by the human on 2026-11-20 as an amendment to the D01 contract. DeepSeek V4.1
-Flash and Qwentaur-4B (with its base) scored; results below. Qwentaur-14B skipped by the human;
-Qwen3.8-27B dropped for budget.
+**Status:** closed by the human on 2026-11-20. Approved the same day as an amendment to the D01
+contract. DeepSeek V4.1 Flash and Qwentaur-4B (with its base) scored; results below. Qwentaur-14B
+skipped by the human; Qwen3.8-27B dropped for budget; contamination probes not built. Conclusions
+and recommended fork updates are at the end.
 
 **Dry-run cost estimate (2026-11-20, all 10,807 prompts, no network):** about 3.1 M input tokens
 per model. Assuming 300 output tokens per call: DeepSeek V4.1 Flash about $4.82, Qwen3.8-27B
@@ -179,3 +180,62 @@ model predict a given person in a way that can be credited to the demographics.
 - Stated probabilities (API models) and log-probabilities (Qwentaur) are different readouts; the
   API models' log-probability readout is not built.
 - Only the 4B Qwentaur was run; whether scale changes the picture is untested.
+
+## Closed: conclusions and recommended fork updates (2026-11-20)
+
+Scope reminder: D01-lite covers **seen** questions only (decision items of `heldout_person`, where a
+training crowd exists). The fork's headline regime, new questions (`heldout_item`), was not tested.
+Recommendations below are proposals; none of the D02 to D05 contracts is edited until the human
+approves.
+
+### What D01-lite established
+
+1. **On seen questions the training crowd is far ahead of every model** (accuracy 0.942 against at
+   most 0.857; NLL of a person's real answer 0.737 against 0.928 for DeepSeek reasoning-off; sources
+   above). The training crowd is the same idea as B1, so this matches D01 H1 on the decision items.
+2. **A general LLM carries real but modest signal without reasoning** (0.779, a quarter of the way
+   from uniform 0.713 to the crowd 0.942), and **reasoning adds a lot** (+0.071 to +0.076 paired).
+3. **Demographic personas do not give an LLM individual-level signal.** DeepSeek's persona prompts
+   make real answers less likely (NLL +0.018). Qwen's improvement is shared by its untuned base and
+   leaves it at about uniform (0.975 against 0.999).
+4. **Psych-101 decision tuning does not transfer to these items.** Qwentaur-4B beats its base but
+   only ties a uniform guess.
+5. **No variance collapse at the population level.** Median SD ratios are 1.01 to 1.10 for DeepSeek
+   (slightly too spread, not too narrow). This argues against D01 H3 and FA6, with a caveat: it is the
+   spread of the predicted distribution, not the spec's sampled SD ratio.
+6. **An LLM knows the direction of classic effects.** On the 10 bias contrasts with a clear human
+   effect, DeepSeek with persona correlates 0.88 (10 of 10 signs right). M4b on unseen experiments
+   is at chance (correlation 0.0248 <!-- src: reports/M4b-pooled-tt/effects.json#effects.summary.correlation.mean -->).
+   These are textbook effects, so memorisation is not ruled out.
+7. **Operations:** reasoning-off calls cost about $0.0001 each and always parsed. Reasoning-high calls
+   cost about $0.0017, and 6 % never answered within 8,000 tokens, clustered on a few items.
+
+### Recommended updates, in priority order
+
+1. **Run the real D02 gate now, cheaply.** Population prompts for the 28 `heldout_item` val items,
+   DeepSeek reasoning-high and reasoning-off, scored through `llm_prompt.py` and the sealed harness
+   against B1 and M4b on NLL. That is 56 calls, well under $0.25 by arithmetic, inside the remaining
+   OpenRouter credit, but it is paid, so it needs approval. This answers the fork's go/no-go directly;
+   everything below depends on it.
+2. **Make the teacher population-only and send it to the prior path.** Finding 3 says
+   persona-conditioned teacher labels carry no person signal, so drop D02 idea 5 (K = 8 persona
+   labels) and make idea 3 (teacher trains the question-to-prior path, people learned from human data)
+   the default design. This cuts the label calls 9-fold.
+3. **Use reasoning for teacher labels and re-cost the bank.** At the measured $0.0017 per call, a
+   10 k population-only bank is about $17 and 50 k about $85 (arithmetic, before a dry run). Add an
+   answer-rate guard (drop or re-ask questions that exceed the token limit) and track billed cost from
+   the response, as `run_api.py` now does.
+4. **Add DeepSeek V4.1 Flash as a candidate teacher beside `gpt-oss-120b`,** chosen by the gate run.
+   Its licence for training on outputs is unverified; record it as a new assumption and check it
+   before any bank is generated.
+5. **Raise D04 (treatment effects) in priority, behind a contamination probe.** Finding 6 is the
+   clearest sign that an LLM knows something M4b cannot learn from 435 questions. Before relying on
+   it, build the paraphrase-gap probe the D01 contract already lists, using the M5 paraphrases.
+6. **Drop the Psych-101 models (Centaur B6, Qwentaur) as teachers or headline comparators.** Keep
+   finding 4 as a reported result.
+7. **Lower the D03 risk estimate.** Update FA6 with finding 5 and keep D03 as a check, not a main
+   campaign. Note that the opposite problem (too spread) is what was seen.
+8. **Keep the fork's target on new questions and experiments.** On seen questions the crowd wins
+   by a wide margin, so a distilled model can only add value where no crowd exists. That is already
+   the design; D01-lite supports it.
+
