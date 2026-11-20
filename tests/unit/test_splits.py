@@ -196,3 +196,56 @@ def test_fold_is_deterministic_and_seed_dependent() -> None:
     a = assign_partitions(f, "heldout_experiment_f0", seed=0)
     assert a.equals(assign_partitions(f, "heldout_experiment_f0", seed=0))
     assert len({fold_experiment(0, s) for s in range(8)}) > 1
+
+
+# ---- item folds (decision 0007) -----------------------------------------------------------
+
+ITEM_FOLDS = [f"heldout_item_f{k}" for k in range(5)]
+
+
+def test_item_fold_test_rows_equal_heldout_item_test(frame: pd.DataFrame) -> None:
+    # The sealed test partition must not move: every fold's test is heldout_item's test.
+    base = set(frame[assign_partitions(frame, "heldout_item", seed=0) == "test"].record_id)
+    for name in ITEM_FOLDS:
+        fold = assign_partitions(frame, name, seed=0)
+        assert set(frame[fold == "test"].record_id) == base
+
+
+def test_every_non_test_item_is_val_in_exactly_one_item_fold(frame: pd.DataFrame) -> None:
+    base = assign_partitions(frame, "heldout_item", seed=0)
+    pool = set(frame[base != "test"].item_id)
+    seen: list[str] = []
+    for name in ITEM_FOLDS:
+        fold = assign_partitions(frame, name, seed=0)
+        seen += sorted(set(frame[fold == "val"].item_id))
+    assert sorted(seen) == sorted(pool)
+
+
+def test_item_fold_is_item_disjoint_and_never_trains_on_test_items(frame: pd.DataFrame) -> None:
+    test_items = set(frame[assign_partitions(frame, "heldout_item", seed=0) == "test"].item_id)
+    for name in ITEM_FOLDS:
+        f = frame.assign(partition=assign_partitions(frame, name, seed=0))
+        train = set(f[f.partition == "train"].item_id)
+        assert train.isdisjoint(set(f[f.partition == "val"].item_id))
+        assert train.isdisjoint(test_items)
+        assert (f.partition.notna()).all()  # nothing excluded before contamination removal
+
+
+def test_item_folds_are_balanced_within_one_item_per_source(frame: pd.DataFrame) -> None:
+    for src in frame.source.unique():
+        g = frame[frame.source == src]
+        sizes = [
+            g[assign_partitions(g, name, seed=0) == "val"].item_id.nunique() for name in ITEM_FOLDS
+        ]
+        assert max(sizes) - min(sizes) <= 1
+
+
+def test_item_folds_are_deterministic_and_seed_dependent(frame: pd.DataFrame) -> None:
+    a = assign_partitions(frame, "heldout_item_f2", seed=0)
+    assert a.equals(assign_partitions(frame, "heldout_item_f2", seed=0))
+    assert not a.equals(assign_partitions(frame, "heldout_item_f2", seed=1))
+
+
+def test_item_fold_manifest_records_its_fold(frame: pd.DataFrame) -> None:
+    m = split_manifest(frame, "heldout_item_f4", seed=0)
+    assert m["item_fold"] == 4 and m["n_item_folds"] == 5

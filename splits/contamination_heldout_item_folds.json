@@ -1,0 +1,25 @@
+{
+  "threshold": 0.8,
+  "folds": {
+    "heldout_item_f0": {
+      "n_held_items": 360,
+      "n_removed_val": 214
+    },
+    "heldout_item_f1": {
+      "n_held_items": 360,
+      "n_removed_val": 203
+    },
+    "heldout_item_f2": {
+      "n_held_items": 360,
+      "n_removed_val": 209
+    },
+    "heldout_item_f3": {
+      "n_held_items": 360,
+      "n_removed_val": 224
+    },
+    "heldout_item_f4": {
+      "n_held_items": 359,
+      "n_removed_val": 215
+    }
+  }
+}
