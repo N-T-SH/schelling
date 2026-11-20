@@ -2,8 +2,9 @@
 
 import hashlib
 import json
+from collections.abc import Collection
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Any
 
 import pandas as pd
 import typer
@@ -113,10 +114,26 @@ def data_splits(
         keyed[part == "train"], keyed[part.isin(["val", "test"])]
     )
     removed = rep["remove_item_ids"]
+    fold_reports: dict[str, Any] = {}
     for name in splits.SPLIT_NAMES:
-        excl = removed if name == "heldout_item" else ()
+        excl: Collection[str] = removed if name == "heldout_item" else ()
+        if name.startswith(splits.ITEM_FOLD_PREFIX):
+            # Decision 0007: the same rule per fold (val items near-duplicating that fold's
+            # train items leave val), plus heldout_item's removals so test stays identical.
+            fpart = splits.assign_partitions(frame, name, seed)
+            frep = contamination.contamination_report(
+                keyed[fpart == "train"], keyed[fpart == "val"]
+            )
+            excl = sorted(set(removed) | set(frep["remove_item_ids"]))
+            fold_reports[name] = {
+                "n_held_items": frep["n_held_items"],
+                "n_removed_val": len(frep["remove_item_ids"]),
+            }
         path = splits.write_split(splits.split_manifest(frame, name, seed, excl), out)
         typer.echo(f"wrote {path}")
+    (out / "contamination_heldout_item_folds.json").write_text(
+        json.dumps({"threshold": rep["threshold"], "folds": fold_reports}, indent=2) + "\n"
+    )
     summary = {
         "threshold": rep["threshold"],
         "n_held_items": rep["n_held_items"],

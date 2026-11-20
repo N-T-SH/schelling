@@ -23,8 +23,13 @@ SPLIT_NAMES = (
     "retest",
     # Leave-one-experiment-out: fold k holds out one of the 8 experiments in effects_pairs.yaml.
     *(f"heldout_experiment_f{k}" for k in range(8)),
+    # Item folds (decision 0007): the non-test items of heldout_item in 5 folds, for comparing
+    # models on unseen questions with more than one fold's worth of items.
+    *(f"heldout_item_f{k}" for k in range(5)),
 )
 EXPERIMENT_PREFIX = "heldout_experiment_f"
+ITEM_FOLD_PREFIX = "heldout_item_f"
+N_ITEM_FOLDS = 5
 VAL_FRAC = 0.10
 TEST_FRAC = 0.10
 
@@ -51,6 +56,18 @@ def _rank_assign(units: pd.Series, source: pd.Series, seed: int, salt: str) -> p
         label = {u: "val" for u in uniq[:n_val]}
         label |= {u: "test" for u in uniq[n_val : n_val + n_test]}
         out[mask] = units[mask].map(lambda u, lab=label: lab.get(u, "train"))
+    return out
+
+
+def _fold_assign(units: pd.Series, source: pd.Series, seed: int, salt: str, k: int) -> pd.Series:
+    """Map each row to a fold 0..k-1 by its unit's hash rank within the row's source, so fold
+    sizes differ by at most one unit per source."""
+    out = pd.Series(-1, index=units.index, dtype=int)
+    for src in source.unique():
+        mask = source == src
+        uniq = sorted(units[mask].unique(), key=lambda u: _h(seed, salt, str(u)))
+        fold = {u: i % k for i, u in enumerate(uniq)}
+        out[mask] = units[mask].map(fold)
     return out
 
 
@@ -103,6 +120,25 @@ def _assign(frame: pd.DataFrame, name: str, seed: int, direction: str) -> pd.Ser
             out[order[a:b]] = "val"
             out[order[b:]] = "test"
         return out
+    if name.startswith(ITEM_FOLD_PREFIX):
+        # Item fold k: test is heldout_item's test, unchanged and still sealed. The remaining
+        # items are ranked into N_ITEM_FOLDS folds; fold k's items are val, the others train.
+        # Every non-test item is val in exactly one fold, scored by a model that never saw it.
+        fold = int(name[len(ITEM_FOLD_PREFIX) :])
+        base = _rank_assign(frame["item_id"], frame["source"], seed, "heldout_item")
+        pool = base != "test"
+        # Fold over the non-test items only, so folds are balanced.
+        which = _fold_assign(
+            frame.loc[pool, "item_id"],
+            frame.loc[pool, "source"],
+            seed,
+            "heldout_item_folds",
+            N_ITEM_FOLDS,
+        )
+        out = pd.Series("test", index=frame.index, dtype=object)
+        out[which.index[which == fold]] = "val"
+        out[which.index[which != fold]] = "train"
+        return out
     if name.startswith(EXPERIMENT_PREFIX):
         # Fold k: experiment e_k is absent from train for everyone. Its val and test rows are the
         # val and test persons of heldout_person; every other row of val and test persons is
@@ -145,6 +181,9 @@ def split_manifest(
         "removed_item_ids": sorted(exclude_item_ids),
         "assignment_hash": hashlib.sha256(joined.encode()).hexdigest(),
     }
+    if name.startswith(ITEM_FOLD_PREFIX):
+        body["item_fold"] = int(name[len(ITEM_FOLD_PREFIX) :])
+        body["n_item_folds"] = N_ITEM_FOLDS
     if name.startswith(EXPERIMENT_PREFIX):
         body["held_out_experiment"] = fold_experiment(int(name[len(EXPERIMENT_PREFIX) :]), seed)
     body["manifest_hash"] = hashlib.sha256(json.dumps(body, sort_keys=True).encode()).hexdigest()

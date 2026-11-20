@@ -61,5 +61,5 @@ def test_build_twice_gives_identical_manifests_and_splits(
     for p in sorted((tmp_path / "splits_a").glob("*.json")):
         assert p.read_text() == (tmp_path / "splits_b" / p.name).read_text()
     assert (
-        len(list((tmp_path / "splits_a").glob("*.json"))) == 15
-    )  # fourteen splits + contamination
+        len(list((tmp_path / "splits_a").glob("*.json"))) == 21
+    )  # nineteen splits + two contamination reports (decision 0007 adds 5 folds and a report)
