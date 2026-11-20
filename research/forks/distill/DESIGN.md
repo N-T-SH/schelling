@@ -1,6 +1,8 @@
 # Fork D: distilled prior, corrected on human data
 
-**Status:** draft for human review (2026-11-11). Nothing here has been run. No money has been spent.
+**Status:** draft for human review. Written 2026-11-11; revised 2026-11-20 after D01-lite and the D02
+gate (§3a), with the D01-lite recommendations folded in and a red-team review (§9). The D02 to D05
+contracts in `campaigns/` are not yet changed to match; that waits for the human's approval of §9.
 **Branch:** `fork/distill` (worktree `.claude/worktrees/fork-distill`), cut from `m5/licence-checks` at `463dd4c`.
 **Decision record:** `docs/decisions/F001-distilled-prior-fork.md`.
 
@@ -42,8 +44,13 @@ human answer distributions**. They predict people from general knowledge only.
 | --- | --- | --- | --- |
 | E1 | Frontier closed LLM, zero-shot, asked for a probability per option | none (population prompt) | headline comparator |
 | E2 | Same LLM | the 14 demographic attributes Schelling's person tower sees | headline comparator, per person |
-| E3 | Open-weight LLM (`gpt-oss-120b` on Fireworks, A19 verified) | none and 14 attributes | the candidate teacher; also a cheap comparator |
+| E3 | Open-weight LLM (`gpt-oss-120b` on Fireworks, A19 verified) | none and 14 attributes | a candidate teacher; also a cheap comparator |
+| E3b | DeepSeek V4.1 Flash (open weights, OpenRouter), reasoning high | none | candidate teacher; passed the D02 gate (§3a); licence for training on its outputs unverified (FA9) |
 | E4 | Jev (spec baseline B4) | person and situation as `state` | only if the human supplies a key; A10 is unverified |
+
+Psych-101 fine-tunes (Centaur, B6; Qwentaur) are **dropped** as teachers and headline comparators:
+in D01-lite, Qwentaur-4B only tied a uniform guess on Twin-2K-500 decision items. The result stays as
+a reported finding.
 
 E1 and E2 are the spec's B5 in two person conditions. Reference points that *are* trained on human
 answers, shown beside them but not part of the claim: B1, B3, M4b, and Centaur (B6, Psych-101 only,
@@ -103,6 +110,41 @@ about 28 Twin-2K-500 val items. The bootstrap there must resample *items*, and i
 If they are too wide to decide anything, the fix is item-fold cross-validation, which is a split change
 and needs an `eval-change/` branch and the human's approval (open question 2).
 
+## 3a. What D01 found (2026-11-20)
+
+Two runs, both on `val`. Full write-ups: `campaigns/D01-external-benchmark/D01-lite.md` (seen decision
+questions, 100 persons) and `campaigns/D01-external-benchmark/D02-gate.md` (unseen questions).
+
+1. **On unseen questions the LLM is the best model we have.** DeepSeek reasoning high, population
+   prompt, no temperature: NLL 1.1874
+   <!-- src: reports/FD-gate-deepseek-high16k-item-val/metrics.json#individual.by_source.twin2k.nll -->
+   against B1 1.3534 <!-- src: reports/FD-gate-b1-item-val/metrics.json#individual.by_source.twin2k.nll -->
+   and the M4b three-seed mean 1.2825 <!-- src: reports/FD-d01/m4b-item-summary.json#metrics.nll.mean -->.
+   Paired against B1 the interval excludes 0
+   (upper end -0.1125 <!-- src: reports/FD-gate/high16k-vs-FD-gate-b1-item-val.json#paired.ci_high -->).
+   Population TVD 0.1604
+   <!-- src: reports/FD-gate-deepseek-high16k-item-val/metrics.json#population.twin2k.summary.tvd.mean -->
+   against M4b's 0.1813 <!-- src: reports/M4b-tt-item-val/metrics.json#population.twin2k.summary.tvd.mean -->.
+   **The D02 gate is passed.**
+2. **Reasoning is what makes it work.** Reasoning off is level with M4b and does not clear B1 with
+   confidence (gate write-up).
+3. **Calibration is off:** ECE 0.0835
+   <!-- src: reports/FD-gate-deepseek-high16k-item-val/metrics.json#individual.by_source.twin2k.ece -->,
+   over the spec limit. Teacher calibration (below) stays necessary.
+4. **No variance collapse.** SD ratio 0.9811
+   <!-- src: reports/FD-gate-deepseek-high16k-item-val/metrics.json#population.twin2k.summary.sd_ratio.mean -->
+   on unseen questions. On seen decision items D01-lite found the opposite tendency (slightly too spread).
+   FA6 is not supported so far.
+5. **Personas carry no individual signal through an LLM** (D01-lite): persona prompts made a person's
+   real answers less likely for DeepSeek. Person heterogeneity has to come from human data.
+6. **On seen questions the training crowd (B1) wins by a wide margin** (D01-lite), so the fork can only
+   add value where no crowd exists: new questions and new experiments.
+7. **The LLM knows the direction of classic effects** (D01-lite bias test), where M4b on unseen
+   experiments is at chance. Memorisation is not ruled out for either finding 1 or 7.
+8. **Operations.** Reasoning-high replies sometimes think past the token limit and return nothing:
+   1 of 28 Twin-2K-500 questions at 8,000 tokens (answered on a re-ask), and most long Psych-101
+   trial prompts. Replies are not deterministic even at temperature 0; the cache is the record.
+
 ## 4. Model design (campaign D02)
 
 ```text
@@ -127,25 +169,31 @@ and needs an `eval-change/` branch and the human's approval (open question 2).
   training in disguise. This needs question *text* of sealed items but never their answers (open
   question 1).
 
-**Teacher labels.** For each bank question: one population distribution, plus K persona-conditioned
-distributions (proposal K = 8). Personas are attribute profiles sampled from Twin-2K-500 *train* persons,
-so the person tower sees realistic inputs. Labels are stored as `response_dist`; the schema and the
-aggregate-record loss already exist in the spec.
+**Teacher labels (revised after D01).** For each bank question: **one population distribution, with
+reasoning on.** Persona-conditioned labels are dropped (§3a finding 5), which cuts the label calls
+9-fold. Labels are stored as `response_dist`; the schema and the aggregate-record loss already exist in
+the spec. Guards on the labelling run: a reply that thinks past the token limit is re-asked once at a
+higher limit (`reuse_max_tokens`), then dropped and counted; billed cost is read from the provider's
+response (`scripts/fd_spend.py`). Bank questions are survey-style; long trial-by-trial prompts are out
+(§3a finding 8).
 
-**Why the teacher is the open-weight model, not the frontier one.** `gpt-oss-120b` is Apache-2.0 and
-cleared for generating training text (A19). Closed providers' terms often restrict training a model on
+**Teacher choice.** Two open-weight candidates, `gpt-oss-120b` and DeepSeek V4.1 Flash, chosen on the
+gate set before the bank is generated; DeepSeek has passed the gate, `gpt-oss-120b` is not yet run.
+DeepSeek's terms for training on its outputs are unverified (FA9) and must be checked first.
+`gpt-oss-120b` is Apache-2.0 and cleared for generating training text (A19). Closed providers' terms often restrict training a model on
 their outputs; that is unverified (FA3), so a closed model is benchmark-only until the human says
 otherwise. Consequence: the student cannot beat the frontier model by copying it. The win has to come
 from the human-data correction, which is the scientific claim worth testing.
 
-**The known risk: imported variance collapse.** LLM "silicon samples" are widely reported to be too
-confident and too uniform across people. Three defences, each an ablation:
+**The feared risk: imported variance collapse.** LLM "silicon samples" are widely reported to be too
+confident and too uniform across people. D01 did not see it at the population level (§3a finding 4),
+so this is now a check rather than the main risk. Three defences, each an ablation:
 
 1. *Teacher calibration.* Before training, fit a per-question-type temperature that maps teacher
    distributions to human ones on Twin-2K-500 **train** items, and apply it to all bank labels.
-2. *Distil into the prior path first.* The two-tower model has a question-to-prior path and a person
-   residual. Breadth matters for the prior; person effects are better learned from real people. Variant:
-   teacher labels train the prior path only.
+2. *Distil into the prior path only (now the default).* The two-tower model has a question-to-prior
+   path and a person residual. Teacher labels train the prior path only; the person residual learns from
+   human data only (§3a finding 5). Training both from teacher labels is the ablation.
 3. *Human data has the last word.* Stage B fine-tunes on human answers and Stage C calibrates on val;
    the SD ratio, entropy ratio and ECE guards are binding.
 
@@ -155,8 +203,9 @@ confident and too uniform across people. Three defences, each an ablation:
 embedded once and training stays on CPU). Unfreezing the top encoder layers is a later idea; on this
 machine (A12, no GPU) it may not fit the budget.
 
-**Estimated generation cost.** Roughly 50 k questions × 9 label calls on a model priced at $0.15 in and
-$0.60 out per million tokens (A19) is tens of dollars. This is arithmetic, not a measurement; the dry run
+**Estimated generation cost (revised).** One reasoning-high label per question. D01-lite measured
+about a sixth of a cent per DeepSeek reasoning-high call, so a 10 k bank is roughly 17 dollars and
+50 k roughly 85 (arithmetic from a measured rate on different prompts, not a quote). The dry run
 replaces it before any spend, and the human sets the cap.
 
 ## 5. What would count as success
@@ -176,14 +225,17 @@ Pre-registered in the contracts, summarised here:
 
 | ID | Question | Needs | Paid spend | Compute |
 | --- | --- | --- | --- | --- |
-| D01 | How good are non-human-conditioned models (E1 to E4) against B1 and M4b in the three regimes? | F001 approved; model choice and cap | yes | none |
+| D01 | How good are non-human-conditioned models (E1 to E4) against B1 and M4b in the three regimes? | F001 approved; model choice and cap | yes | none (D01-lite and the gate done, §3a) |
+| D01b | Contamination probe: does the teacher's gate result survive paraphrased questions? | M5 paraphrases | under a dollar | none |
 | D02 | Does pretraining on calibrated teacher labels for a broad bank, then fine-tuning on human data, beat M4b on unseen questions? | D01 gate | yes (bank) | CPU |
-| D03 | Does distillation import variance collapse or hurt the seen-question regime? | D02 artifacts | none | CPU, eval only |
-| D04 | Does it improve treatment-effect direction and size on unseen experiments? | D02 winner | none | CPU, 8 folds |
+| D04 | Does it improve treatment-effect direction and size on unseen experiments? (raised in priority, §3a finding 7) | D02 winner, D01b | small (teacher labels for 8 folds) | CPU, 8 folds |
+| D03 | Does distillation import variance collapse or hurt the seen-question regime? (demoted to a check, §3a finding 4) | D02 artifacts | none | CPU, eval only |
 | D05 | Head to head: distilled model against E1 to E4 on accuracy, population fidelity and cost | D01, D02, D03 | none new | eval only |
 
 Gate after D01: D02 starts only if the calibrated teacher beats B1 on `heldout_item` val NLL. A teacher
-that knows less than "no information" has nothing to distil.
+that knows less than "no information" has nothing to distil. **Passed on 2026-11-20 without
+calibration** (§3a). Before D02: D01b, a three-seed M4b re-run at the fork SHA whose predictions are
+kept, and the human's decision on §9.
 
 ## 7. Running beside the mainline without interfering
 
@@ -220,3 +272,63 @@ that knows less than "no information" has nothing to distil.
 4. Is Jev (E4) in scope? It needs your key and the A10 check.
 5. The fork depends on the Fireworks client and paraphrase store on PR 9. Merge PR 9 first, or keep the
    fork stacked on it?
+
+## 9. Red team (2026-11-20, after the D02 gate)
+
+The question: given what D01 found, is "distil an LLM into the two-tower model" still the right way to
+reach the goal (realistic population outcomes on questions and experiments we have no data for)?
+
+**Attacks, strongest first.**
+
+1. **The cost argument for distillation mostly disappears.** The winning teacher needs one population
+   call per *question*, not per decision: no person information goes in (§3a finding 5). A simulator
+   asks each question once for the whole population, so a cached LLM prior costs a sixth of a cent per
+   question, shared across every simulated person. D05 part 4 ("100 times cheaper per decision") is met
+   by caching alone. What distillation still buys: no network or provider dependency at run time,
+   questions generated on the fly without a call, deterministic output, and offline use. Those are real
+   but they are product requirements, and nobody has said they are required.
+2. **A simpler design has not been tried: use the LLM prior directly.** Feed the teacher's population
+   distribution into the two-tower model as a per-question prior (for example a logit offset on the
+   question-to-prior path), and let the person tower learn individual deviations from human data. It
+   needs no bank, no pretraining stage and no licence for training on outputs, and it keeps the
+   teacher's full quality instead of a compressed copy. If it is as good as distillation, distillation is
+   not needed; if distillation is better, that is the result worth reporting. Right now D02 cannot tell.
+3. **The student may not be able to hold what the teacher knows.** The two-tower model reads questions
+   through a small frozen sentence encoder. The teacher's advantage comes from reasoning about the
+   question (reasoning off is no better than M4b). Pretraining on 10 k soft labels may teach a frozen
+   encoder's head little of that. Cheap check before any bank: fit the prior path to teacher labels on
+   the 435 training questions and see how close it gets to the teacher on the 28 val questions.
+4. **D02's decision rule cannot be measured on 28 items.** H1 asks for a margin of three M4b seed SDs
+   (seed SD 0.0099 <!-- src: reports/FD-d01/m4b-item-summary.json#metrics.nll.sd -->), but a 95 % interval
+   over 28 items is several times wider: the gate's against B1 runs from -0.2938
+   <!-- src: reports/FD-gate/high16k-vs-FD-gate-b1-item-val.json#paired.ci_low --> to -0.1125
+   <!-- src: reports/FD-gate/high16k-vs-FD-gate-b1-item-val.json#paired.ci_high -->. Choosing among
+   distillation variants on these items will mostly fit noise. Item-fold cross-validation (open question
+   2, an `eval-change/` proposal) is a precondition, not an option.
+5. **The headline may be memorisation.** Twin-2K-500 is public. If the teacher's edge shrinks on
+   paraphrased questions, distilling it buys recall of a public dataset, not knowledge of questions in
+   general. D01b must run first; a bank filtered against Twin-2K-500 text does not protect against a
+   teacher that has read the answers.
+6. **Persons.** The LLM adds nothing per person, and on seen questions the person tower adds little over
+   B1. For the simulator, most value is in population distributions and treatment effects on new
+   material. Both designs (distilled or direct prior) put the person tower on human data, so this
+   attack does not separate them, but it does limit how much either can claim per person.
+
+**Defences that hold.** Distillation does give a self-contained model, which matters if the simulator
+must run without network access or create questions at run time faster than an API allows. The human
+data still has the last word in both designs. Calibration and guards apply unchanged.
+
+**Verdict.** Distillation is not clearly the right primary approach any more. The gate shows the
+teacher is worth using; it does not show that compressing it is worth the cost and risk. Recommended
+revision for the human's approval:
+
+1. **Run first, cheaply:** D01b (contamination probe, under a dollar), the three-seed M4b re-run at the
+   fork SHA, and the encoder-capacity check (attack 3, CPU only, no spend).
+2. **Reframe D02 as a three-arm comparison** under one contract: M4b; M4b with the cached LLM prior
+   injected (no distillation); M4b pretrained on distilled teacher labels. The question becomes "which
+   way of using the teacher is best", decided on item folds (attack 4).
+3. **Ask the human** whether offline, network-free running is a requirement. If not, and arm 2 matches
+   arm 3, the fork recommends the direct prior and skips the bank.
+4. **Move D04 up** with the same three arms, since treatment effects on new experiments are where the
+   LLM showed the most that M4b lacks.
+

@@ -59,11 +59,19 @@ population prompts, Qwentaur-4B against its own base (Colab free tier), DeepSeek
 Qwen3.8-27B (OpenRouter). Tooling built and tested (`src/schelling/bench/`, `scripts/d01/`,
 `notebooks/d01_colab_logprobs.ipynb`); DeepSeek and Qwentaur-4B scored; closed with recommendations.
 
+## D02 gate (2026-11-20)
+
+Passed. DeepSeek V4.1 Flash, reasoning high, population prompt, beats B1 and M4b on `heldout_item` val
+(`campaigns/D01-external-benchmark/D02-gate.md`, audited). Recommendations from D01-lite are folded into
+`DESIGN.md` (§2, §3a, §4, §6), with a red-team review in §9 whose verdict is that distillation is no
+longer clearly the right primary approach.
+
 ## Blocked: needs the human
 
-0. D01-lite closed by the human (2026-11-20; $3.96 billed of the $7 OpenRouter credit). Eight
-   recommended fork updates at the end of `D01-lite.md`. The first needs approval: spend under
-   $0.25 to run the D02 gate (DeepSeek on the 28 `heldout_item` val items, through the harness).
+0. Approve or change the DESIGN §9 revision: run D01b (contamination probe, under a dollar), a three-seed
+   M4b re-run and the encoder-capacity check first; then reframe D02 as three arms (M4b, M4b plus the
+   cached LLM prior, M4b plus distillation) decided on item folds. Also: is network-free running a
+   requirement? It decides whether distillation is needed at all.
 
 1. Spend approval for the E3 smoke test and runs (cap), and how to shrink the `heldout_person` persona run.
 2. Which frontier model is E1/E2 and its cap (FA1 to FA3 are checked after you name it).
