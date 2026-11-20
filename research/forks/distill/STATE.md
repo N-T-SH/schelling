@@ -68,10 +68,10 @@ longer clearly the right primary approach.
 
 ## Blocked: needs the human
 
-0. Approve or change the DESIGN §9 revision: run D01b (contamination probe, under a dollar), a three-seed
-   M4b re-run and the encoder-capacity check first; then reframe D02 as three arms (M4b, M4b plus the
-   cached LLM prior, M4b plus distillation) decided on item folds. Also: is network-free running a
-   requirement? It decides whether distillation is needed at all.
+0. Review `D02-OPTIONS.md` (status, four arms with pros and cons, decision steps). Decisions needed:
+   is network-free running a requirement; approve an `eval-change/item-folds` proposal; caps of one
+   dollar each for D01b (contamination probe) and the A1 teacher labels. Then step 1: D01b, the
+   three-seed M4b re-run and item folds.
 
 1. Spend approval for the E3 smoke test and runs (cap), and how to shrink the `heldout_person` persona run.
 2. Which frontier model is E1/E2 and its cap (FA1 to FA3 are checked after you name it).

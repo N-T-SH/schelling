@@ -309,7 +309,12 @@ reach the goal (realistic population outcomes on questions and experiments we ha
    paraphrased questions, distilling it buys recall of a public dataset, not knowledge of questions in
    general. D01b must run first; a bank filtered against Twin-2K-500 text does not protect against a
    teacher that has read the answers.
-6. **Persons.** The LLM adds nothing per person, and on seen questions the person tower adds little over
+6. **A fine-tuned decision LLM was not considered either.** LoRA on a small open LLM trained on
+   Twin-2K-500 training answers (not Psych-101) combines an LLM's language knowledge with human
+   correction in one network-free model. Against it: it answers in one pass without reasoning, the
+   setting where the LLM was no better than M4b, and Psych-101 tuning of the same base did not
+   transfer. It belongs in the comparison rather than being assumed away.
+7. **Persons.** The LLM adds nothing per person, and on seen questions the person tower adds little over
    B1. For the simulator, most value is in population distributions and treatment effects on new
    material. Both designs (distilled or direct prior) put the person tower on human data, so this
    attack does not separate them, but it does limit how much either can claim per person.
@@ -324,11 +329,13 @@ revision for the human's approval:
 
 1. **Run first, cheaply:** D01b (contamination probe, under a dollar), the three-seed M4b re-run at the
    fork SHA, and the encoder-capacity check (attack 3, CPU only, no spend).
-2. **Reframe D02 as a three-arm comparison** under one contract: M4b; M4b with the cached LLM prior
-   injected (no distillation); M4b pretrained on distilled teacher labels. The question becomes "which
-   way of using the teacher is best", decided on item folds (attack 4).
+2. **Reframe D02 as a four-arm comparison** under one contract: M4b (A0); M4b with the cached LLM
+   prior injected, no distillation (A1); M4b pretrained on distilled teacher labels (A2); a small LLM
+   fine-tuned on Twin-2K-500 training answers (A3). The question becomes "which way of using an LLM is
+   best", decided on item folds (attack 4). Pros, cons and decision rules for each arm:
+   `research/forks/distill/D02-OPTIONS.md`.
 3. **Ask the human** whether offline, network-free running is a requirement. If not, and arm 2 matches
    arm 3, the fork recommends the direct prior and skips the bank.
-4. **Move D04 up** with the same three arms, since treatment effects on new experiments are where the
+4. **Move D04 up** with the winning arm, since treatment effects on new experiments are where the
    LLM showed the most that M4b lacks.
 
