@@ -46,3 +46,7 @@ wandb/
 !/reports/**/effects.json
 !/reports/**/guards.json
 !/reports/**/summary.json
+
+# D01 model outputs (probabilities per prompt); scored into reports/
+/results/
+/results-*/
