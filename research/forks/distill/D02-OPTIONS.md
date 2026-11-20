@@ -16,7 +16,9 @@ fork can matter.
 | --- | --- | --- |
 | D01-lite: LLMs on seen decision questions | done, closed | general LLM beats a uniform guess, reasoning helps a lot, personas add nothing per person, Psych-101 tuning does not transfer |
 | D02 gate: LLM on unseen questions | **passed** | DeepSeek V4.1 Flash, reasoning high, beats B1 and M4b |
-| D01b contamination probe | not built | needed before trusting the gate |
+| D01b contamination probe | **passed** (2026-11-20) | the teacher keeps its edge on reworded questions (`campaigns/D01-external-benchmark/D01b-probe.md`) |
+| Item folds (decision 0007) | merged (PR 10) | five folds, 282 unseen Twin-2K-500 questions pooled |
+| M4b three-seed re-run | done | reproduces the earlier seeds; predictions kept (`reports/FD-m4b2-item-s*-val`) |
 | D02 to D05 | not approved | this document proposes how to run D02 |
 
 The gate, Twin-2K-500 rows of `heldout_item` val (28 unseen questions), NLL (lower is better):
@@ -132,11 +134,11 @@ human's approval.
 1. ~~Is running without the network a requirement for the simulator?~~ **Decided 2026-11-20: not
    required** (the human, in chat). A2's main advantage is gone: it runs only if A1 disappoints or the
    A2 capacity check comes close to the teacher.
-2. Approve an `eval-change/item-folds` proposal: 28 items cannot separate arms that differ by a few
-   hundredths of NLL (DESIGN §9, attack 4).
-3. Approve the spend caps below.
+2. ~~Approve an `eval-change/item-folds` proposal.~~ **Approved and merged 2026-11-20** (decision
+   0007, PR 10).
+3. ~~Approve the spend caps below.~~ **Approved 2026-11-20** (one dollar each for D01b and A1).
 
-**Step 1. Prerequisites (cheap).**
+**Step 1. Prerequisites (cheap). Done 2026-11-20:** D01b passed, M4b re-run done, folds merged.
 
 1. **D01b contamination probe** (under a dollar): score the teacher on the M5 paraphrases of the gate
    questions. If its edge over B1 mostly disappears on paraphrases, the gate result is memorisation:

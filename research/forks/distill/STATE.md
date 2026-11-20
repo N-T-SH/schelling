@@ -68,11 +68,9 @@ longer clearly the right primary approach.
 
 ## Blocked: needs the human
 
-0. Review `D02-OPTIONS.md` (status, four arms with pros and cons, decision steps). Decided 2026-11-20:
-   network-free running is not required, so A1 (direct LLM prior) leads and A2 is a fallback. Still
-   needed: approve an `eval-change/item-folds` proposal; caps of one
-   dollar each for D01b (contamination probe) and the A1 teacher labels. Then step 1: D01b, the
-   three-seed M4b re-run and item folds.
+0. Nothing blocked. Step 1 of `D02-OPTIONS.md` is done (D01b passed, M4b re-run done, item folds
+   merged as decision 0007). Step 2 in progress: A1 teacher answers for every non-test Twin-2K-500
+   question (cap one dollar), then A1 training on the item folds.
 
 1. Spend approval for the E3 smoke test and runs (cap), and how to shrink the `heldout_person` persona run.
 2. Which frontier model is E1/E2 and its cap (FA1 to FA3 are checked after you name it).

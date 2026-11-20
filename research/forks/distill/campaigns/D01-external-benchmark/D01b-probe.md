@@ -51,4 +51,27 @@ dataset's answer patterns in a way that survives rewording.
 
 ## Results
 
-Not run yet.
+**Pass.** Run 2026-11-20; 129 paraphrase calls for 24 questions, billed about 12 cents (fetch summary,
+not a metrics file: `runs/fd-gate/d01b-fetch.json`, git-ignored). 4 paraphrase replies did not parse
+and count as a uniform guess, which can only hurt the teacher. Source: `reports/FD-d01b/probe.json`, git e9145d55, clean.
+
+| | Value |
+| --- | --- |
+| `edge_orig` (B1 minus teacher, original wording) | 0.2120 <!-- src: reports/FD-d01b/probe.json#edge_orig --> |
+| `edge_para` (B1 minus teacher, reworded) | 0.2002 <!-- src: reports/FD-d01b/probe.json#edge_para --> |
+| `retention` | 0.9441 <!-- src: reports/FD-d01b/probe.json#retention --> |
+
+Paired over the 24 items (negative favours the first model):
+
+| Comparison | Difference | Interval |
+| --- | --- | --- |
+| Teacher reworded − B1 | -0.2002 <!-- src: reports/FD-d01b/probe.json#teacher_para_vs_b1.mean_diff --> | -0.3052 <!-- src: reports/FD-d01b/probe.json#teacher_para_vs_b1.ci_low --> to -0.1055 <!-- src: reports/FD-d01b/probe.json#teacher_para_vs_b1.ci_high --> |
+| Teacher reworded − teacher original | 0.0118 <!-- src: reports/FD-d01b/probe.json#teacher_para_vs_orig.mean_diff --> | -0.0021 <!-- src: reports/FD-d01b/probe.json#teacher_para_vs_orig.ci_low --> to 0.0277 <!-- src: reports/FD-d01b/probe.json#teacher_para_vs_orig.ci_high --> |
+| M4b reworded − M4b original (control) | 0.0607 <!-- src: reports/FD-d01b/probe.json#m4b_para_vs_orig.mean_diff --> | 0.0017 <!-- src: reports/FD-d01b/probe.json#m4b_para_vs_orig.ci_low --> to 0.1458 <!-- src: reports/FD-d01b/probe.json#m4b_para_vs_orig.ci_high --> |
+
+**Reading.** Retention is well above one half and the reworded teacher still beats B1 with the
+interval excluding 0, so the decision rule says pass: A1 proceeds. The control strengthens it: M4b,
+which cannot have memorised these questions, loses more under rewording than the teacher does. The
+rewording has a real cost, and the teacher absorbs it; that is the opposite of what verbatim recall
+would show. The limit stated above stands: this rules out recall of the wording, not knowledge of the
+dataset's answers that survives rewording.
