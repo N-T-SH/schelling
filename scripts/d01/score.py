@@ -40,6 +40,22 @@ def load_results(folder: Path) -> dict[str, Any]:
     return probs
 
 
+def retest_agreement(human: pd.DataFrame) -> dict[str, float]:
+    """How often a person repeats their own wave-1 answer in wave 4: a ceiling on
+    individual-level prediction for the retested items."""
+    both = human.pivot_table(
+        index=["person_id", "item_id"], columns="wave", values="response", aggfunc="first"
+    )
+    if 1 not in both or 4 not in both:
+        return {"n_pairs": 0.0}
+    both = both[[1, 4]].dropna()
+    return {
+        "n_pairs": float(len(both)),
+        "n_items": float(both.index.get_level_values("item_id").nunique()),
+        "exact_agreement": float((both[1] == both[4]).mean()),
+    }
+
+
 @app.command()
 def main(
     prompts: Annotated[Path, typer.Option()],
@@ -50,6 +66,9 @@ def main(
     n_splits: Annotated[int, typer.Option()] = 200,
     n_boot: Annotated[int, typer.Option()] = 2000,
     seed: Annotated[int, typer.Option()] = 0,
+    waves: Annotated[
+        str, typer.Option(help="'first': each person's wave-1 answer only; 'all': pool retests")
+    ] = "first",
 ) -> None:
     recs = pd.DataFrame([json.loads(x) for x in prompts.read_text().splitlines() if x.strip()])
     items = set(recs["item_id"])
@@ -64,6 +83,13 @@ def main(
     ref = ref[(ref["source"] == "twin2k") & ref["item_id"].isin(items)]
     for frame in (human, ref):
         frame["person_id"] = frame["person_id"].astype(str)
+    retest = retest_agreement(human)
+    if waves == "first":
+        # 54 decision items were asked again in wave 4; pooling would count those people twice.
+        human = human[human["wave"] == 1]
+        ref = ref[ref["wave"] == 1]
+    elif waves != "all":
+        raise typer.BadParameter("--waves must be first or all")
     pairs = load_pairs()
 
     models: dict[str, Any] = {}
@@ -86,6 +112,8 @@ def main(
         "prompts": str(prompts),
         "prompts_sha256": hashlib.sha256(prompts.read_bytes()).hexdigest(),
         "n_prompts": len(recs),
+        "waves": waves,
+        "human_retest": retest,
         "models": models,
         "comparisons": comparisons,
         "git_sha": provenance.git_sha(),
