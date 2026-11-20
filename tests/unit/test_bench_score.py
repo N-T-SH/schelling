@@ -130,3 +130,18 @@ def test_item_without_population_prompt_is_left_out_of_person_comparison() -> No
     }
     out = score.score_model(prompts, probs, _human(), _human(), PAIRS, n_splits=5, n_boot=50)
     assert out["individual"]["n_rows"] == 10 * (len(TRUE) - 1)
+
+
+def test_arm_accuracy_skips_items_without_that_arm() -> None:
+    persons = [f"p{j}" for j in range(10)]
+    prompts = _prompts(persons)
+    prompts = prompts[prompts["prompt_id"] != "i1-pop"]
+    probs = {
+        pid: TRUE[item] for pid, item in zip(prompts["prompt_id"], prompts["item_id"], strict=True)
+    }
+    out = score.score_model(prompts, probs, _human(), _human(), PAIRS, n_splits=5, n_boot=50)
+    assert out["population"]["n_items"] == len(TRUE) - 1
+    assert np.isfinite(out["population"]["accuracy"]["mean"])
+    assert np.isfinite(out["population"]["accuracy_over_ceiling"])
+    same = score.compare_items(out["per_item"], out["per_item"], "population_acc", 50, 0)
+    assert same["n_items"] == len(TRUE) - 1 and same["mean"] == 0

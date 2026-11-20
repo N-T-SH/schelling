@@ -137,10 +137,15 @@ def score_model(
     for arm in ("population", "persona"):
         if f"{arm}_acc" not in items:
             continue
-        arm_acc = items[f"{arm}_acc"].to_numpy(dtype=float)
+        # Items without an answer for this arm (unparsed replies dropped upstream) are skipped,
+        # and the ceiling is taken over the same items.
+        have_arm = items[f"{arm}_acc"].notna()
+        arm_acc = items.loc[have_arm, f"{arm}_acc"].to_numpy(dtype=float)
+        arm_ceiling = float(items.loc[have_arm, "ceiling"].mean())
         out[arm] = {
+            "n_items": int(have_arm.sum()),
             "accuracy": bootstrap_mean(arm_acc, n_boot, rng),
-            "accuracy_over_ceiling": float(arm_acc.mean() / out["ceiling"]),
+            "accuracy_over_ceiling": float(arm_acc.mean() / arm_ceiling),
             "sd_ratio_median": float(np.nanmedian(items[f"{arm}_sd_ratio"])),
         }
 
@@ -200,8 +205,8 @@ def compare_items(
     a: list[dict[str, Any]], b: list[dict[str, Any]], key: str, n_boot: int, seed: int
 ) -> dict[str, Any]:
     """Paired item bootstrap of model A minus model B on a per-item metric."""
-    da = {r["item_id"]: r[key] for r in a if key in r}
-    db = {r["item_id"]: r[key] for r in b if key in r}
+    da = {r["item_id"]: r[key] for r in a if key in r and not np.isnan(r[key])}
+    db = {r["item_id"]: r[key] for r in b if key in r and not np.isnan(r[key])}
     shared = sorted(set(da) & set(db))
     diff = np.array([da[i] - db[i] for i in shared])
     return {
