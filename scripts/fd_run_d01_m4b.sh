@@ -8,17 +8,20 @@ export OMP_NUM_THREADS=2 MKL_NUM_THREADS=2
 renice -n 19 -p $$ > /dev/null 2>&1
 PROCESSED=${PROCESSED:?set PROCESSED to the main checkout data/processed}
 SEEDS=${SEEDS:-"0 1 2"}
+# Name prefix for runs and reports; a re-run uses a new one so earlier metrics stay untouched.
+TAG=${TAG:-fd-m4b-item}
+REPORT=${REPORT:-FD-m4b-item}
 mkdir -p runs
 for s in $SEEDS; do
-  name=fd-m4b-item-s$s
+  name=$TAG-s$s
   if [ ! -f "runs/$name/final/config.json" ]; then
     uv run schelling train --config configs/twotower-a.yaml --set "name=$name" --set "out_dir=runs/$name" \
       --set "seed=$s" --set split=heldout_item --set "processed_dir=$PROCESSED" > "runs/$name.log" 2>&1 \
       || echo "FAILED $name"
   fi
-  if [ ! -f "reports/FD-m4b-item-s$s-val/metrics.json" ]; then
+  if [ ! -f "reports/$REPORT-s$s-val/metrics.json" ]; then
     uv run schelling eval --model "runs/$name/final" --split heldout_item --partition val \
-      --processed "$PROCESSED" --out "reports/FD-m4b-item-s$s-val" --seed 0 > "runs/$name-eval.log" 2>&1 \
+      --processed "$PROCESSED" --out "reports/$REPORT-s$s-val" --seed 0 > "runs/$name-eval.log" 2>&1 \
       || echo "FAILED eval $name"
   fi
 done
