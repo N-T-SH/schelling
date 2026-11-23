@@ -68,3 +68,24 @@ def test_person_subsample_is_fixed_and_whole_persons() -> None:
     assert len(s1) == 5 * 6
     assert sorted(s1["record_id"]) == sorted(s2["record_id"])
     assert len(compare.subsample_persons(rows, 100, seed=3)) == len(rows)
+
+
+def test_item_nll_of_one_run_is_the_mean_row_nll_within_each_item() -> None:
+    recs, a, _ = _rows()
+    got = compare.item_nll(recs, a)
+    assert list(got.index) == [f"i{i}" for i in range(6)]
+    assert got.to_numpy() == pytest.approx(np.full(6, -np.log(0.8)))
+
+
+def test_item_nll_refuses_a_run_that_misses_rows() -> None:
+    recs, a, _ = _rows()
+    with pytest.raises(ValueError, match="missing"):
+        compare.item_nll(recs, a.iloc[:-1])
+
+
+def test_seed_mean_averages_runs_item_by_item() -> None:
+    s1 = pd.Series([1.0, 3.0], index=["x", "y"])
+    s2 = pd.Series([2.0, 5.0], index=["x", "y"])
+    assert compare.seed_mean([s1, s2]).to_dict() == {"x": 1.5, "y": 4.0}
+    with pytest.raises(ValueError, match="items"):
+        compare.seed_mean([s1, s2.iloc[:1]])

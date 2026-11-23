@@ -30,7 +30,7 @@ for s in $SEEDS; do
       if [ ! -f "runs/$name/final/config.json" ]; then
         uv run schelling train --config configs/twotower-a.yaml --set "name=$name" \
           --set "out_dir=runs/$name" --set "seed=$s" --set "split=$split" \
-          --set "processed_dir=$PROCESSED" "${extra[@]}" > "runs/$name.log" 2>&1 \
+          --set "processed_dir=$PROCESSED" ${extra[@]+"${extra[@]}"} > "runs/$name.log" 2>&1 \
           || { echo "FAILED $name"; continue; }
       fi
       ev "runs/$name/final" "FD-$arm-f$f-s$s-val"

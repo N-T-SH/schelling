@@ -51,6 +51,28 @@ def unit_nll(rows: pd.DataFrame, unit: str) -> pd.DataFrame:
     return pd.DataFrame(out)
 
 
+def item_nll(records: pd.DataFrame, pred: pd.DataFrame) -> pd.Series:
+    """Mean row NLL per item of one run. Every record must have a prediction."""
+    rows = records[["record_id", "item_id", "response"]].merge(
+        pred, on="record_id", how="left", validate="1:1"
+    )
+    if rows["probs"].isna().any():
+        raise ValueError(f"{int(rows['probs'].isna().sum())} records missing a prediction")
+    out = {
+        item: metrics.nll([np.asarray(p) for p in g["probs"]], g["response"].to_numpy(dtype=int))
+        for item, g in rows.groupby("item_id", sort=True)
+    }
+    return pd.Series(out, dtype=float)
+
+
+def seed_mean(runs: list[pd.Series]) -> pd.Series:
+    """Item-by-item mean over seeds; every run must cover the same items."""
+    first = set(runs[0].index)
+    if any(set(r.index) != first for r in runs):
+        raise ValueError("runs cover different items")
+    return pd.concat(runs, axis=1).mean(axis=1).sort_index()
+
+
 def paired_bootstrap(
     units: pd.DataFrame, n_boot: int = 10_000, seed: int = 0, level: float = 0.95
 ) -> dict[str, Any]:
