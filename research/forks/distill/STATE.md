@@ -68,15 +68,16 @@ longer clearly the right primary approach.
 
 ## Blocked: needs the human
 
-0. ~~A1 teacher answers.~~ **Done 2026-11-23.** All 528 non-test Twin-2K-500 questions of
-   `heldout_item_f0,f1` train and val have a teacher reply, asked with
-   `configs/fork-distill/gate-deepseek-high16k.json`. The 24 replies that did not parse were asked
-   again at 32,000 tokens (`configs/fork-distill/a1-deepseek-high32k.json`, which reuses the 16k
-   and 8k answers); 3 still do not parse. Billed in all about 1.00 dollar of the 1.50 cap (fetch
-   summaries `runs/fd-a1/r3/fetch.json` and `runs/fd-a1/r4/fetch.json`, git-ignored, not metrics
-   files). Run one fetch process only (about 1 GB); four in parallel crashed the Mac. Next: build A1
-   from the 32k spec (unparsed replies give no prior) and train it on the item folds
-   (`D02-OPTIONS.md` step 2).
+0. ~~A1 teacher answers.~~ **Done 2026-11-23**, about 1.00 dollar of the 1.50 cap: 529 non-test
+   Twin-2K-500 questions, 3 without a parsed reply even at 32,000 tokens. Run one fetch process only.
+   **A1 built (2026-11-23):** teacher prior added to the two-tower item prior with a learned weight
+   per task type (302371b, 3358148); table `runs/fd-a1/teacher_prior.json` from
+   `scripts/fd_a1_prior.py`. **A1 probe running** (pre-registered in
+   `campaigns/D02-distilled-prior/A1-probe.md`): `scripts/fd_run_a1_folds.sh` from the clean worktree
+   `.claude/worktrees/fd-a1-runs` at e9191c9, A0 and A1 on five item folds by three seeds, val only,
+   one job at a time, about 5 hours; log `runs/fd-a1/driver.log`. Then `scripts/fd_pooled.py` and the
+   write-up below the line in the pre-registration. Do not edit files in that worktree while it runs
+   (provenance would turn dirty).
 
 1. Spend approval for the E3 smoke test and runs (cap), and how to shrink the `heldout_person` persona run.
 2. Which frontier model is E1/E2 and its cap (FA1 to FA3 are checked after you name it).
