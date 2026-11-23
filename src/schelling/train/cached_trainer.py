@@ -31,7 +31,7 @@ from schelling.eval import provenance
 from schelling.infer.baseline_adapter import make_item, person_attributes
 from schelling.infer.batching import options_of, question_text
 from schelling.infer.predictor import Predictor
-from schelling.infer.teacher import load_teacher, teacher_key
+from schelling.infer.teacher import load_teacher, teacher_lookup
 from schelling.infer.text import attribute_strings, build_question_context
 from schelling.model import SchellingTwoTower, SchellingTwoTowerConfig, calibration
 from schelling.model.heads import score_conditionals
@@ -112,7 +112,7 @@ def build_cache(
     person_ix: dict[str, int] = {}
     person_attr: list[list[int]] = []
     q_idx, p_idx, task, y, opts = [], [], [], [], []
-    t_key: dict[str, int] = {}  # teacher key -> row of T
+    t_key: dict[tuple[str, str, tuple[str, ...]], int] = {}  # question as asked -> row of T
     t_idx: list[int] = []
     for pid, qtype, text, o, lv, state, resp in zip(
         frame["person_id"],
@@ -152,7 +152,7 @@ def build_cache(
         y.append(int(resp))
         opts.append([o_text.setdefault(t, len(o_text)) for t in options_of(q)])
         if teacher is not None:
-            tk = teacher_key(qtype, question_text(q), options_of(q))
+            tk = (qtype, question_text(q), tuple(options_of(q)))
             t_idx.append(t_key.setdefault(tk, len(t_key)))
     alt_lists: dict[int, list[int]] = {}
     if paraphrases is not None and n_alt > 0:
@@ -190,8 +190,8 @@ def build_cache(
     if teacher is not None:
         T = torch.zeros(len(t_key), max(k, 2))
         t_has = torch.zeros(len(t_key), dtype=torch.bool)
-        for tk, i in t_key.items():
-            pr = teacher.get(tk)
+        for (qt, text, labels), i in t_key.items():
+            pr = teacher_lookup(teacher, qt, text, list(labels))
             if pr is not None and len(pr) <= T.shape[1]:
                 T[i, : len(pr)] = torch.tensor(pr)
                 t_has[i] = True

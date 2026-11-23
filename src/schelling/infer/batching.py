@@ -9,7 +9,7 @@ from typing import Any
 
 import torch
 
-from schelling.infer.teacher import teacher_key, teacher_tensors
+from schelling.infer.teacher import teacher_tensors
 from schelling.infer.text import attribute_strings, build_context, build_question_context
 from schelling.schema import Choice, DecisionRequest, Noul, Score
 
@@ -74,9 +74,9 @@ def _build_two_tower(
     if task != "noul":
         out.update(_options(tokenizer, config.max_option_tokens, items))
     if getattr(config, "teacher_prior", False):
-        keys = [teacher_key(task, question_text(q), options_of(q)) for _, q in items]
+        questions = [(task, question_text(q), options_of(q)) for _, q in items]
         width = 2 if task == "noul" else int(out["option_mask"].shape[1])
-        out.update(teacher_tensors(keys, teacher or {}, width))
+        out.update(teacher_tensors(questions, teacher or {}, width))
     return out
 
 

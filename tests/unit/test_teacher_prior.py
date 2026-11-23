@@ -11,7 +11,13 @@ from tests.helpers import tiny_tokenizer, tiny_tt_model
 
 from schelling.infer.baseline_adapter import frame_items, person_attributes, predict_items
 from schelling.infer.predictor import Predictor
-from schelling.infer.teacher import load_teacher, save_teacher, teacher_key
+from schelling.infer.teacher import (
+    load_teacher,
+    save_teacher,
+    teacher_key,
+    teacher_lookup,
+    to_canonical,
+)
 from schelling.model.heads import (
     choice_probs,
     noul_probs,
@@ -88,11 +94,45 @@ def test_models_without_the_teacher_have_no_new_weights() -> None:
     assert "heads.teacher_w" in tiny_tt_model(teacher_prior=True).state_dict()
 
 
-def test_the_key_ignores_the_person_and_the_state_but_not_the_options() -> None:
+def test_the_key_ignores_choice_order_but_not_level_order_or_the_options() -> None:
+    # Choice options have no order (SPEC: permuting options permutes probabilities), so a
+    # shuffled question must find the same teacher answer; score levels are ordered.
     k = teacher_key("choice", "Pick one", ["a", "b"])
-    assert k == teacher_key("choice", "Pick one", ["a", "b"])
-    assert k != teacher_key("choice", "Pick one", ["b", "a"])
+    assert k == teacher_key("choice", "Pick one", ["b", "a"])
+    assert k != teacher_key("choice", "Pick one", ["a", "c"])
+    assert teacher_key("score", "Rate", ["a", "b"]) != teacher_key("score", "Rate", ["b", "a"])
     assert k != teacher_key("score", "Pick one", ["a", "b"])
+
+
+def test_lookup_returns_the_teacher_answer_in_the_asked_option_order() -> None:
+    table = {
+        teacher_key("choice", "Q", ["x", "y", "z"]): to_canonical(
+            "choice", ["x", "y", "z"], [0.2, 0.5, 0.3]
+        )
+    }
+    assert teacher_lookup(table, "choice", "Q", ["z", "x", "y"]) == pytest.approx([0.3, 0.2, 0.5])
+    assert teacher_lookup(table, "choice", "Q", ["x", "y"]) is None
+
+
+def test_permuting_choice_options_permutes_a1_probabilities() -> None:
+    from schelling.infer.baseline_adapter import make_item
+
+    model, tok = tiny_tt_model(seed=2, residual_std=0.3, teacher_prior=True), tiny_tokenizer()
+    opts = ["red", "green", "blue", "yellow"]
+    model.teacher_table = {
+        teacher_key("choice", "pick a colour", opts): to_canonical(
+            "choice", opts, [0.1, 0.2, 0.3, 0.4]
+        )
+    }
+    rng = np.random.default_rng(0)
+    base = predict_items(model, tok, [make_item("choice", "pick a colour", opts, None, "", {})])[0]
+    for _ in range(5):
+        perm = list(rng.permutation(4))
+        shuffled = [opts[i] for i in perm]
+        out = predict_items(
+            model, tok, [make_item("choice", "pick a colour", shuffled, None, "", {})]
+        )[0]
+        assert out == pytest.approx(base[perm], abs=1e-5)
 
 
 def _table(frame) -> dict[str, list[float]]:  # type: ignore[no-untyped-def]
@@ -107,7 +147,7 @@ def _table(frame) -> dict[str, list[float]]:  # type: ignore[no-untyped-def]
         labels = [] if qtype == "noul" else list(o if qtype == "choice" else lv)
         n = 2 if qtype == "noul" else len(labels)
         p = np.random.default_rng(i).dirichlet(np.ones(n))
-        out[teacher_key(qtype, text, labels)] = p.tolist()
+        out[teacher_key(qtype, text, labels)] = to_canonical(qtype, labels, p.tolist())
     return out
 
 

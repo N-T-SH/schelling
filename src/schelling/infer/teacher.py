@@ -14,10 +14,37 @@ import torch
 FILENAME = "teacher_prior.json"
 
 
+def _order(qtype: str, labels: list[str]) -> list[int]:
+    """Positions in canonical order. Choice options have no order, so they are sorted; score
+    levels and noul answers keep theirs."""
+    n = 2 if qtype == "noul" else len(labels)
+    return sorted(range(n), key=lambda i: labels[i]) if qtype == "choice" else list(range(n))
+
+
 def teacher_key(qtype: str, text: str, labels: list[str]) -> str:
-    """labels: the options (choice) or levels (score) in data order; empty for noul."""
-    raw = json.dumps([qtype, text, list(labels)], ensure_ascii=False)
+    """labels: the options (choice) or levels (score); empty for noul."""
+    canon = [labels[i] for i in _order(qtype, labels)] if qtype != "noul" else []
+    raw = json.dumps([qtype, text, canon], ensure_ascii=False)
     return hashlib.sha256(raw.encode()).hexdigest()
+
+
+def to_canonical(qtype: str, labels: list[str], probs: list[float]) -> list[float]:
+    """Probabilities given in `labels` order -> the order stored in the table."""
+    return [float(probs[i]) for i in _order(qtype, labels)]
+
+
+def teacher_lookup(
+    table: dict[str, list[float]], qtype: str, text: str, labels: list[str]
+) -> list[float] | None:
+    """The teacher's probabilities in `labels` order, or None if the table lacks the question."""
+    stored = table.get(teacher_key(qtype, text, labels))
+    order = _order(qtype, labels)
+    if stored is None or len(stored) != len(order):
+        return None
+    out = [0.0] * len(order)
+    for j, i in enumerate(order):
+        out[i] = stored[j]
+    return out
 
 
 def load_teacher(path: str | Path) -> dict[str, list[float]]:
@@ -32,13 +59,14 @@ def save_teacher(path: str | Path, table: dict[str, list[float]], meta: dict[str
 
 
 def teacher_tensors(
-    keys: list[str], table: dict[str, list[float]], width: int
+    questions: list[tuple[str, str, list[str]]], table: dict[str, list[float]], width: int
 ) -> dict[str, torch.Tensor]:
-    """(B, width) zero-padded probabilities and a (B,) mask of the questions the table knows."""
-    probs = torch.zeros(len(keys), width)
-    has = torch.zeros(len(keys), dtype=torch.bool)
-    for i, k in enumerate(keys):
-        p = table.get(k)
+    """(B, width) zero-padded probabilities in each question's own option order and a (B,) mask
+    of the questions the table knows. questions: (qtype, text, labels)."""
+    probs = torch.zeros(len(questions), width)
+    has = torch.zeros(len(questions), dtype=torch.bool)
+    for i, (qtype, text, labels) in enumerate(questions):
+        p = teacher_lookup(table, qtype, text, labels)
         if p is not None and len(p) <= width:
             probs[i, : len(p)] = torch.tensor(p)
             has[i] = True

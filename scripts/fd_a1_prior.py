@@ -22,7 +22,7 @@ import typer
 from schelling.baselines.llm_prompt import LLMPromptBaseline
 from schelling.data.loader import load_partition
 from schelling.eval import provenance
-from schelling.infer.teacher import save_teacher, teacher_key
+from schelling.infer.teacher import save_teacher, teacher_key, to_canonical
 
 app = typer.Typer(add_completion=False)
 
@@ -57,7 +57,7 @@ def main(
             unparsed.append(str(row["item_id"].iloc[0]))
             continue
         labels = [] if qtype == "noul" else list(o if qtype == "choice" else lv)
-        table[teacher_key(qtype, text, labels)] = [float(p) for p in probs]
+        table[teacher_key(qtype, text, labels)] = to_canonical(qtype, labels, list(probs))
     meta = {
         "spec": str(spec),
         "splits": splits.split(","),
