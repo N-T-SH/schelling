@@ -270,6 +270,19 @@ def test_raised_limit_reuses_answered_and_re_asks_only_empty_replies(tmp_path: P
     assert all(np.isclose(p.sum(), 1) for p in probs)
 
 
+def test_limit_raised_twice_reuses_answers_from_either_lower_limit(tmp_path: Path) -> None:
+    rows = _frame().drop_duplicates("item_id")
+    low = _online(_spec(tmp_path, max_tokens=1000), FakeLLM()).fit(pd.DataFrame(), _persons())
+    low.predict_proba(rows)
+
+    llm = FakeLLM()
+    top = _online(_spec(tmp_path, max_tokens=4000, reuse_max_tokens=[2000, 1000]), llm).fit(
+        pd.DataFrame(), _persons()
+    )
+    top.predict_proba(rows)
+    assert llm.calls == []  # every answer made at 1000 is found, though none was made at 2000
+
+
 def test_rows_outside_the_chosen_sources_get_uniform_and_no_call(tmp_path: Path) -> None:
     frame = _frame().drop_duplicates("item_id").reset_index(drop=True)
     frame["source"] = ["twin2k", "psych101", "twin2k"]

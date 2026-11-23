@@ -69,9 +69,11 @@ class LLMSpec(BaseModel):
     person_subsample: int = 0
     subsample_seed: int = 0
     extra: dict[str, Any] = {}
-    # Reuse a non-empty cached answer made with this lower token limit, so raising the limit
-    # re-asks only the questions whose reasoning ran out of tokens.
-    reuse_max_tokens: int | None = None
+    # Reuse a non-empty cached answer made with this lower token limit (or any of these limits,
+    # tried in order), so raising the limit re-asks only the questions whose reasoning ran out of
+    # tokens. A list is needed when the limit is raised twice: answers reused at the middle limit
+    # are cached only under the lowest one.
+    reuse_max_tokens: int | list[int] | None = None
     # Ask the LLM about rows of these sources only; other rows get a uniform guess and are
     # counted as skipped (e.g. Psych-101, which is outside the fork's claim, decision 0001).
     sources: list[str] | None = None
@@ -193,11 +195,15 @@ class LLMPromptBaseline:
         """The raw cached-or-fresh response for one request (used by the paid-call script)."""
         messages = build_messages(question, labels, attrs, self.spec.wording)
         lookup = getattr(self._client, "cached", None)
-        if self.spec.reuse_max_tokens is not None and lookup is not None:
+        reuse = self.spec.reuse_max_tokens
+        limits = [] if reuse is None else [reuse] if isinstance(reuse, int) else list(reuse)
+        for limit in limits:
+            if lookup is None:
+                break
             prior = lookup(
                 self.spec.model,
                 messages,
-                max_tokens=self.spec.reuse_max_tokens,
+                max_tokens=limit,
                 temperature=0.0,
                 **self.spec.extra,
             )
