@@ -28,6 +28,8 @@ class ModelCfg(_Strict):
     dropout: float = 0.1
     use_person: bool = True  # ablation: False removes the person tower's effect
     prior_weight: float = 1.0  # weight of the item-prior-only loss
+    # A1 (fork D): teacher_prior.json with a teacher distribution per question
+    teacher_prior_path: str | None = None
     max_question_tokens: int = 192
     max_attr_tokens: int = 16
     max_attributes: int = 32

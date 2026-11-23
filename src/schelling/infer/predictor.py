@@ -11,6 +11,8 @@ import torch
 from transformers import AutoTokenizer, PretrainedConfig
 
 from schelling.infer.batching import build_tensors, options_of
+from schelling.infer.teacher import FILENAME as TEACHER_FILE
+from schelling.infer.teacher import load_teacher, save_teacher
 from schelling.infer.text import person_text
 from schelling.model import SchellingModel, SchellingTwoTower
 from schelling.schema import Answer, Choice, DecisionRequest, Noul, PersonContext, Score
@@ -42,11 +44,16 @@ class Predictor:
         tokenizer = AutoTokenizer.from_pretrained(
             str(repo_or_path), revision=revision or "main", trust_remote_code=False
         )
+        if isinstance(model, SchellingTwoTower) and getattr(model.config, "teacher_prior", False):
+            model.teacher_table = load_teacher(Path(repo_or_path) / TEACHER_FILE)
         return cls(model, tokenizer)
 
     def save_pretrained(self, path: str | Path) -> None:
         self.model.save_pretrained(str(path), safe_serialization=True)
         self.tokenizer.save_pretrained(str(path))
+        table = getattr(self.model, "teacher_table", None)
+        if table:
+            save_teacher(Path(path) / TEACHER_FILE, table, {"questions": len(table)})
 
     def encode_person(self, person: PersonContext | None) -> PersonEmbedding:
         return PersonEmbedding(person_text(person, getattr(self.model.config, "history_items", 0)))
@@ -58,7 +65,11 @@ class Predictor:
 
     def _tensors(self, task: str, items: list[Item]) -> dict[str, torch.Tensor]:
         return build_tensors(
-            self.tokenizer, self.model.config, task, [(req, q) for _, _, req, q in items]
+            self.tokenizer,
+            self.model.config,
+            task,
+            [(req, q) for _, _, req, q in items],
+            getattr(self.model, "teacher_table", None),
         )
 
     @torch.no_grad()

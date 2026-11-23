@@ -9,6 +9,7 @@ from typing import Any
 
 import torch
 
+from schelling.infer.teacher import teacher_key, teacher_tensors
 from schelling.infer.text import attribute_strings, build_context, build_question_context
 from schelling.schema import Choice, DecisionRequest, Noul, Score
 
@@ -36,7 +37,11 @@ def _options(
 
 
 def _build_two_tower(
-    tokenizer: Any, config: Any, task: str, items: list[tuple[DecisionRequest, Question]]
+    tokenizer: Any,
+    config: Any,
+    task: str,
+    items: list[tuple[DecisionRequest, Question]],
+    teacher: dict[str, list[float]] | None = None,
 ) -> dict[str, torch.Tensor]:
     contexts = [
         build_question_context(req.state, q, tokenizer, config.max_question_tokens)
@@ -68,14 +73,27 @@ def _build_two_tower(
     }
     if task != "noul":
         out.update(_options(tokenizer, config.max_option_tokens, items))
+    if getattr(config, "teacher_prior", False):
+        keys = [teacher_key(task, question_text(q), options_of(q)) for _, q in items]
+        width = 2 if task == "noul" else int(out["option_mask"].shape[1])
+        out.update(teacher_tensors(keys, teacher or {}, width))
     return out
 
 
+def question_text(q: Question) -> str:
+    return q.proposition if isinstance(q, Noul) else q.prompt
+
+
 def build_tensors(
-    tokenizer: Any, config: Any, task: str, items: list[tuple[DecisionRequest, Question]]
+    tokenizer: Any,
+    config: Any,
+    task: str,
+    items: list[tuple[DecisionRequest, Question]],
+    teacher: dict[str, list[float]] | None = None,
 ) -> dict[str, torch.Tensor]:
+    """`teacher`: the A1 question table, used only by two-tower models built with it."""
     if getattr(config, "model_type", "") == "schelling_tt":
-        return _build_two_tower(tokenizer, config, task, items)
+        return _build_two_tower(tokenizer, config, task, items, teacher)
     contexts = [
         build_context(
             req.person, req.state, q, tokenizer, config.max_context_tokens, config.history_items

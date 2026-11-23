@@ -61,7 +61,11 @@ def predict_items(
             tensors = {
                 k: v.to(device)
                 for k, v in build_tensors(
-                    tokenizer, model.config, task, [items[i] for i in chunk]
+                    tokenizer,
+                    model.config,
+                    task,
+                    [items[i] for i in chunk],
+                    getattr(model, "teacher_table", None),
                 ).items()
             }
             with torch.autocast(device.type, dtype=torch.bfloat16, enabled=precision == "bf16"):

@@ -29,8 +29,9 @@ from schelling.data.loader import load_records, partition_frame, select_partitio
 from schelling.data.splits import split_manifest
 from schelling.eval import provenance
 from schelling.infer.baseline_adapter import make_item, person_attributes
-from schelling.infer.batching import options_of
+from schelling.infer.batching import options_of, question_text
 from schelling.infer.predictor import Predictor
+from schelling.infer.teacher import load_teacher, teacher_key
 from schelling.infer.text import attribute_strings, build_question_context
 from schelling.model import SchellingTwoTower, SchellingTwoTowerConfig, calibration
 from schelling.model.heads import score_conditionals
@@ -58,6 +59,10 @@ class CachedData:
     source: np.ndarray
     # (n_question_vectors, n_alt): other wordings of a question, -1 padded, left-aligned
     q_alt: torch.Tensor | None = None
+    # A1: teacher probabilities per distinct question (zero-padded), row -> question, known mask
+    T: torch.Tensor | None = None
+    t_idx: torch.Tensor | None = None
+    t_has: torch.Tensor | None = None
 
     @property
     def n(self) -> int:
@@ -96,6 +101,7 @@ def build_cache(
     device: torch.device,
     paraphrases: ParaphraseStore | None = None,
     n_alt: int = 0,
+    teacher: dict[str, list[float]] | None = None,
 ) -> CachedData:
     cfg = model.config
     first: dict[tuple[str, str, str], tuple[str, str, Any, Any, str]] = {}
@@ -106,6 +112,8 @@ def build_cache(
     person_ix: dict[str, int] = {}
     person_attr: list[list[int]] = []
     q_idx, p_idx, task, y, opts = [], [], [], [], []
+    t_key: dict[str, int] = {}  # teacher key -> row of T
+    t_idx: list[int] = []
     for pid, qtype, text, o, lv, state, resp in zip(
         frame["person_id"],
         frame["qtype"],
@@ -143,6 +151,9 @@ def build_cache(
         task.append(TASK_ID[qtype])
         y.append(int(resp))
         opts.append([o_text.setdefault(t, len(o_text)) for t in options_of(q)])
+        if teacher is not None:
+            tk = teacher_key(qtype, question_text(q), options_of(q))
+            t_idx.append(t_key.setdefault(tk, len(t_key)))
     alt_lists: dict[int, list[int]] = {}
     if paraphrases is not None and n_alt > 0:
         # Other wordings of the question stem only: options, levels and state are unchanged,
@@ -175,6 +186,15 @@ def build_cache(
         if a:
             attr_idx[i, : len(a)] = torch.tensor(a, dtype=torch.long)
     dev = device
+    T = t_has = None
+    if teacher is not None:
+        T = torch.zeros(len(t_key), max(k, 2))
+        t_has = torch.zeros(len(t_key), dtype=torch.bool)
+        for tk, i in t_key.items():
+            pr = teacher.get(tk)
+            if pr is not None and len(pr) <= T.shape[1]:
+                T[i, : len(pr)] = torch.tensor(pr)
+                t_has[i] = True
     return CachedData(
         U=_vectors(model, tokenizer, list(q_text), cfg.max_question_tokens, dev),
         E=_vectors(model, tokenizer, list(o_text), cfg.max_option_tokens, dev),
@@ -188,6 +208,9 @@ def build_cache(
         study=frame["study_id"].to_numpy(),
         source=frame["source"].to_numpy(),
         q_alt=None if q_alt is None else q_alt.to(dev),
+        T=None if T is None else T.to(dev),
+        t_idx=None if teacher is None else torch.tensor(t_idx, dtype=torch.long, device=dev),
+        t_has=None if t_has is None else t_has.to(dev),
     )
 
 
@@ -222,13 +245,18 @@ def _gather(
     oi = oi[:, : max(k, 1)]
     option_mask = oi >= 0
     e = data.E[oi.clamp(min=0)] if data.E.shape[0] else None
-    return {
+    out = {
         "u": u,
         "attr_vecs": attr_vecs,
         "attr_mask": attr_mask,
         "e": e,
         "option_mask": option_mask,
     }
+    if data.T is not None and data.t_idx is not None and data.t_has is not None:
+        ti = data.t_idx[rows]
+        out["teacher_probs"] = data.T[ti][:, : max(k, 2)]
+        out["teacher_has"] = data.t_has[ti]
+    return out
 
 
 def _task_rows(data: CachedData, rows: torch.Tensor) -> dict[str, torch.Tensor]:
@@ -377,6 +405,7 @@ def _build_model(cfg: TrainConfig) -> tuple[SchellingTwoTower, Any]:
         person_heads=m.person_heads,
         dropout=m.dropout,
         use_person=m.use_person,
+        teacher_prior=m.teacher_prior_path is not None,
         max_question_tokens=m.max_question_tokens,
         max_option_tokens=m.max_option_tokens,
         max_attr_tokens=m.max_attr_tokens,
@@ -422,6 +451,9 @@ def _subset(data: CachedData, n: int, seed: int) -> CachedData:
         attr_idx=data.attr_idx,
         study=data.study[keep.cpu().numpy()],
         source=data.source[keep.cpu().numpy()],
+        T=data.T,
+        t_idx=None if data.t_idx is None else data.t_idx[keep],
+        t_has=data.t_has,
     )
 
 
@@ -461,6 +493,12 @@ def _calibrate(model: SchellingTwoTower, data: CachedData) -> dict[str, Any]:
     return res
 
 
+def _known(data: CachedData) -> list[int]:
+    """[questions the teacher table knows, distinct questions]."""
+    assert data.t_has is not None
+    return [int(data.t_has.sum()), int(data.t_has.numel())]
+
+
 def train_cached(cfg: TrainConfig) -> TrainResult:
     t0 = time.time()
     _seed_all(cfg.seed, cfg.deterministic)
@@ -489,6 +527,15 @@ def train_cached(cfg: TrainConfig) -> TrainResult:
 
     model, tokenizer = _build_model(cfg)
     model = model.to(device)  # type: ignore[arg-type]
+    teacher = None
+    if cfg.model.teacher_prior_path:
+        # A1: questions only, never answers; the table ships with the model (teacher_prior.json)
+        teacher = load_teacher(cfg.model.teacher_prior_path)
+        if not teacher:
+            raise FileNotFoundError(
+                f"empty or missing teacher table {cfg.model.teacher_prior_path}"
+            )
+        model.teacher_table = teacher
     store = (
         ParaphraseStore(Path(cfg.data.paraphrase_path), cfg.data.paraphrase_generator)
         if cfg.data.paraphrase_path and cfg.data.paraphrases_per_question > 0
@@ -496,9 +543,9 @@ def train_cached(cfg: TrainConfig) -> TrainResult:
     )
     # Paraphrases touch the training cache only; val is always scored on the original wording.
     train_data = build_cache(
-        model, tokenizer, train_df, attrs, device, store, cfg.data.paraphrases_per_question
+        model, tokenizer, train_df, attrs, device, store, cfg.data.paraphrases_per_question, teacher
     )
-    val_data = build_cache(model, tokenizer, val_df, attrs, device)
+    val_data = build_cache(model, tokenizer, val_df, attrs, device, teacher=teacher)
     model.heads.set_input_stats(train_data.U, train_data.E, train_data.A)
     monitor = _subset(val_data, cfg.eval.max_rows, cfg.seed)
     print(
@@ -572,6 +619,15 @@ def train_cached(cfg: TrainConfig) -> TrainResult:
         "partitions_read": ["train", "val"],
         "n_train_rows": int(train_data.n),
         "n_val_rows": int(val_data.n),
+        "teacher": None
+        if teacher is None
+        else {
+            "path": cfg.model.teacher_prior_path,
+            "table_questions": len(teacher),
+            "train_questions_known": _known(train_data),
+            "val_questions_known": _known(val_data),
+            "weight": [float(w) for w in model.heads.teacher_w.detach().cpu()],
+        },
         "trainable_parameters": int(
             sum(p.numel() for p in model.heads.parameters() if p.requires_grad)
         ),

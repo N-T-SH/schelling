@@ -31,7 +31,10 @@ class SchellingTwoTower(PreTrainedModel):
             config.person_heads,
             config.dropout,
             config.use_person,
+            getattr(config, "teacher_prior", False),
         )
+        # question key -> teacher probabilities (A1); filled from teacher_prior.json on load
+        self.teacher_table: dict[str, list[float]] = {}
         self.use_cache = True  # inference only; ignored while training or with gradients enabled
         self._cache: dict[bytes, torch.Tensor] = {}
         self.post_init()
@@ -102,10 +105,12 @@ class SchellingTwoTower(PreTrainedModel):
         attr_mask: torch.Tensor,
         e: torch.Tensor | None = None,
         option_mask: torch.Tensor | None = None,
+        teacher_probs: torch.Tensor | None = None,
+        teacher_has: torch.Tensor | None = None,
     ) -> TTOut:
         if task not in TASKS:
             raise ValueError(f"task must be one of {TASKS}, got {task!r}")
-        return self.heads(task, u, attr_vecs, attr_mask, e, option_mask)
+        return self.heads(task, u, attr_vecs, attr_mask, e, option_mask, teacher_probs, teacher_has)
 
     def raw_parts(
         self,
@@ -118,6 +123,8 @@ class SchellingTwoTower(PreTrainedModel):
         option_input_ids: torch.Tensor | None = None,
         option_attention_mask: torch.Tensor | None = None,
         option_mask: torch.Tensor | None = None,
+        teacher_probs: torch.Tensor | None = None,
+        teacher_has: torch.Tensor | None = None,
     ) -> TTOut:
         u = self.encode_texts(input_ids, attention_mask)
         attrs = self._encode_grouped(attr_input_ids, attr_attention_mask, attr_mask)
@@ -126,7 +133,7 @@ class SchellingTwoTower(PreTrainedModel):
             if option_input_ids is None or option_attention_mask is None or option_mask is None:
                 raise ValueError(f"{task} needs option tensors")
             e = self._encode_grouped(option_input_ids, option_attention_mask, option_mask)
-        return self.combine(task, u, attrs, attr_mask, e, option_mask)
+        return self.combine(task, u, attrs, attr_mask, e, option_mask, teacher_probs, teacher_has)
 
     def raw(self, task: str, **tensors: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor | None]:
         out = self.raw_parts(task, **tensors)

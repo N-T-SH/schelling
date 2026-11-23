@@ -10,6 +10,8 @@ from dataclasses import dataclass
 import torch
 from torch import nn
 
+from .heads import teacher_offset
+
 
 @dataclass
 class TTOut:
@@ -63,10 +65,22 @@ class PersonEncoder(nn.Module):
 
 class TwoTowerHeads(nn.Module):
     def __init__(
-        self, hidden: int, d: int, person_heads: int, dropout: float, use_person: bool
+        self,
+        hidden: int,
+        d: int,
+        person_heads: int,
+        dropout: float,
+        use_person: bool,
+        use_teacher: bool = False,
     ) -> None:
         super().__init__()
         self.use_person = use_person
+        self.use_teacher = use_teacher
+        if use_teacher:
+            # A1 (fork D): one learned weight per task type (noul, choice, score) on a cached
+            # teacher distribution, added to the item prior in logit form. Starts at 1: the prior
+            # begins as the teacher plus the prior network's own guess.
+            self.teacher_w = nn.Parameter(torch.ones(3))
         self.u_proj, self.e_proj, self.a_proj = (nn.Linear(hidden, d) for _ in range(3))
         self.drop = nn.Dropout(dropout)
         # Per-dimension input statistics. Frozen mean-pooled backbone vectors of different items
@@ -98,6 +112,8 @@ class TwoTowerHeads(nn.Module):
         for m in self.modules():
             if isinstance(m, nn.Linear):
                 m.reset_parameters()
+        if self.use_teacher:
+            nn.init.ones_(self.teacher_w)
         self.zero_residual()
 
     @torch.no_grad()
@@ -127,8 +143,30 @@ class TwoTowerHeads(nn.Module):
         attr_mask: torch.Tensor,
         e: torch.Tensor | None,
         option_mask: torch.Tensor | None,
+        teacher_probs: torch.Tensor | None = None,
+        teacher_has: torch.Tensor | None = None,
     ) -> TTOut:
-        """u (B, H) question vectors; attr_vecs (B, A, H); e (B, K, H) option or level vectors."""
+        """u (B, H) question vectors; attr_vecs (B, A, H); e (B, K, H) option or level vectors.
+        teacher_probs (B, 2) for noul or (B, K) otherwise, used where teacher_has (B,) is True."""
+        out = self._forward(task, u, attr_vecs, attr_mask, e, option_mask)
+        if not self.use_teacher or teacher_probs is None or teacher_has is None:
+            return out
+        w = self.teacher_w[("noul", "choice", "score").index(task)]
+        mask = None if task == "noul" else out.mask
+        off = teacher_offset(task, teacher_probs[:, : 2 if mask is None else mask.shape[1]], mask)
+        has = teacher_has.to(off.dtype)
+        has = has if off.dim() == 1 else has.unsqueeze(-1)
+        return TTOut(out.prior + w * off * has, out.residual, out.mask)
+
+    def _forward(
+        self,
+        task: str,
+        u: torch.Tensor,
+        attr_vecs: torch.Tensor,
+        attr_mask: torch.Tensor,
+        e: torch.Tensor | None,
+        option_mask: torch.Tensor | None,
+    ) -> TTOut:
         u = (u - self.u_mean) / self.u_std
         attr_vecs = (attr_vecs - self.a_mean) / self.a_std
         q = self.drop(self.u_proj(u))

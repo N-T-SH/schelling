@@ -18,6 +18,7 @@ class SchellingTwoTowerConfig(PretrainedConfig):
         person_heads: int = 4,
         dropout: float = 0.1,
         use_person: bool = True,
+        teacher_prior: bool = False,
         temperature_noul: float = 1.0,
         temperature_choice: float = 1.0,
         temperature_score: float = 1.0,
@@ -33,6 +34,8 @@ class SchellingTwoTowerConfig(PretrainedConfig):
         self.person_heads = person_heads
         self.dropout = dropout
         self.use_person = use_person  # ablation: False removes the person tower's effect
+        # A1 (fork D): add a cached teacher distribution to the item prior (teacher_prior.json)
+        self.teacher_prior = teacher_prior
         self.temperature_noul = temperature_noul
         self.temperature_choice = temperature_choice
         self.temperature_score = temperature_score

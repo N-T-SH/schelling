@@ -45,6 +45,28 @@ def score_probs(cond: torch.Tensor) -> torch.Tensor:
     return torch.cat([1 - surv[:, :1], surv[:, :-1] - surv[:, 1:], surv[:, -1:]], dim=-1)
 
 
+def teacher_offset(
+    task: str, probs: torch.Tensor, mask: torch.Tensor | None, floor: float = 1e-6
+) -> torch.Tensor:
+    """A distribution in the logit form of each head, so a head given only this offset returns
+    the distribution itself (A1, fork D).
+
+    noul: probs (B, 2) [p_no, p_yes] -> (B,) log-odds. choice: (B, K) -> (B, K) log-probs.
+    score: (B, L) -> (B, L-1) logit of P(y > k | y >= k) = log S(k+1) - log p(k), where
+    S(k) = P(y >= k); padded thresholds are zero.
+    """
+    p = probs.clamp_min(floor)
+    if task == "noul":
+        return torch.log(p[:, 1]) - torch.log(p[:, 0])
+    assert mask is not None
+    keep = mask.to(probs.dtype)
+    if task == "choice":
+        return torch.log(p) * keep
+    tail = torch.flip(torch.cumsum(torch.flip(probs * keep, [1]), 1), [1])  # S(k)
+    out = torch.log(tail[:, 1:].clamp_min(floor)) - torch.log(p[:, :-1])
+    return out * keep[:, 1:]
+
+
 class NoulHead(nn.Module):
     def __init__(self, dim: int, hidden: int) -> None:
         super().__init__()
