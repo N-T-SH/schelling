@@ -63,4 +63,6 @@ subset, which both arms already do.
 
 ## Results
 
-Not run yet.
+Run 2026-11-24 at e9191c9, all 40 reports clean. Written up in `A1-results.md` (audited). In short:
+A1 passes the rule (interval below 0, all three guards pass), so it becomes the default design for
+unseen questions pending the `heldout_person` check. A1 is not clearly better than the teacher alone.

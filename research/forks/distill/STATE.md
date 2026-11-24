@@ -72,12 +72,11 @@ longer clearly the right primary approach.
    Twin-2K-500 questions, 3 without a parsed reply even at 32,000 tokens. Run one fetch process only.
    **A1 built (2026-11-23):** teacher prior added to the two-tower item prior with a learned weight
    per task type (302371b, 3358148); table `runs/fd-a1/teacher_prior.json` from
-   `scripts/fd_a1_prior.py`. **A1 probe running** (pre-registered in
-   `campaigns/D02-distilled-prior/A1-probe.md`): `scripts/fd_run_a1_folds.sh` from the clean worktree
-   `.claude/worktrees/fd-a1-runs` at e9191c9, A0 and A1 on five item folds by three seeds, val only,
-   one job at a time, about 5 hours; log `runs/fd-a1/driver.log`. Then `scripts/fd_pooled.py` and the
-   write-up below the line in the pre-registration. Do not edit files in that worktree while it runs
-   (provenance would turn dirty).
+   `scripts/fd_a1_prior.py`. **A1 probe done (2026-11-24, e9191c9, clean):** A1 passes the
+   pre-registered rule against A0 on 282 unseen questions, all guards pass; it is not clearly better
+   than the teacher alone. Numbers in `campaigns/D02-distilled-prior/A1-results.md` (audited). Next,
+   once the human agrees: the `heldout_person` no-regression check for A1, then A2 capacity and A3
+   feasibility (D02-OPTIONS step 2).
 
 1. Spend approval for the E3 smoke test and runs (cap), and how to shrink the `heldout_person` persona run.
 2. Which frontier model is E1/E2 and its cap (FA1 to FA3 are checked after you name it).

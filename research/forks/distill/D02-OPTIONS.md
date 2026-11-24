@@ -160,6 +160,8 @@ human's approval.
 
 1. If **A1 beats A0** with the interval excluding 0 and passes the guards (ECE, SD ratio,
    permutation), A1 is the default design.
+   **Result 2026-11-24:** it does, and passes the guards; it is not clearly better than the teacher
+   alone (`campaigns/D02-distilled-prior/A1-results.md`). The `heldout_person` check comes next.
 2. **A2** runs in full (bank, five seeds) only if its capacity check came close to the teacher or A1
    fails (network-free running is not required, step 0). It then has to match A1 to be worth its cost.
 3. **A3** is kept only if it beats A1, or if A1 is ruled out by the contamination probe.
